@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 use App\Models\User;
 
@@ -11,6 +12,11 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
+    // JUST AUTHENTICATED USERS
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     public function index()
     {
         return view('profile.index', [
@@ -40,7 +46,12 @@ class UserController extends Controller
     public function show($id)
     {
         $user = User::find($id);
-        return view('layouts.profile.show', ['user' => $user]);
+
+        if ($user && Auth::user()->id === $user->id) {
+            return view('layouts.profile.show', ['user' => $user]);
+        } else {
+            return redirect()->route('home')->with('error', 'Você não tem permissão para acessar este perfil.');
+        }
     }
 
     /**
