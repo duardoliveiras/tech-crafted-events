@@ -29,8 +29,8 @@ class User extends Authenticatable
         'email',
         'password',
         'phone',
-        'isdeleted',
-        'isbanned',
+        'isDeleted',
+        'isBanned',
 
     ];
 
