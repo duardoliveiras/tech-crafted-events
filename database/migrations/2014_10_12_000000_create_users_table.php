@@ -18,6 +18,8 @@ return new class extends Migration
             $table->date('birthdate')->nullable();
             $table->char('phone', 15)->nullable();
             $table->timestamp('email_verified_at')->nullable();
+            $table->boolean('isBanned')->default(false);
+            $table->boolean('isDeleted')->default(false);
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();

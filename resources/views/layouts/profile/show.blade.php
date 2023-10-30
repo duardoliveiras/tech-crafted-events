@@ -6,14 +6,19 @@
         <div class="col-md-6 offset-md-3">
             <div class="card">
                 <div class="card-header">
-                    <h4>Perfil do Usuário</h4>
+                    <h4>User profile</h4>
                 </div>
                 <div class="card-body">
-                    <p><strong>Nome:</strong> {{ $user->name }}</p>
+                    <p><strong>Name:</strong> {{ $user->name }}</p>
                     <p><strong>E-mail:</strong> {{ $user->email }}</p>
-                    <p><strong>Data de Nascimento:</strong> {{ $user->birthdate }}</p>
-                    <p><strong>Telefone:</strong> {{ $user->phone }}</p>
-                    <a class="btn btn-primary">Editar Perfil</a>
+                    <p><strong>Birthdate:</strong> {{ $user->birthdate }}</p>
+                    <p><strong>Phone number:</strong> {{ $user->phone }}</p>
+                    <a class="btn btn-primary" href="{{route('profile.edit', ['profile' => Auth::user()->id])}}">Edit profile</a>
+                    <form class="d-inline" action="{{ route('profile.destroy', Auth::user()->id) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger">Delete Account</button>
+                    </form>
                 </div>
             </div>
         </div>
