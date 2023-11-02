@@ -29,7 +29,7 @@ class LoginController extends Controller
     {
         return array_merge(
             $request->only($this->username(), 'password'),
-            ['isDeleted' => false] // Garante que apenas usuários não deletados possam fazer login
+            ['is_deleted' => false] // Garante que apenas usuários não deletados possam fazer login
         );
     }
 

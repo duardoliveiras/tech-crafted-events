@@ -9,6 +9,7 @@ DROP TABLE IF EXISTS Discussion CASCADE;
 DROP TABLE IF EXISTS EventOrganizer CASCADE;
 DROP TABLE IF EXISTS Admin CASCADE;
 DROP TABLE IF EXISTS Notification CASCADE;
+DROP TYPE IF EXISTS NotificationType;
 DROP TABLE IF EXISTS Users CASCADE;
 DROP TABLE IF EXISTS University CASCADE;
 DROP TABLE IF EXISTS Event CASCADE;
@@ -73,8 +74,8 @@ CREATE TABLE Users
     birthDate     DATE         NOT NULL,
     university_id INT          NOT NULL,
     FOREIGN KEY (university_id) REFERENCES University (id),
-    isBanned      BOOLEAN DEFAULT FALSE,
-    isDeleted     BOOLEAN DEFAULT FALSE
+    is_banned      BOOLEAN DEFAULT FALSE,
+    is_deleted     BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE EventOrganizer
@@ -99,8 +100,8 @@ CREATE TABLE Event
     address           VARCHAR(255)   NOT NULL,
     category_id       INT            NOT NULL,
     city_id           INT            NOT NULL,
-    owner_id           INT            NOT NULL,
-    FOREIGN KEY (ownerId) REFERENCES EventOrganizer (id),
+    owner_id          INT            NOT NULL,
+    FOREIGN KEY (owner_id) REFERENCES EventOrganizer (id),
     FOREIGN KEY (category_id) REFERENCES Category (id),
     FOREIGN KEY (city_id) REFERENCES City (id)
 );
@@ -202,10 +203,10 @@ VALUES (1, 'University of California, Los Angeles', '405 Hilgard Ave', 1),
        (4, 'Universidade do Porto', 'Praça de Gomes Teixeira', 5);
 
 
-INSERT INTO Users (id, name, phone, email, password, birthDate, university_id, isBanned, isDeleted)
-VALUES (1, 'John Doe', '+1 456-7890', 'john.doe@example.com', '902fab49244e61e09d9568aedebc84daa1da7b2a', '1990-03-15',
+INSERT INTO Users (id, name, phone, email, password, birthDate, university_id, is_banned, is_deleted)
+VALUES (1, 'Tiririca', '+55 77997890', 'tiririca@gmail.com', '902fab49244e61e09d9568aedebc84daa1da7b2a', '1990-03-15',
         1, false, false),
-       (2, 'Jane Smith', '+1 654-3210', 'jane.smith@example.com', '3dbd406aad81722b7311188ab5600ea0239f7965',
+       (2, 'Manoel Gomes', '+1 654-3210', 'caneta-azul@azul-caneta.com', '3dbd406aad81722b7311188ab5600ea0239f7965',
         '1988-08-20', 2, false, false);
 
 INSERT INTO eventorganizer (id, legalid, user_id)
