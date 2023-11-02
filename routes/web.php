@@ -1,22 +1,11 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
-
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\EventController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserController;
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
+use Illuminate\Support\Facades\Route;
 
 // Home
 Route::redirect('/', '/home');
@@ -33,12 +22,12 @@ Route::controller(RegisterController::class)->group(function () {
     Route::post('/register', 'register');
 });
 
-Auth::routes();
+\Illuminate\Support\Facades\Auth::routes();
 
 // Home
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 // User
+Route::resource('profile', UserController::class);
 
-Route::resource('profile',UserController::class);
+Route::resource('events', EventController::class);
