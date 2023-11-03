@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Vote extends Model
 {
     protected $fillable = ['voteType', 'votedAt', 'user_id', 'comment_id'];
+    protected $keyType = 'string';
 
     public function user()
     {

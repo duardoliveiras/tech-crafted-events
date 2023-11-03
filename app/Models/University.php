@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class University extends Model
 {
     protected $table = 'university';
+    protected $keyType = 'string';
 
     protected $fillable = ['name', 'address', 'city_id'];
 
