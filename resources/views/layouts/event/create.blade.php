@@ -99,6 +99,5 @@
                 {{ session('success') }}
             </div>
         @endif
-        </div>
 
 @endsection
