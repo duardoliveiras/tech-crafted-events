@@ -9,6 +9,7 @@ class Country extends Model
 {
     use HasFactory;
     protected $table = 'country';
+    protected $keyType = 'string';
     protected $fillable = ['name', 'initials'];
     public function states()
     {

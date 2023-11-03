@@ -10,6 +10,7 @@ class Admin extends Model
     use HasFactory;
 
     protected $table = 'admin';
+    protected $keyType = 'string';
 
     public function user(){
         return $this->belongsTo('App\Models\User');

@@ -30,10 +30,10 @@ class EventController extends Controller
 
         $query = Event::query();
 
-        if ($eventType && is_numeric($eventType)) {
+        if ($eventType) {
             $query->where('category_id', $eventType);
         }
-        if ($location && is_numeric($location)) {
+        if ($location) {
             $query->where('city_id', $location);
         }
         if ($dateFilter) {
