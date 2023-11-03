@@ -1,11 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
-@php
-    $hasLegalId = true;
- @endphp
-    <div class="container">
-        <h1>Create New Event</h1>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">Create New Event</div>
+                    <div class="card-body">
 
         @if ($errors->any())
             <div class="alert alert-danger">
@@ -78,19 +80,25 @@
                 <input type="text" class="form-control" id="address" name="address" required>
             </div>
 
-            <div class="form-group">
-                <label for="legalid">Identificador Legal:</label>
-                <input type="text" id="legalid" name="legalid"  class="form-control" required>
-            </div>
-
+            @if(!$hasLegalId)
+                <div class="form-group">
+                    <label for="legalid">Legal ID:</label>
+                    <input type="text" class="form-control" id="legalid" name="legalid" placeholder="Enter your legal ID">
+                </div>
+            @endif
 
             <button type="submit" class="btn btn-primary">Create Event</button>
         </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
         @if(session('success'))
             <div class="alert alert-success">
                 {{ session('success') }}
             </div>
         @endif
-    </div>
+        </div>
 
 @endsection

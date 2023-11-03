@@ -34,9 +34,10 @@ class EventController extends Controller
     {
         $category = Category::all();
         $city = City::all();
+        $eventOrganizer = EventOrganizer::where('user_id', Auth::id())->first();
+        $hasLegalId = $eventOrganizer && !is_null($eventOrganizer->legalid);
 
-
-        return view('layouts.event.create', compact('category', 'city'));
+        return view('layouts.event.create', compact('category', 'city', 'hasLegalId'));
     }
 
     public function store(Request $request)
