@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-100">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -16,15 +16,15 @@
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
-<body>
+<body class="d-flex flex-column h-100">
 <div id="app">
     @include('partials.navbar')
 
-    <main class="py-4">
+    <main class="flex-shrink-0 py-4">
         @yield('content')
     </main>
 
-    <footer class="text-white text-center text-lg-start"
+    <footer class="text-white text-center text-lg-start mt-auto"
             style="background-color: #10107B !important;">
         <div class="container pt-5">
             <div class="row mt-2">

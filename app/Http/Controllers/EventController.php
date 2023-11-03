@@ -120,6 +120,52 @@ class EventController extends Controller
         }
 
     }
+    public function edit($id)
+    {
+        $event = Event::findOrFail($id);
+
+        $this->authorize('update', $event);
+
+        $category = Category::all();
+        $city = City::all();
+
+        return view('layouts.event.edit', compact('event', 'category', 'city'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $event = Event::findOrFail($id);
+
+        $this->authorize('update', $event);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'startdate' => 'required|date',
+            'category_id' => 'required|exists:category,id',
+            'enddate' => 'required|date',
+            'city_id' => 'required|exists:city,id',
+            'startticketsqty' => 'required|integer',
+            'currentticketsqty' => 'required|integer',
+            'currentprice' => 'required|numeric',
+            'address' => 'required|string|max:255',
+        ]);
+
+        $event->update($request->all());
+
+        return redirect()->route('events.show', $event->id)->with('success', 'Event updated successfully!');
+    }
+
+    public function destroy($id)
+    {
+        $event = Event::findOrFail($id);
+
+        $this->authorize('delete', $event);
+
+        $event->delete();
+
+        return redirect()->route('events.index')->with('success', 'Event deleted successfully.');
+    }
 
 
 }
