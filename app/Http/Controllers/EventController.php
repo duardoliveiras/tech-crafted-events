@@ -6,6 +6,7 @@ use App\Models\Event;
 use App\Models\Category;
 use App\Models\City;
 use App\Models\EventOrganizer;
+use App\Models\University;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -17,10 +18,35 @@ class EventController extends Controller
         $this->middleware('auth')->except(['index', 'show']);
     }
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $events = Event::all();
-        return view('layouts.event.list', ['events' => $events]);
+        $categories = Category::all();
+        $locations = City::all();
+        $universities = University::all();
+
+        $eventType = $request->query('eventType');
+        $location = $request->query('location');
+        $dateFilter = $request->query('date-filter');
+
+        $query = Event::query();
+
+        if ($eventType && is_numeric($eventType)) {
+            $query->where('category_id', $eventType);
+        }
+        if ($location && is_numeric($location)) {
+            $query->where('city_id', $location);
+        }
+        if ($dateFilter) {
+            $query->where('startdate', $dateFilter);
+        }
+
+        $events = $query->get();
+
+        return view('layouts.event.list', [
+            'events' => $events,
+            'universities' => $universities,
+            'eventTypes' => $categories,
+            'locations' => $locations]);
     }
 
     public function show($id): View
@@ -59,12 +85,12 @@ class EventController extends Controller
 
 
         $eventOrganizer = EventOrganizer::firstOrCreate([
-            'user_id' => Auth::id(), // Usuário atualmente autenticado
+            'user_id' => Auth::id(),
         ], [
-            'legalid' => $request->input('legalid'), // O campo legalid vindo do formulário
+            'legalid' => $request->input('legalid'),
         ]);
 
-        // Caso o legal_id seja necessário e não esteja presente, retorne com erro
+
         if (!$eventOrganizer->legalid) {
             return redirect()->back()->withInput()->withErrors([
                 'legalid' => 'O campo Identificador Legal é obrigatório.'

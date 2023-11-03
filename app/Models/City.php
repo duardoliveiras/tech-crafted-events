@@ -25,4 +25,9 @@ class City extends Model
         return $this->hasMany(Event::class);
     }
 
+
+    public function universities()
+    {
+        return $this->hasMany(University::class);
+    }
 }
