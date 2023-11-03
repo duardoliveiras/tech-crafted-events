@@ -24,10 +24,11 @@ class Event extends Model
         'city_id',
         'owner_id'
     ];
+    public $timestamps = false;
 
     public function category()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(Category::class, 'category_id');
     }
 
     public function city()
@@ -37,6 +38,6 @@ class Event extends Model
 
     public function owner()
     {
-        return $this->belongsTo(User::class, 'owner_id');
+        return $this->belongsTo(EventOrganizer::class, 'owner_id');
     }
 }

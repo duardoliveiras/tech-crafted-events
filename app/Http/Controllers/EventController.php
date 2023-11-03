@@ -2,17 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Event;
 use App\Models\Category;
 use App\Models\City;
-use App\Models\Event;
+use App\Models\EventOrganizer;
 use App\Models\University;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class EventController extends Controller
 {
     public function __construct()
     {
+        $this->middleware('auth')->except(['index', 'show']);
     }
 
     public function index(Request $request): View
@@ -55,11 +58,67 @@ class EventController extends Controller
 
     public function create()
     {
+        $category = Category::all();
+        $city = City::all();
+        $eventOrganizer = EventOrganizer::where('user_id', Auth::id())->first();
+        $hasLegalId = $eventOrganizer && !is_null($eventOrganizer->legalid);
 
+        return view('layouts.event.create', compact('category', 'city', 'hasLegalId'));
     }
 
     public function store(Request $request)
     {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'startdate' => 'required|date',
+            'category_id' => 'required|exists:category,id',
+            'enddate' => 'required|date',
+            'city_id' => 'required|exists:city,id',
+            'startticketsqty' => 'required|integer',
+            'currentticketsqty' => 'required|integer',
+            'currentprice' => 'required|numeric',
+            'address' => 'required|string|max:255',
+        ]);
+
+
+
+
+        $eventOrganizer = EventOrganizer::firstOrCreate([
+            'user_id' => Auth::id(),
+        ], [
+            'legalid' => $request->input('legalid'),
+        ]);
+
+
+        if (!$eventOrganizer->legalid) {
+            return redirect()->back()->withInput()->withErrors([
+                'legalid' => 'O campo Identificador Legal é obrigatório.'
+            ]);
+        }
+
+
+        $event = new Event([
+            'name' => $request->name,
+            'description' => $request->description,
+            'startdate' => $request->startdate,
+            'category_id' => $request->category_id,
+            'enddate' => $request->enddate,
+            'startticketsqty' => $request->startticketsqty,
+            'currentticketsqty' => $request->currentticketsqty,
+            'currentprice' => $request->currentprice,
+            'address' => $request->address,
+            'city_id' => $request->city_id,
+            'owner_id' => $eventOrganizer-> id,
+
+        ]);
+        if ($event->save()) {
+            return redirect()->route('events.index')->with('success', 'Event created successfully.');
+        } else {
+
+            return redirect()->back()->withInput()->withErrors(['msg' => 'Error saving the event.']);
+        }
+
     }
 
 
