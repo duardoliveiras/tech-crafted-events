@@ -8,8 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class EventOrganizer extends Model
 {
     use HasFactory;
+
+    protected $table = 'eventorganizer';
+
+    public $timestamps = false;
     protected $fillable = [
-        'legal_id',
+        'legalid',
         'user_id',
     ];
 

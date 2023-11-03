@@ -1,7 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
-
+@php
+    $hasLegalId = true;
+ @endphp
     <div class="container">
         <h1>Create New Event</h1>
 
@@ -23,6 +25,15 @@
                 <label for="name">Event Name:</label>
                 <input type="text" class="form-control" id="name" name="name" required>
             </div>
+            <div class="form-group">
+                <label for="category_id">Category</label>
+                <select class="form-control" id="category_id" name="category_id">
+                    <option value="">Select a Category</option>
+                    @foreach ($category as $category)
+                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                    @endforeach
+                </select>
+            </div>
 
             <div class="form-group">
                 <label for="description">Description:</label>
@@ -38,7 +49,15 @@
                 <label for="enddate">End Date:</label>
                 <input type="datetime-local" class="form-control" id="enddate" name="enddate" required>
             </div>
-
+            <div class="form-group">
+                <label for="city">City</label>
+                <select class="form-control" id="city_id" name="city_id">
+                    <option value="">Select a Category</option>
+                    @foreach ($city as $city)
+                        <option value="{{ $city->id }}">{{ $city->name }}</option>
+                    @endforeach
+                </select>
+            </div>
             <div class="form-group">
                 <label for="startticketsqty">Start Tickets Quantity:</label>
                 <input type="number" class="form-control" id="startticketsqty" name="startticketsqty" required>
@@ -59,8 +78,19 @@
                 <input type="text" class="form-control" id="address" name="address" required>
             </div>
 
+            <div class="form-group">
+                <label for="legalid">Identificador Legal:</label>
+                <input type="text" id="legalid" name="legalid"  class="form-control" required>
+            </div>
+
+
             <button type="submit" class="btn btn-primary">Create Event</button>
         </form>
+        @if(session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
     </div>
 
 @endsection
