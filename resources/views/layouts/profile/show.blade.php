@@ -17,7 +17,7 @@
                     <form class="d-inline" action="{{ route('profile.destroy', Auth::user()->id) }}" method="POST">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-danger">Delete Account</button>
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Do still want to cancel this account? You cannot undo this action. ')">Delete Account</button>
                     </form>
                 </div>
             </div>

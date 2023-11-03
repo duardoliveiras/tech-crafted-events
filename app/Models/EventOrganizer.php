@@ -10,6 +10,7 @@ class EventOrganizer extends Model
     use HasFactory;
 
     protected $table = 'eventorganizer';
+    protected $keyType = 'string';
 
     public $timestamps = false;
     protected $fillable = [
