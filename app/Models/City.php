@@ -9,6 +9,7 @@ class City extends Model
 {
     use HasFactory;
     protected $table = 'city';
+    protected $keyType = 'string';
 
     protected $fillable = [
         'name',

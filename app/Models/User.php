@@ -33,6 +33,7 @@ class User extends Authenticatable
         'is_banned',
         'university_id'
     ];
+    protected $keyType = 'string';
 
 
     /**
