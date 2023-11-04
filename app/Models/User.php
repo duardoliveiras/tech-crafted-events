@@ -17,6 +17,8 @@ class User extends Authenticatable
 
     // Don't add create and update timestamps in database.
     public $timestamps = false;
+    protected $table = 'users';
+    protected $keyType = 'string';
 
     /**
      * The attributes that are mass assignable.
@@ -33,7 +35,6 @@ class User extends Authenticatable
         'is_banned',
         'university_id'
     ];
-    protected $keyType = 'string';
 
 
     /**
@@ -56,13 +57,24 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function events()
+    public function event()
     {
         return $this->hasMany(Event::class, 'owner_id', 'id');
     }
-    public function tickets()
+    public function ticket()
     {
         return $this->hasMany(Ticket::class);
     }
+
+    public function admin()
+    {
+        return $this->hasOne(Admin::class);
+    }
+
+    public function isAdmin()
+    {
+        return $this->admin()->exists();
+    }
+
 
 }

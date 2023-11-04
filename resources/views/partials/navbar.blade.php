@@ -5,6 +5,9 @@
         <div class="d-flex container align-items-center" id="navbarSupportedContent">
             <div class="container text-center" id="central">
                 <ul class="navbar-nav d-flex justify-content-center gap-4">
+                    @if(Auth::user() && Auth::user()->isAdmin())
+                        <li class="nav-item"><a class="nav-link" href="{{ route('admin.dashboard') }}">Admin Dashboard</a></li>
+                    @endif
                     <li class="nav-item"><a class="nav-link" href="/home">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="/events">Events</a></li>
                     <li class="nav-item"><a class="nav-link" href="/about">About us</a></li>

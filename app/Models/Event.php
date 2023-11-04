@@ -48,7 +48,7 @@ class Event extends Model
 
     public function ticket()
     {
-        return $this->hasMany(Ticket::class, 'event_id');
+        return $this->hasMany(Ticket::class);
     }
     public function discussion()
     {

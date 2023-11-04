@@ -38,11 +38,7 @@ class EventPolicy
      */
     public function update(User $user, Event $event): bool
     {
-        if ($event->owner) {
-            return $event->owner->user_id === $user->id;
-        }
-
-        return false;
+        return $user->isAdmin() || $event->owner->user_id === $user->id;
     }
 
     /**
@@ -50,10 +46,7 @@ class EventPolicy
      */
     public function delete(User $user, Event $event): bool
     {
-        if ($event->owner) {
-            return $event->owner->user_id === $user->id;
-        }
-        return false;
+        return $user->isAdmin() || $event->owner->user_id === $user->id;
     }
 
     /**

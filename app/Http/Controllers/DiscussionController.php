@@ -13,7 +13,7 @@ class DiscussionController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('has.ticket')->only('show');
+        $this->middleware('acess.ticket')->only('show');
     }
     public function index()
     {
@@ -41,7 +41,7 @@ class DiscussionController extends Controller
      */
     public function show($eventId)
     {
-        $event = Event::with('discussion')->findOrFail($eventId);
+        $event = Event::with('discussion', 'ticket')->findOrFail($eventId);
         $user = auth()->user();
         $discussion = $event->discussion;
         if (!$event->discussion) {
@@ -51,7 +51,7 @@ class DiscussionController extends Controller
         $userHasTicket = $event->ticket->contains('user_id', $user->id);
         $isOrganizer = $event->owner->id == $user->id;
 
-        if (!$userHasTicket && !$isOrganizer) {
+        if (!($userHasTicket || $isOrganizer || $user->isAdmin())) {
             abort(403, 'You do not have access to this discussion.');
         }
 
