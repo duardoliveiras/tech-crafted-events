@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\EnsureUserHasAccessOrIsAdmin;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -48,7 +49,8 @@ class Kernel extends HttpKernel
     protected $routeMiddleware = [
 
         'auth' => \App\Http\Middleware\Authenticate::class,
-        'has.ticket' => \App\Http\Middleware\EnsureUserHasTicket::class,
+        'acess.ticket' => EnsureUserHasAccessOrIsAdmin::class,
+        'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
     ];
 
     /**

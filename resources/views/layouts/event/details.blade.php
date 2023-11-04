@@ -24,15 +24,16 @@
                     @php
                         $userHasTicket = $event->ticket->contains('user_id', auth()->id());
                         $ticketsAvailable = $event->currentticketsqty > 0;
+                        $isOwnerOrAdmin = auth()->user()->isAdmin() || auth()->id() === $event->owner_id;
                     @endphp
                     @if(!$userHasTicket && $ticketsAvailable)
                         <a href="{{ route('ticket.buy', ['event' => $event->id]) }}" class="btn btn-success mt-3">Buy Ticket</a>
                     @endif
-                    @if($userHasTicket)
+                    @if($userHasTicket || $isOwnerOrAdmin)
                         <a href="{{ route('discussion.show', ['event' => $event->id]) }}" class="btn btn-primary mt-3">Access Discussion</a>
                     @endif
                 @endif
-                @if(auth()->id() === $event->owner->user_id)
+                @if(auth()->user()->isAdmin() || auth()->id() === $event->owner->user_id)
                     <a href="{{ route('events.edit', $event->id) }}" class="btn btn-primary mt-3">Edit Event</a>
                     <form action="{{ route('events.destroy', $event->id) }}" method="POST" class="d-inline">
                         @csrf
