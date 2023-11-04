@@ -27,6 +27,9 @@ class Event extends Model
         'owner_id'
     ];
     public $timestamps = false;
+    protected $casts = [
+        'currentprice' => 'float',
+    ];
 
     public function category()
     {
@@ -41,5 +44,24 @@ class Event extends Model
     public function owner()
     {
         return $this->belongsTo(EventOrganizer::class, 'owner_id');
+    }
+
+    public function ticket()
+    {
+        return $this->hasMany(Ticket::class, 'event_id');
+    }
+    public function discussion()
+    {
+        return $this->hasOne(Discussion::class);
+    }
+
+    protected static function booted()
+    {
+        static::created(function ($event) {
+            Discussion::create([
+                'event_id' => $event->id,
+
+            ]);
+        });
     }
 }
