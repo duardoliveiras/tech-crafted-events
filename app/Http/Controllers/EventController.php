@@ -51,8 +51,9 @@ class EventController extends Controller
 
     public function show($id): View
     {
-        $event = Event::find($id);
-        return view('layouts.event.details', compact('event'));
+        $event = Event::with('ticket')->findOrFail($id);
+        $userHasTicket = $event->ticket->contains('user_id', auth()->id());
+        return view('layouts.event.details', compact('event','userHasTicket'));
     }
 
 
