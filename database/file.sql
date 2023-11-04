@@ -218,6 +218,13 @@ INSERT INTO eventorganizer (id, legalid, user_id)
 VALUES (uuid_generate_v4(), '123456', (SELECT id FROM Users WHERE name = 'Tiririca')),
        (uuid_generate_v4(), '125656', (SELECT id FROM Users WHERE name = 'Manoel Gomes'));
 
+INSERT INTO Users (id, name, phone, email, password, birthDate, university_id, is_banned, is_deleted)
+VALUES (uuid_generate_v4(), 'tiririca pior que ta nao fica', '+55 99997890', 'admin@gmail.com', '$2y$10$/cAIN8kgiGZR3jDakznSreoEZYQ6NNXnfEAUPEeWmgB9gd3.IdKaG',
+        '1990-03-15',
+        (SELECT id FROM University WHERE name = 'University of California, Los Angeles'), false, false);
+INSERT INTO admin (id, user_id)
+VALUES (uuid_generate_v4(), (SELECT id FROM Users WHERE name = 'tiririca pior que ta nao fica'));
+
 insert into event (id, name, description, startdate, enddate, startticketsqty, currentticketsqty, currentprice, address,
                    category_id, city_id, owner_id)
 values (uuid_generate_v4(), 'Music Festival', 'A three-day music extravaganza', '2023-09-27', '2023-09-30', 1000, 750,
