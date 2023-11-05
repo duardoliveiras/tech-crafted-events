@@ -76,5 +76,10 @@ class User extends Authenticatable
         return $this->admin()->exists();
     }
 
+    public function eventOrganizer()
+    {
+        return $this->hasMany(EventOrganizer::class, 'user_id');
+    }
+
 
 }

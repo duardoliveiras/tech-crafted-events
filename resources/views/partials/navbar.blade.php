@@ -34,8 +34,8 @@
                             {{ Auth::user()->name }}
                         </a>
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item">My events</a>
                             @auth
+                                <a class="dropdown-item" href="{{route('myevents.index')}}">My events</a>
                                 <a class="dropdown-item" href="{{ route('profile.show', ['profile' => Auth::user()->id]) }}">Profile</a>
                             @endauth
                             <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
@@ -51,3 +51,4 @@
         </div>
     </div>
 </nav>
+

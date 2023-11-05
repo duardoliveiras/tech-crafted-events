@@ -7,9 +7,15 @@ use App\Models\Category;
 use App\Models\City;
 use App\Models\EventOrganizer;
 use App\Models\University;
+use App\Models\Discussion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Storage;
+
 
 class EventController extends Controller
 {
@@ -52,8 +58,13 @@ class EventController extends Controller
     public function show($id): View
     {
         $event = Event::with('ticket')->findOrFail($id);
-        $userHasTicket = $event->ticket->contains('user_id', auth()->id());
-        return view('layouts.event.details', compact('event','userHasTicket'));
+        $userHasTicket = false;
+
+        if (auth()->check()) {
+            $userHasTicket = $event->ticket->contains('user_id', auth()->id());
+        }
+
+        return view('layouts.event.details', compact('event', 'userHasTicket'));
     }
 
 
@@ -77,9 +88,9 @@ class EventController extends Controller
             'enddate' => 'required|date',
             'city_id' => 'required|exists:city,id',
             'startticketsqty' => 'required|integer',
-            'currentticketsqty' => 'required|integer',
             'currentprice' => 'required|numeric',
             'address' => 'required|string|max:255',
+            'image_url' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
 
@@ -99,6 +110,7 @@ class EventController extends Controller
         }
 
 
+
         $event = new Event([
             'name' => $request->name,
             'description' => $request->description,
@@ -106,13 +118,29 @@ class EventController extends Controller
             'category_id' => $request->category_id,
             'enddate' => $request->enddate,
             'startticketsqty' => $request->startticketsqty,
-            'currentticketsqty' => $request->currentticketsqty,
+            'currentticketsqty' => $request->startticketsqty,
             'currentprice' => $request->currentprice,
             'address' => $request->address,
             'city_id' => $request->city_id,
             'owner_id' => $eventOrganizer-> id,
 
+
         ]);
+
+        if ($request->hasFile('image_url')) {
+            $imageFile = $request->file('image_url');
+            $image = Image::make($imageFile);
+
+            $image->resize(null, 200, function ($constraint) {
+                $constraint->aspectRatio();
+            })->resizeCanvas(200, 200, 'center', false, 'ffffff');
+
+            $imagePath = 'events/' . $imageFile->hashName();
+            Storage::disk('public')->put($imagePath, (string) $image->encode());
+
+            $event->image_url = $imagePath;
+        }
+
         if ($event->save()) {
             return redirect()->route('events.index')->with('success', 'Event created successfully.');
         } else {
@@ -150,7 +178,12 @@ class EventController extends Controller
             'currentticketsqty' => 'required|integer',
             'currentprice' => 'required|numeric',
             'address' => 'required|string|max:255',
+            'image_url' => 'sometimes|image|max:2048',
         ]);
+        if ($request->hasFile('image:url')) {
+            $imagePath = $request->file('image_url')->store('events', 'public');
+
+        }
 
         $event->update($request->all());
 
@@ -160,13 +193,26 @@ class EventController extends Controller
     public function destroy($id)
     {
         $event = Event::findOrFail($id);
+        \Log::info("Attempting to delete event: Event ID {$id} - Event Owner ID: {$event->owner_id}");
 
         $this->authorize('delete', $event);
 
-        $event->delete();
+        DB::beginTransaction();
 
-        return redirect()->route('events.index')->with('success', 'Event deleted successfully.');
+        try {
+            Discussion::where('event_id', $id)->delete();
+
+            $event->delete();
+
+            DB::commit();
+
+            return redirect()->route('events.index')->with('success', 'Event deleted successfully.');
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            return redirect()->route('events.index')->with('error', 'Error deleting event');
+        }
+
     }
-
-
 }
