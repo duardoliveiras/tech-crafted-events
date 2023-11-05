@@ -24,7 +24,9 @@ class Event extends Model
         'address',
         'category_id',
         'city_id',
-        'owner_id'
+        'owner_id',
+        'image_url',
+
     ];
     public $timestamps = false;
     protected $casts = [

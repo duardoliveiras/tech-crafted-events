@@ -101,6 +101,7 @@ CREATE TABLE Event
     currentTicketsQty INT            NOT NULL,
     currentPrice      DECIMAL(10, 2) NOT NULL,
     address           VARCHAR(255)   NOT NULL,
+    image_url         VARCHAR(255)   NOT NULL,
     category_id       UUID            NOT NULL,
     city_id           UUID            NOT NULL,
     owner_id          UUID            NOT NULL,
@@ -225,65 +226,7 @@ VALUES (uuid_generate_v4(), 'tiririca pior que ta nao fica', '+55 99997890', 'ad
 INSERT INTO admin (id, user_id)
 VALUES (uuid_generate_v4(), (SELECT id FROM Users WHERE name = 'tiririca pior que ta nao fica'));
 
-insert into event (id, name, description, startdate, enddate, startticketsqty, currentticketsqty, currentprice, address,
-                   category_id, city_id, owner_id)
-values (uuid_generate_v4(), 'Music Festival', 'A three-day music extravaganza', '2023-09-27', '2023-09-30', 1000, 750,
-        75.00, '123 Main St, Cityville', (SELECT id FROM Category WHERE name = 'Concerts'),
-        (SELECT id FROM City WHERE name = 'Los Angeles'), (SELECT id FROM eventorganizer WHERE legalid = '123456'));
 
-insert into event (id, name, description, startdate, enddate, startticketsqty, currentticketsqty, currentprice, address,
-                   category_id, city_id, owner_id)
-values (uuid_generate_v4(), 'Art Exhibition', 'Featuring local artists', '2023-09-11', '2023-09-16', 500, 400, 28.50,
-        '456 Elm St, Townsville', (SELECT id FROM Category WHERE name = 'Sports'),
-        (SELECT id FROM City WHERE name = 'New York City'), (SELECT id FROM eventorganizer WHERE legalid = '123456'));
-
-insert into event (id, name, description, startdate, enddate, startticketsqty, currentticketsqty, currentprice, address,
-                   category_id, city_id, owner_id)
-values (uuid_generate_v4(), 'Sports Event', 'Soccer championship', '2023-02-18', '2023-02-22', 1000, 850, 59.99,
-        '789 Oak St, Sports City', (SELECT id FROM Category WHERE name = 'Sports'),
-        (SELECT id FROM City WHERE name = 'Toronto'), (SELECT id FROM eventorganizer WHERE legalid = '125656'));
-
-insert into event (id, name, description, startdate, enddate, startticketsqty, currentticketsqty, currentprice, address,
-                   category_id, city_id, owner_id)
-values (uuid_generate_v4(), 'Food Festival', 'A culinary delight', '2023-04-19', '2023-04-23', 800, 700, 80.50,
-        '567 Pine St, Foodtown', (SELECT id FROM Category WHERE name = 'Concerts'),
-        (SELECT id FROM City WHERE name = 'São Paulo'), (SELECT id FROM eventorganizer WHERE legalid = '123456'));
-
-insert into event (id, name, description, startdate, enddate, startticketsqty, currentticketsqty, currentprice, address,
-                   category_id, city_id, owner_id)
-values (uuid_generate_v4(), 'Tech Conference', 'Innovation and technology', '2023-09-27', '2023-09-30', 500, 450, 60.00,
-        '345 Cedar St, Techville', (SELECT id FROM Category WHERE name = 'Conferences'),
-        (SELECT id FROM City WHERE name = 'Porto'), (SELECT id FROM eventorganizer WHERE legalid = '125656'));
-
-insert into event (id, name, description, startdate, enddate, startticketsqty, currentticketsqty, currentprice, address,
-                   category_id, city_id, owner_id)
-values (uuid_generate_v4(), 'Comedy Show', 'Laughs and entertainment', '2022-11-18', '2022-11-20', 300, 250, 45.00,
-        '101 Maple St, Laughsville', (SELECT id FROM Category WHERE name = 'Concerts'),
-        (SELECT id FROM City WHERE name = 'Los Angeles'), (SELECT id FROM eventorganizer WHERE legalid = '123456'));
-
-insert into event (id, name, description, startdate, enddate, startticketsqty, currentticketsqty, currentprice, address,
-                   category_id, city_id, owner_id)
-values (uuid_generate_v4(), 'Film Festival', 'Celebrating cinema', '2023-05-04', '2023-05-07', 600, 550, 65.00,
-        '222 Film St, Movietown', (SELECT id FROM Category WHERE name = 'Conferences'),
-        (SELECT id FROM City WHERE name = 'New York City'), (SELECT id FROM eventorganizer WHERE legalid = '125656'));
-
-insert into event (id, name, description, startdate, enddate, startticketsqty, currentticketsqty, currentprice, address,
-                   category_id, city_id, owner_id)
-values (uuid_generate_v4(), 'Fashion Show', 'Latest fashion trends', '2023-04-22', '2023-04-25', 400, 350, 40.00,
-        '777 Runway St, Fashionville', (SELECT id FROM Category WHERE name = 'Concerts'),
-        (SELECT id FROM City WHERE name = 'Toronto'), (SELECT id FROM eventorganizer WHERE legalid = '125656'));
-
-insert into event (id, name, description, startdate, enddate, startticketsqty, currentticketsqty, currentprice, address,
-                   category_id, city_id, owner_id)
-values (uuid_generate_v4(), 'Science Symposium', 'Exploring scientific discoveries', '2022-11-30', '2022-12-02', 200,
-        150, 70.00, '999 Lab St, Sciencetown', (SELECT id FROM Category WHERE name = 'Conferences'),
-        (SELECT id FROM City WHERE name = 'São Paulo'), (SELECT id FROM eventorganizer WHERE legalid = '123456'));
-
-insert into event (id, name, description, startdate, enddate, startticketsqty, currentticketsqty, currentprice, address,
-                   category_id, city_id, owner_id)
-values (uuid_generate_v4(), 'Dance Performance', 'A mesmerizing dance showcase', '2023-07-26', '2023-07-28', 300, 250,
-        25.00, '444 Rhythm St, Dancetown', (SELECT id FROM Category WHERE name = 'Sports'),
-        (SELECT id FROM City WHERE name = 'Porto'), (SELECT id FROM eventorganizer WHERE legalid = '125656'));
 
 
 

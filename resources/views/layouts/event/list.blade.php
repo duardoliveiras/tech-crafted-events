@@ -49,7 +49,7 @@
                 <div class="col-md-4">
                     <div class="card mb-4">
                         <a href="/events/{{ $event->id }}" class="text-decoration-none text-reset">
-                            <img src="https://images-na.ssl-images-amazon.com/images/S/pv-target-images/ccd4c7fe64769b46c7cdefe3a8402b2ae396e9bb563cc151fbfbee9798397c21._RI_TTW_SX720_FMjpg_.jpg"
+                            <img src="{{('storage/' . $event->image_url) }}"
                                  class="card-img-top" alt="{{ $event->name }}">
                             <div class="card-body">
                                 <h5 class="card-title">{{ $event->name }}</h5>
@@ -101,3 +101,4 @@
     </div>
 
 @endsection
+

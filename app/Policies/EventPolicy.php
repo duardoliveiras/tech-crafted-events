@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use Illuminate\Support\Facades\Log;
 use App\Models\Event;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
@@ -46,7 +47,10 @@ class EventPolicy
      */
     public function delete(User $user, Event $event): bool
     {
-        return $user->isAdmin() || $event->owner->user_id === $user->id;
+        $isOwner = $event->owner->user_id == $user->id;
+        \Log::info("Policy check for deleting event: User ID {$user->id} - Event Owner User ID: {$event->owner->user_id} - Is Owner: " . ($isOwner ? 'Yes' : 'No'));
+
+        return $user->isAdmin() || $isOwner;
     }
 
     /**

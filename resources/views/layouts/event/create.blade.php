@@ -20,12 +20,16 @@
             </div>
         @endif
 
-        <form action="{{ route('events.store') }}" method="POST">
+        <form action="{{ route('events.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
             <div class="form-group">
                 <label for="name">Event Name:</label>
                 <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="image_url">Event Image:</label>
+                <input type="file" class="form-control" id="image_url" name="image_url" required>
             </div>
             <div class="form-group">
                 <label for="category_id">Category</label>
@@ -63,11 +67,6 @@
             <div class="form-group">
                 <label for="startticketsqty">Start Tickets Quantity:</label>
                 <input type="number" class="form-control" id="startticketsqty" name="startticketsqty" required>
-            </div>
-
-            <div class="form-group">
-                <label for="currentticketsqty">Current Tickets Quantity:</label>
-                <input type="number" class="form-control" id="currentticketsqty" name="currentticketsqty" required>
             </div>
 
             <div class="form-group">

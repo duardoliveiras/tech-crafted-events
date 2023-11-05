@@ -33,14 +33,16 @@
                         <a href="{{ route('discussion.show', ['event' => $event->id]) }}" class="btn btn-primary mt-3">Access Discussion</a>
                     @endif
                 @endif
-                @if(auth()->user()->isAdmin() || auth()->id() === $event->owner->user_id)
-                    <a href="{{ route('events.edit', $event->id) }}" class="btn btn-primary mt-3">Edit Event</a>
-                    <form action="{{ route('events.destroy', $event->id) }}" method="POST" class="d-inline">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger mt-3" onclick="return confirm('Are you sure you want to cancel this event? This action cannot be undone.')">Cancel Event</button>
-                    </form>
-                @endif
+                    @if(auth()->check())
+                        @if(auth()->user()->isAdmin() || auth()->id() === $event->owner->user_id)
+                        <a href="{{ route('events.edit', $event->id) }}" class="btn btn-primary mt-3">Edit Event</a>
+                        <form action="{{ route('events.destroy', $event->id) }}" method="POST" class="d-inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger mt-3" onclick="return confirm('Are you sure you want to cancel this event? This action cannot be undone.')">Cancel Event</button>
+                        </form>
+                        @endif
+                    @endif
             </div>
         </div>
     </div>
