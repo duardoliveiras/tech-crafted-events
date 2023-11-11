@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Event;
-use Illuminate\Http\Request;
 use App\Models\Comment;
 use App\Models\Discussion;
+use App\Models\Event;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 
 class CommentController extends Controller
 {
@@ -14,7 +15,7 @@ class CommentController extends Controller
         $this->middleware('auth');
     }
 
-    public function store(Request $request,Event $event,Discussion $discussion )
+    public function store(Request $request, Event $event, Discussion $discussion): RedirectResponse
     {
         $request->validate([
             'content' => 'required|string',
@@ -31,8 +32,28 @@ class CommentController extends Controller
         $comment->save();
 
 
-        return redirect()->route('discussion.show', ['event' => $event->id])
+        return redirect()
+            ->route('discussion.show', ['event' => $event->id])
             ->with('success', 'Comment added successfully.');
-
     }
+
+    public function toggleVote(Comment $comment, int $voteType)
+    {
+        $userId = auth()->id();
+
+        $existingVote = $comment->votes()->where('user_id', $userId)->first();
+
+        if ($existingVote && $existingVote->vote_type === $voteType) {
+            $existingVote->delete();
+        } else {
+            $comment->votes()->updateOrCreate(
+                ['user_id' => $userId],
+                ['vote_type' => $voteType]
+            );
+        }
+
+        return response()->json(['success' => true]);
+    }
+
+
 }

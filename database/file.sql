@@ -95,8 +95,8 @@ CREATE TABLE Event
     id                UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name              VARCHAR(255)   NOT NULL,
     description       TEXT           NOT NULL,
-    startDate         DATE           NOT NULL,
-    endDate           DATE           NOT NULL,
+    startDate         timestamp           NOT NULL,
+    endDate           timestamp           NOT NULL,
     startTicketsQty   INT            NOT NULL,
     currentTicketsQty INT            NOT NULL,
     currentPrice      DECIMAL(10, 2) NOT NULL,
@@ -161,8 +161,8 @@ CREATE TABLE Comment
 CREATE TABLE Vote
 (
     id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    voteType   smallint NOT NULL, -- 1 for upvote, -1 for downvote
-    votedAt    TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
+    vote_type   smallint NOT NULL, -- 1 for upvote, -1 for downvote
+    voted_at    TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
     user_id    UUID      NOT NULL,
     comment_id UUID      NOT NULL,
     FOREIGN KEY (user_id) REFERENCES Users (id),

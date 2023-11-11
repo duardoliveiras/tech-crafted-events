@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Comment extends Model
 {
     use HasFactory;
+
     protected $keyType = 'string';
     public $timestamps = false;
     protected $table = 'comment';
@@ -22,10 +25,18 @@ class Comment extends Model
         'discussion_id'
     ];
 
-    public function discussion(){
-        return $this -> belongsTo(Discussion::class);
+    public function discussion(): BelongsTo
+    {
+        return $this->belongsTo(Discussion::class);
     }
-    public function user(){
-        return $this -> belongsTo(User::class);
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function votes(): HasMany
+    {
+        return $this->hasMany(Vote::class, 'comment_id');
     }
 }
