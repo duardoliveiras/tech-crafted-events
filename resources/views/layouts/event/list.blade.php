@@ -47,15 +47,21 @@
         <div class="row mt-3">
             @foreach($events as $event)
                 <div class="col-md-4">
-                    <div class="card mb-4">
+                    <div class="card mb-4 shadow" style="border-width: 0;">
                         <a href="/events/{{ $event->id }}" class="text-decoration-none text-reset">
+                            <div style="position: absolute; top: 10px; left: 20px; background: white; color: #7848F4; padding: 8px; border-radius: 10px;">
+                                @if ($event->currentprice == 0)
+                                    FREE
+                                @else
+                                    € {{ number_format($event->currentprice, 2) }}
+                                @endif
+                            </div>
                             <img src="{{('storage/' . $event->image_url) }}"
                                  class="card-img-top" alt="{{ $event->name }}">
                             <div class="card-body">
                                 <h5 class="card-title">{{ $event->name }}</h5>
-                                <p class="card-text">Ticket price: R$ {{ $event->currentprice }}</p>
-                                <p class="card-text">Localization: {{ $event->address }}</p>
-                                <p class="card-text">When: {{ $event->startdate }}</p>
+                                <p class="card-text mb-1" style="color: #7848F4;">{{ \Carbon\Carbon::parse($event->startdate)->format('l, F j, g:i A') }}</p>
+                                <p class="card-text" style="color: #7E7E7E;">{{ $event->address }}, {{ $event->city->name }}</p>
                             </div>
                         </a>
                     </div>

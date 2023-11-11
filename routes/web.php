@@ -55,10 +55,16 @@ Route::get('/events/{event}/discussion', [DiscussionController::class, 'show'])
     ->name('discussion.show')
     ->middleware(['auth', 'acess.ticket']);
 
-//Add comments
+// add comments
 Route::post('/events/{event}/discussion/{discussion}/comment', [CommentController::class, 'store'])
     ->name('discussion.comment')
     ->middleware(['auth']);
+
+// add vote to comment
+Route::middleware(['auth'])->group(function () {
+    Route::post('/comments/{comment}/toggle-vote/{voteType}', [CommentController::class, 'toggleVote'])
+        ->name('comment.toggleVote');
+});;
 
 //Vote in the comments
 Route::post('/comments/{comment}/upvote', 'CommentController@upvote')->name('comment.upvote');

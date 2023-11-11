@@ -81,5 +81,11 @@ class User extends Authenticatable
         return $this->hasMany(EventOrganizer::class, 'user_id');
     }
 
+    public function votesForDiscussion(Discussion $discussion)
+    {
+        return Vote::whereIn('comment_id', $discussion->comment()->pluck('id'))
+            ->where('user_id', $this->id)
+            ->pluck('vote_type', 'comment_id');
+    }
 
 }

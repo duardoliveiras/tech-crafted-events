@@ -55,12 +55,10 @@ class DiscussionController extends Controller
             abort(403, 'You do not have access to this discussion.');
         }
 
-
-
-
         $comments = $discussion->comments ?? collect();
+        $userVotes = $user->votesForDiscussion($discussion);
 
-        return view('layouts.event.discussion.show', compact('discussion', 'comments','event'));
+        return view('layouts.event.discussion.show', compact('discussion', 'comments', 'event', 'userVotes'));
     }
 
 

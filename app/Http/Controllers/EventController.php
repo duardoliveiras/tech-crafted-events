@@ -10,7 +10,6 @@ use App\Models\University;
 use App\Models\Discussion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Intervention\Image\Facades\Image;
@@ -131,9 +130,9 @@ class EventController extends Controller
             $imageFile = $request->file('image_url');
             $image = Image::make($imageFile);
 
-            $image->resize(null, 200, function ($constraint) {
+            $image->resize(null, 1050, function ($constraint) {
                 $constraint->aspectRatio();
-            })->resizeCanvas(200, 200, 'center', false, 'ffffff');
+            })->resizeCanvas(1050, 1050, 'center', false, 'ffffff');
 
             $imagePath = 'events/' . $imageFile->hashName();
             Storage::disk('public')->put($imagePath, (string) $image->encode());
