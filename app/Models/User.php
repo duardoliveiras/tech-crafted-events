@@ -33,7 +33,8 @@ class User extends Authenticatable
         'phone',
         'is_deleted',
         'is_banned',
-        'university_id'
+        'university_id',
+        'image_url'
     ];
 
 

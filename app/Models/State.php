@@ -10,7 +10,7 @@ class State extends Model
     use HasFactory;
     protected $table = 'state';
     protected $keyType = 'string';
-
+    public $timestamps = false;
     protected $fillable = ['name', 'initials', 'country_id'];
 
     public function country()

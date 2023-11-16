@@ -16,11 +16,11 @@ class Comment extends Model
     protected $table = 'comment';
 
     protected $casts = [
-        'commentedat' => 'datetime',
+        'commented_at' => 'datetime',
     ];
     protected $fillable = [
         'text',
-        'commentedat',
+        'commented_at',
         'user_id',
         'discussion_id'
     ];

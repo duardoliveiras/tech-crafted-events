@@ -26,12 +26,12 @@ class Discussion extends Model
         return $this->hasMany(Comment::class);
     }
 
-    public function commentsWithUserVotes($userId)
+    public function commentsOrderedByVotes()
     {
-        return Comment::whereHas('votes', function ($query) use ($userId) {
-            $query->where('user_id', $userId);
-        })
-            ->where('discussion_id', $this->id) // Assuming 'id' is the primary key of Discussion
-            ->get();
+        return $this->hasMany(Comment::class)
+            ->get()
+            ->sortByDesc(function ($comment) {
+                return $comment->votes()->sum('vote_type');
+            });
     }
 }

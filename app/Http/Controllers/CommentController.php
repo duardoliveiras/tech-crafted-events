@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Comment;
 use App\Models\Discussion;
 use App\Models\Event;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -26,7 +27,7 @@ class CommentController extends Controller
             'text' => $request->input('content'),
             'user_id' => auth()->id(),
             'discussion_id' => $discussion->id,
-            'commentedat' => now(),
+            'commented_at' => now(),
         ]);
 
         $comment->save();
@@ -37,7 +38,7 @@ class CommentController extends Controller
             ->with('success', 'Comment added successfully.');
     }
 
-    public function toggleVote(Comment $comment, int $voteType)
+    public function toggleVote(Comment $comment, int $voteType): JsonResponse
     {
         $userId = auth()->id();
 
@@ -45,14 +46,22 @@ class CommentController extends Controller
 
         if ($existingVote && $existingVote->vote_type === $voteType) {
             $existingVote->delete();
+            $newVoteType = 0; // vote removed
         } else {
             $comment->votes()->updateOrCreate(
                 ['user_id' => $userId],
                 ['vote_type' => $voteType]
             );
+            $newVoteType = $voteType;
         }
 
-        return response()->json(['success' => true]);
+        $voteCount = $comment->votes()->sum('vote_type');
+
+        return response()->json([
+            'success' => true,
+            'newVoteType' => $newVoteType,
+            'voteCount' => $voteCount,
+        ]);
     }
 
 

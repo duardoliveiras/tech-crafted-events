@@ -19,12 +19,12 @@
                             </ul>
                         </div>
                     @endif
-                    @if ($event->currentprice == 0)
+                    @if ($event->current_price == 0)
                         <div class="alert alert-info">This event is free! Just confirm your attendance below.</div>
                         <button type="submit" class="btn btn-success">Get Free Ticket</button>
                     @else
-                        <p class="card-text">Price: ${{ number_format($event->currentprice, 2) }}</p>
-                        <button type="submit" class="btn btn-primary">Buy Ticket for ${{ number_format($event->currentprice, 2) }}</button>
+                        <p class="card-text">Price: ${{ number_format($event->current_price, 2) }}</p>
+                        <button type="submit" class="btn btn-primary">Buy Ticket for ${{ number_format($event->current_price, 2) }}</button>
                     @endif
                 </form>
             </div>
