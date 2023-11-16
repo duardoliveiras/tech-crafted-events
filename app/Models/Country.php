@@ -11,6 +11,8 @@ class Country extends Model
     protected $table = 'country';
     protected $keyType = 'string';
     protected $fillable = ['name', 'initials'];
+    public $timestamps = false;
+
     public function states()
     {
         return $this->hasMany(State::class);

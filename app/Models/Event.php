@@ -11,26 +11,24 @@ class Event extends Model
 
     protected $table = 'event';
     protected $keyType = 'string';
-    protected $dates = ['startdate', 'enddate'];
-
+    protected $dates = ['start_date', 'end_date'];
+    public $timestamps = false;
     protected $fillable = [
         'name',
         'description',
-        'startdate',
-        'enddate',
-        'startticketsqty',
-        'currentticketsqty',
-        'currentprice',
+        'start_date',
+        'end_date',
+        'start_tickets_qty',
+        'current_tickets_qty',
+        'current_price',
         'address',
         'category_id',
         'city_id',
         'owner_id',
-        'image_url',
-
+        'image_url'
     ];
-    public $timestamps = false;
     protected $casts = [
-        'currentprice' => 'float',
+        'current_price' => 'float',
     ];
 
     public function category()
@@ -61,8 +59,7 @@ class Event extends Model
     {
         static::created(function ($event) {
             Discussion::create([
-                'event_id' => $event->id,
-
+                'event_id' => $event->id
             ]);
         });
     }

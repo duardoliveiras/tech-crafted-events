@@ -10,7 +10,7 @@
                     <label for="eventType" class="text-white label-filter">Looking for</label>
                     <select id="eventType" name="eventType" class="form-control">
                         <option value="">Choose event type</option>
-                        @foreach ($eventTypes as $eventType)
+                        @foreach ($categories as $eventType)
                             <option value="{{ $eventType->id }}" {{ request('eventType') == $eventType->id ? 'selected' : '' }}>{{ $eventType->name }}</option>
                         @endforeach
                     </select>

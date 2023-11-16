@@ -16,14 +16,14 @@
                 <p class="card-text">{{ $event->description }}</p>
                 <ul class="list-group list-group-flush">
                     <!-- ... other list items ... -->
-                    <li class="list-group-item"><strong>Current Tickets Quantity:</strong> {{ $event->currentticketsqty }}</li>
-                    <li class="list-group-item"><strong>Ticket Price:</strong> ${{ number_format($event->currentprice, 2) }}</li>
+                    <li class="list-group-item"><strong>Current Tickets Quantity:</strong> {{ $event->current_tickets_qty }}</li>
+                    <li class="list-group-item"><strong>Ticket Price:</strong> ${{ number_format($event->current_price, 2) }}</li>
                     <!-- ... other list items ... -->
                 </ul>
                 @if(auth()->check())
                     @php
                         $userHasTicket = $event->ticket->contains('user_id', auth()->id());
-                        $ticketsAvailable = $event->currentticketsqty > 0;
+                        $ticketsAvailable = $event->current_tickets_qty > 0;
                         $isOwnerOrAdmin = auth()->user()->isAdmin() || auth()->id() === $event->owner_id;
                     @endphp
                     @if(!$userHasTicket && $ticketsAvailable)

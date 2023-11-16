@@ -18,6 +18,7 @@ class TicketController extends Controller
     {
         return redirect()->route('event.show', $request->event_id)->with('success', 'Ticket purchased successfully!');
     }
+
     public function showBuyTicketForm(Event $event)
     {
         return view('layouts.event.ticket.buy', compact('event'));
@@ -26,9 +27,9 @@ class TicketController extends Controller
     public function acquireTicket(Request $request, $eventId)
     {
         $event = Event::findOrFail($eventId);
-        $pricepaid = $event->currentprice > 0 ? $event->currentprice : 0.0;
+        $pricepaid = $event->current_price > 0 ? $event->current_price : 0.0;
 
-        if ($event->currentticketsqty <= 0) {
+        if ($event->current_tickets_qty <= 0) {
             return back()->withError('Sorry, there are no more tickets available for this event.');
         }
 
@@ -36,15 +37,15 @@ class TicketController extends Controller
             return back()->withError('You already have a ticket for this event.');
         }
 
-        // Cast currentprice to float and use strict comparison
-        if ((float)$event->currentprice === 0.0) {
+        // Cast current_price to float and use strict comparison
+        if ((float)$event->current_price === 0.0) {
             $ticket = new Ticket([
                 'user_id' => Auth::id(),
                 'event_id' => $eventId,
-                'pricepaid'=> $pricepaid,
+                'price_paid' => $pricepaid,
             ]);
 
-            $event->decrement('currentticketsqty');
+            $event->decrement('current_tickets_qty');
             $ticket->save();
 
             return redirect()->route('events.show', $eventId)->with('success', 'Your free ticket has been acquired!');
@@ -54,8 +55,8 @@ class TicketController extends Controller
                 'event_id' => $eventId,
             ]);
 
-            $event->decrement('currentticketsqty');
-            dd($event->currentprice);
+            $event->decrement('current_tickets_qty');
+            dd($event->current_price);
             $ticket->save();
 
             // Add the ticket ID to the redirect if you need to reference it later
@@ -63,6 +64,4 @@ class TicketController extends Controller
         }
     }
 
-
-    // ... include other methods as needed ...
 }

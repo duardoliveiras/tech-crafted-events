@@ -6,9 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\University;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Intervention\Image\Facades\Image;
+use Illuminate\Http\Request;
 
 class RegisterController extends Controller
 {
@@ -48,7 +54,7 @@ class RegisterController extends Controller
      * @param array $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    protected function validator(array $data)
+    protected function validator(array $data): \Illuminate\Contracts\Validation\Validator
     {
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
@@ -66,19 +72,41 @@ class RegisterController extends Controller
      * @param array $data
      * @return \App\Models\User
      */
-    protected function create(array $data)
+    protected function create(array $data): User
     {
+        $imageUrl = '';
+
+        if (optional($data['image_url'])) {
+            $imageFile = $data['image_url'];
+
+            if ($imageFile->isValid()) {
+                $image = Image::make($imageFile);
+
+                $imagePath = 'users/' . $imageFile->hashName();
+                Storage::disk('public')->put($imagePath, (string)$image->encode());
+
+                $imageUrl = $imagePath;
+            }
+        }
+
         return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'phone' => $data['phone'],
             'birthdate' => $data['birthdate'],
-            'university_id' => $data['university_id']
+            'university_id' => $data['university_id'],
+            'image_url' => $imageUrl
         ]);
     }
 
-    public function showRegistrationForm()
+    protected function registered(Request $request, $user)
+    {
+        return redirect($this->redirectPath());
+    }
+
+
+    public function showRegistrationForm(): View|Application|Factory|\Illuminate\Contracts\Foundation\Application
     {
         $universities = University::all();
         return view('auth.register', compact('universities'));
