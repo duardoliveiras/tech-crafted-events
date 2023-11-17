@@ -139,7 +139,7 @@ CREATE TABLE Discussion
 CREATE TABLE Ticket
 (
     id        UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    price_aid DECIMAL(10, 2) NOT NULL,
+    price_paid DECIMAL(10, 2) NOT NULL,
     event_id  UUID           NOT NULL,
     user_id   UUID           NOT NULL,
     FOREIGN KEY (event_id) REFERENCES Event (id),

@@ -24,19 +24,19 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="startdate" class="form-label">Start Date</label>
-                        <input type="datetime-local" class="form-control" id="startdate" name="startdate" value="{{ old('startdate', $event->startdate) }}" required>
+                        <label for="start_date" class="form-label">Start Date</label>
+                        <input type="datetime-local" class="form-control" id="start_date" name="start_date" value="{{ old('start_date', $event->start_date) }}" required>
                     </div>
 
                     <div class="mb-3">
-                        <label for="enddate" class="form-label">End Date</label>
-                        <input type="datetime-local" class="form-control" id="enddate" name="enddate" value="{{ old('enddate', $event->enddate) }}" required>
+                        <label for="end_date" class="form-label">End Date</label>
+                        <input type="datetime-local" class="form-control" id="end_date" name="end_date" value="{{ old('end_date', $event->end_date) }}" required>
                     </div>
 
                     <div class="mb-3">
                         <label for="category_id" class="form-label">Category</label>
                         <select class="form-select" id="category_id" name="category_id" required>
-                            @foreach($category as $category)
+                            @foreach($categories as $category)
                                 <option value="{{ $category->id }}" {{ $event->category_id == $category->id ? 'selected' : '' }}>
                                     {{ $category->name }}
                                 </option>
@@ -47,7 +47,7 @@
                     <div class="mb-3">
                         <label for="city_id" class="form-label">City</label>
                         <select class="form-select" id="city_id" name="city_id" required>
-                            @foreach($city as $city)
+                            @foreach($cities as $city)
                                 <option value="{{ $city->id }}" {{ $event->city_id == $city->id ? 'selected' : '' }}>
                                     {{ $city->name }}
                                 </option>
@@ -56,18 +56,18 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="startticketsqty" class="form-label">Starting Ticket Quantity</label>
-                        <input type="number" class="form-control" id="startticketsqty" name="startticketsqty" value="{{ old('startticketsqty', $event->startticketsqty) }}" required>
+                        <label for="start_tickets_qty" class="form-label">Starting Ticket Quantity</label>
+                        <input type="number" class="form-control" id="start_tickets_qty" name="start_tickets_qty" value="{{ old('start_tickets_qty', $event->start_tickets_qty) }}" required>
                     </div>
 
                     <div class="mb-3">
-                        <label for="currentticketsqty" class="form-label">Current Ticket Quantity</label>
-                        <input type="number" class="form-control" id="currentticketsqty" name="currentticketsqty" value="{{ old('currentticketsqty', $event->currentticketsqty) }}" required>
+                        <label for="current_tickets_qty" class="form-label">Current Ticket Quantity</label>
+                        <input type="number" class="form-control" id="current_tickets_qty" name="current_tickets_qty" value="{{ old('current_tickets_qty', $event->current_tickets_qty) }}" required>
                     </div>
 
                     <div class="mb-3">
-                        <label for="currentprice" class="form-label">Current Price</label>
-                        <input type="text" class="form-control" id="currentprice" name="currentprice" value="{{ old('currentprice', $event->currentprice) }}" required>
+                        <label for="current_price" class="form-label">Current Price</label>
+                        <input type="text" class="form-control" id="current_price" name="current_price" value="{{ old('current_price', $event->current_price) }}" required>
                     </div>
 
                     <div class="mb-3">
