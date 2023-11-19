@@ -30,14 +30,14 @@ Route::controller(RegisterController::class)->group(function () {
 \Illuminate\Support\Facades\Auth::routes();
 
 // Home
-Route::get('/home', [HomeController::class, 'index'])->name('home');
+Route::get('/home', [EventController::class, 'index'])->name('home');
 Route::view('/help', 'help')->name('help');
 Route::view('/about', 'about')->name('about');
 
 // User
 Route::resource('profile', UserController::class);
 
-Route::get('/myevents', [MyEventsController::class, 'index'])->name('myevents.index');
+Route::get('/my-events', [MyEventsController::class, 'index'])->name('my_events.index');
 
 //Admin
 Route::middleware(['auth', 'admin'])->group(function () {
