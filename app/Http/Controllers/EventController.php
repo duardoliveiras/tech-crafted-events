@@ -2,17 +2,37 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Event;
 use App\Models\Category;
 use App\Models\City;
+use App\Models\Country;
+use App\Models\Discussion;
+use App\Models\Event;
 use App\Models\EventOrganizer;
 use App\Models\University;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Intervention\Image\Facades\Image;
 
 class EventController extends Controller
 {
+    const NOMINATIM_API_URL = "https://nominatim.openstreetmap.org/reverse?format=json";
+
+    private $validationRules = [
+        'name' => 'required|string|max:255',
+        'description' => 'required|string',
+        'start_date' => 'required|date',
+        'category_id' => 'required|exists:category,id',
+        'end_date' => 'required|date',
+        'start_tickets_qty' => 'required|integer',
+        'current_price' => 'required|numeric',
+        'address' => 'required|string|max:255',
+        'image_url' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+    ];
+
     public function __construct()
     {
         $this->middleware('auth')->except(['index', 'show']);
@@ -27,109 +47,134 @@ class EventController extends Controller
         $eventType = $request->query('eventType');
         $location = $request->query('location');
         $dateFilter = $request->query('date-filter');
+        $nameFilter = $request->query('full-text-search');
 
         $query = Event::query();
+
+        if ($nameFilter) {
+            $query->where('name', 'like', '%' . $nameFilter . '%');
+        }
 
         if ($eventType) {
             $query->where('category_id', $eventType);
         }
+
         if ($location) {
             $query->where('city_id', $location);
         }
+
         if ($dateFilter) {
-            $query->where('startdate', $dateFilter);
+            $query->whereDate('start_date', '=', date('Y-m-d', strtotime($dateFilter)));
         }
 
         $events = $query->get();
 
-        return view('layouts.event.list', [
-            'events' => $events,
-            'universities' => $universities,
-            'eventTypes' => $categories,
-            'locations' => $locations]);
+        return view('layouts.event.list', compact('events', 'universities', 'categories', 'locations'));
+    }
+
+    public function getCityCode($lat, $lon)
+    {
+        $response = Http::get(self::NOMINATIM_API_URL . "&lat={$lat}&lon={$lon}");
+        $cityCode = '';
+
+        if ($response->successful()) {
+            $data = $response->json();
+            [$city, $state, $country, $countryCode] = $this->processAddress($data['address']);
+
+            $existingCountry = Country::firstOrCreate(
+                ['initials' => strtoupper($countryCode)],
+                ['name' => $country, 'initials' => strtoupper($countryCode)]
+            );
+
+            $existingState = $existingCountry->states()->firstOrCreate(['name' => $state]);
+
+            $existingCity = $existingState->cities()->firstOrCreate(['name' => $city]);
+
+            $cityCode = $existingCity->id;
+        }
+
+        return $cityCode;
+    }
+
+    private function processAddress($address)
+    {
+        $city = $address['city'] ?? 'default';
+        $state = $address['state'] ?? $address['county'] ?? 'default';
+        $country = $address['country'] ?? 'default';
+        $countryCode = $address['country_code'] ?? 'default';
+
+        return [$city, $state, $country, $countryCode];
     }
 
     public function show($id): View
     {
-        $event = Event::find($id);
-        return view('layouts.event.details', compact('event'));
-    }
+        $event = Event::with('ticket')->findOrFail($id);
+        $userHasTicket = auth()->check() && $event->ticket->contains('user_id', auth()->id());
 
+        return view('layouts.event.details', compact('event', 'userHasTicket'));
+    }
 
     public function create()
     {
-        $category = Category::all();
-        $city = City::all();
+        $categories = Category::all();
         $eventOrganizer = EventOrganizer::where('user_id', Auth::id())->first();
-        $hasLegalId = $eventOrganizer && !is_null($eventOrganizer->legalid);
+        $hasLegalId = $eventOrganizer && !is_null($eventOrganizer->legal_id);
 
-        return view('layouts.event.create', compact('category', 'city', 'hasLegalId'));
+        return view('layouts.event.create', compact('categories', 'hasLegalId'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'startdate' => 'required|date',
-            'category_id' => 'required|exists:category,id',
-            'enddate' => 'required|date',
-            'city_id' => 'required|exists:city,id',
-            'startticketsqty' => 'required|integer',
-            'currentticketsqty' => 'required|integer',
-            'currentprice' => 'required|numeric',
-            'address' => 'required|string|max:255',
-        ]);
+        $request->validate($this->validationRules);
 
+        $cityCode = $this->getCityCode($request->lat, $request->lon);
 
+        $eventOrganizer = EventOrganizer::firstOrCreate(
+            ['user_id' => Auth::id()],
+            ['legal_id' => $request->input('legal_id')]
+        );
 
-
-        $eventOrganizer = EventOrganizer::firstOrCreate([
-            'user_id' => Auth::id(),
-        ], [
-            'legalid' => $request->input('legalid'),
-        ]);
-
-
-        if (!$eventOrganizer->legalid) {
+        if (!$eventOrganizer->legal_id) {
             return redirect()->back()->withInput()->withErrors([
-                'legalid' => 'O campo Identificador Legal é obrigatório.'
+                'legal_id' => 'A Legal Identifier is mandatory for creating an event.'
             ]);
         }
 
+        $event = Event::create(array_merge(
+            $request->all(),
+            [
+                'city_id' => $cityCode,
+                'owner_id' => $eventOrganizer->id,
+                'current_tickets_qty' => $request->start_tickets_qty,
+                'image_url' => $this->uploadImage($request->file('image_url'))
+            ]
+        ));
 
-        $event = new Event([
-            'name' => $request->name,
-            'description' => $request->description,
-            'startdate' => $request->startdate,
-            'category_id' => $request->category_id,
-            'enddate' => $request->enddate,
-            'startticketsqty' => $request->startticketsqty,
-            'currentticketsqty' => $request->currentticketsqty,
-            'currentprice' => $request->currentprice,
-            'address' => $request->address,
-            'city_id' => $request->city_id,
-            'owner_id' => $eventOrganizer-> id,
-
-        ]);
-        if ($event->save()) {
-            return redirect()->route('events.index')->with('success', 'Event created successfully.');
-        } else {
-
-            return redirect()->back()->withInput()->withErrors(['msg' => 'Error saving the event.']);
-        }
-
+        return $event
+            ? redirect()->route('events.index')->with('success', 'Event created successfully.')
+            : redirect()->back()->withInput()->withErrors(['msg' => 'Error saving the event.']);
     }
+
+    private function uploadImage($imageFile)
+    {
+        $image = Image::make($imageFile);
+
+        $imagePath = 'events/' . $imageFile->hashName();
+        Storage::disk('public')->put($imagePath, (string)$image->encode());
+
+        return $imagePath;
+    }
+
     public function edit($id)
     {
         $event = Event::findOrFail($id);
 
         $this->authorize('update', $event);
 
-        $category = Category::all();
-        $city = City::all();
+        $categories = Category::all();
+        $cities = City::all();
 
-        return view('layouts.event.edit', compact('event', 'category', 'city'));
+        return view('layouts.event.edit', compact('event', 'categories', 'cities'));
     }
 
     public function update(Request $request, $id)
@@ -138,18 +183,14 @@ class EventController extends Controller
 
         $this->authorize('update', $event);
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'startdate' => 'required|date',
-            'category_id' => 'required|exists:category,id',
-            'enddate' => 'required|date',
-            'city_id' => 'required|exists:city,id',
-            'startticketsqty' => 'required|integer',
-            'currentticketsqty' => 'required|integer',
-            'currentprice' => 'required|numeric',
-            'address' => 'required|string|max:255',
-        ]);
+        $request->validate(array_merge($this->validationRules, [
+            'current_tickets_qty' => 'required|integer',
+            'image_url' => 'sometimes|image|max:2048',
+        ]));
+
+        if ($request->hasFile('image_url')) {
+            $event->image_url = $this->uploadImage($request->file('image_url'));
+        }
 
         $event->update($request->all());
 
@@ -162,10 +203,15 @@ class EventController extends Controller
 
         $this->authorize('delete', $event);
 
-        $event->delete();
+        try {
+            DB::transaction(function () use ($event) {
+                Discussion::where('event_id', $event->id)->delete();
+                $event->delete();
+            });
 
-        return redirect()->route('events.index')->with('success', 'Event deleted successfully.');
+            return redirect()->route('events.index')->with('success', 'Event deleted successfully.');
+        } catch (\Exception $e) {
+            return redirect()->route('events.index')->with('error', 'Error deleting event');
+        }
     }
-
-
 }

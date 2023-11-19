@@ -12,7 +12,14 @@ class LoginController extends Controller
 {
     use AuthenticatesUsers;
 
-    protected $redirectTo = RouteServiceProvider::HOME;
+    protected function redirectPath()
+    {
+        if (Auth::user()->isAdmin()) {
+            return route('admin.dashboard');
+        }
+
+        return property_exists($this, 'redirectTo') ? $this->redirectTo : '/home';
+    }
 
     public function __construct()
     {

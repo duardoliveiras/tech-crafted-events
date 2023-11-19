@@ -5,8 +5,10 @@
         <div class="d-flex container align-items-center" id="navbarSupportedContent">
             <div class="container text-center" id="central">
                 <ul class="navbar-nav d-flex justify-content-center gap-4">
+                    @if(Auth::user() && Auth::user()->isAdmin())
+                        <li class="nav-item"><a class="nav-link" href="{{ route('admin.dashboard') }}">Admin Dashboard</a></li>
+                    @endif
                     <li class="nav-item"><a class="nav-link" href="/home">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/events">Events</a></li>
                     <li class="nav-item"><a class="nav-link" href="/about">About us</a></li>
                     <li class="nav-item"><a class="nav-link" href="/help">Help/FAQ</a></li>
                 </ul>
@@ -28,11 +30,14 @@
                 @else
                     <li class="nav-item dropdown">
                         <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                            <img class="rounded-circle shadow-1-strong me-2"
+                                 src="{{ Auth::user()->image_url ? asset('storage/' . Auth::user()->image_url) : 'https://static-00.iconduck.com/assets.00/user-icon-2048x2048-ihoxz4vq.png' }}"
+                                 alt="avatar" width="50" height="50"/>
                             {{ Auth::user()->name }}
                         </a>
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item">My events</a>
                             @auth
+                                <a class="dropdown-item" href="{{route('my_events.index')}}">My events</a>
                                 <a class="dropdown-item" href="{{ route('profile.show', ['profile' => Auth::user()->id]) }}">Profile</a>
                             @endauth
                             <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
@@ -48,3 +53,4 @@
         </div>
     </div>
 </nav>
+

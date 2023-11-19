@@ -8,7 +8,9 @@ use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Intervention\Image\Facades\Image;
 
 class RegisterController extends Controller
 {
@@ -48,14 +50,16 @@ class RegisterController extends Controller
      * @param array $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    protected function validator(array $data)
+    protected function validator(array $data): \Illuminate\Contracts\Validation\Validator
     {
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'phone' => ['string', 'max:15'],
-            'birthdate' => ['date']
+            'birthdate' => ['date'],
+            'university_id' => 'required|exists:university,id',
+            'image_url' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
         ]);
     }
 
@@ -66,15 +70,31 @@ class RegisterController extends Controller
      * @param array $data
      * @return \App\Models\User
      */
-    protected function create(array $data)
+    protected function create(array $data): User
     {
+        $imageUrl = '';
+
+        if (optional($data['image_url'])) {
+            $imageFile = $data['image_url'];
+
+            if ($imageFile->isValid()) {
+                $image = Image::make($imageFile);
+
+                $imagePath = 'users/' . $imageFile->hashName();
+                Storage::disk('public')->put($imagePath, (string)$image->encode());
+
+                $imageUrl = $imagePath;
+            }
+        }
+
         return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'phone' => $data['phone'],
             'birthdate' => $data['birthdate'],
-            'university_id' => $data['university_id']
+            'university_id' => $data['university_id'],
+            'image_url' => $imageUrl
         ]);
     }
 

@@ -15,27 +15,47 @@
                 <h5 class="card-title">{{ $event->name }}</h5>
                 <p class="card-text">{{ $event->description }}</p>
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item"><strong>Category:</strong> {{ $event->category->name }}</li>
-                    <li class="list-group-item"><strong>Start Date:</strong> {{ $event->startdate instanceof \Carbon\Carbon ? $event->startdate->format('F d, Y h:i A') : \Carbon\Carbon::parse($event->startdate)->format('F d, Y h:i A') }}</li>
-                    <li class="list-group-item"><strong>End Date:</strong> {{ $event->enddate instanceof \Carbon\Carbon ? $event->enddate->format('F d, Y h:i A') : \Carbon\Carbon::parse($event->enddate)->format('F d, Y h:i A') }}</li>
-                    <li class="list-group-item"><strong>City:</strong> {{ $event->city->name }}</li>
-                    <li class="list-group-item"><strong>Start Tickets Quantity:</strong> {{ $event->startticketsqty }}</li>
-                    <li class="list-group-item"><strong>Current Tickets Quantity:</strong> {{ $event->currentticketsqty }}</li>
-                    <li class="list-group-item"><strong>Ticket Price:</strong> ${{ number_format($event->currentprice, 2) }}</li>
-                    <li class="list-group-item"><strong>Address:</strong> {{ $event->address }}</li>
-
+                    <li class="list-group-item"><strong>Current Tickets Quantity:</strong> {{ $event->current_tickets_qty }}</li>
+                    <li class="list-group-item"><strong>Ticket Price:</strong> ${{ number_format($event->current_price, 2) }}</li>
                 </ul>
-                    @if(auth()->id() === $event->owner->user_id)
-                        <a href="{{ route('events.edit', $event->id) }}" class="btn btn-primary mt-3">Edit Event</a>
+                @if(auth()->check())
+                    @php
+                        $userHasTicket = $event->ticket->contains('user_id', auth()->id());
+                        $ticketsAvailable = $event->current_tickets_qty > 0;
+                        $isOwnerOrAdmin = auth()->user()->isAdmin() || auth()->id() === $event->owner_id;
+                    @endphp
+                    @if(!$userHasTicket && $ticketsAvailable)
+                        <a href="{{ route('ticket.buy', ['event' => $event->id]) }}" class="btn btn-success mt-3">Buy Ticket</a>
+                    @endif
+                        @php
+                            $userTicket = null;
+                            if ($event->ticket) {
+                                $userTicket = $event->ticket->firstWhere('user_id', auth()->id());
+                            }
+                        @endphp
+
+                        @if($userHasTicket || $isOwnerOrAdmin)
+                            <a href="{{ route('discussion.show', ['event' => $event->id]) }}" class="btn btn-primary mt-3">Access Discussion</a>
+
+                            @if($userTicket)
+                                <a href="{{ route('ticket.show', ['event' => $event->id, 'ticket' => $userTicket->id]) }}" class="btn btn-success mt-3">Access Ticket</a>
+                            @endif
+                        @endif
+
+                    @endif
+                    @if(auth()->check())
+                        @if(auth()->user()->isAdmin() || auth()->id() === $event->owner->user_id)
+                            <a href="{{ route('ticket.authorize', $event->id) }}" class="btn btn-info mt-3">Authenticate ticket</a>
+                            <a href="{{ route('events.edit', $event->id) }}" class="btn btn-warning mt-3">Edit Event</a>
+
                         <form action="{{ route('events.destroy', $event->id) }}" method="POST" class="d-inline">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger mt-3" onclick="return confirm('Do still want to cancel this event? You cannot undo this action. ')">Cancel Event</button>
+                            <button type="submit" class="btn btn-danger mt-3" onclick="return confirm('Are you sure you want to cancel this event? This action cannot be undone.')">Cancel Event</button>
                         </form>
-
+                        @endif
                     @endif
             </div>
         </div>
     </div>
 @endsection
-
