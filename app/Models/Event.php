@@ -29,7 +29,7 @@ class Event extends Model
     protected $casts = [
         'current_price' => 'float',
         'start_date' => 'datetime',
-        'end_date' => 'datetime,'
+        'end_date' => 'datetime',
     ];
 
     public function category()
