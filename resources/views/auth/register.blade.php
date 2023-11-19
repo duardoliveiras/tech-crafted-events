@@ -12,7 +12,7 @@
                     <div class="card-header">{{ __('Register') }}</div>
 
                     <div class="card-body">
-                        <form method="POST" action="{{route('register') }}" enctype="multipart/form-data">
+                        <form method="POST" action="{{route('register') }}" enctype="multipart/form-data" id="form-register">
                             @csrf
 
                             @if ($errors->any())
@@ -160,10 +160,7 @@
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h5 class="modal-title" id="cropImageModalLabel">Crop image</h5>
-                                                <button type="button" class="close" data-dismiss="modal"
-                                                        aria-label="Fechar">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body d-flex align-items-center justify-content-center">
                                                 <div class="img-container d-flex justify-content-center">
@@ -172,7 +169,7 @@
                                                 </div>
                                             </div>
                                             <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                                                     Close
                                                 </button>
                                                 <button type="button" class="btn btn-primary" id="crop">Crop</button>
@@ -295,15 +292,12 @@
         });
 
         image.addEventListener('load', function () {
-            console.log(image)
             cropper = new Cropper(image, {
                 aspectRatio: 1,
                 viewMode: 3,
                 minContainerWidth: image.width < 200 && image.height < 200 ? image.width * 2 : image.width,
                 minContainerHeight: image.width < 200 && image.height < 200 ? image.height * 2 : image.height,
             });
-            console.log(image.height)
-            console.log(image.width)
         }, false);
 
         $modal.on('hidden.bs.modal', function () {
