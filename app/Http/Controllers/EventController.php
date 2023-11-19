@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Intervention\Image\Facades\Image;
+use Carbon\Carbon;
 
 class EventController extends Controller
 {
@@ -24,10 +25,10 @@ class EventController extends Controller
     private $validationRules = [
         'name' => 'required|string|max:255',
         'description' => 'required|string',
-        'start_date' => 'required|date',
+        'start_date' => 'required|date_format:Y-m-d\TH:i',
         'category_id' => 'required|exists:category,id',
-        'end_date' => 'required|date',
-        'start_tickets_qty' => 'required|integer',
+        'end_date' => 'required|date_format:Y-m-d\TH:i|after_or_equal:start_date',
+        'start_tickets_qty' => 'required|integer|min:1',
         'current_price' => 'required|numeric',
         'address' => 'required|string|max:255',
         'image_url' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
@@ -121,6 +122,13 @@ class EventController extends Controller
     public function store(Request $request)
     {
         $request->validate($this->validationRules);
+        $startDate = Carbon::parse($request->input('start_date'));
+        $endDate = Carbon::parse($request->input('end_date'));
+        if ($endDate->diffInDays($startDate) > 5) {
+            return redirect()->back()->withInput()->withErrors([
+                'end_date' => 'The event cannot be longer than 5 days.'
+            ]);
+        }
 
         $cityCode = $this->getCityCode($request->lat, $request->lon);
 
@@ -186,6 +194,14 @@ class EventController extends Controller
             'current_tickets_qty' => 'required|integer',
             'image_url' => 'sometimes|image|max:2048',
         ]));
+
+        $startDate = Carbon::parse($request->input('start_date'));
+        $endDate = Carbon::parse($request->input('end_date'));
+        if ($endDate->diffInDays($startDate) > 5) {
+            return redirect()->back()->withInput()->withErrors([
+                'end_date' => 'The event cannot be longer than 5 days.'
+            ]);
+        }
 
         if ($request->hasFile('image_url')) {
             $event->image_url = $this->uploadImage($request->file('image_url'));
