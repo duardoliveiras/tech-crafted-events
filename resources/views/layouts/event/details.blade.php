@@ -15,10 +15,8 @@
                 <h5 class="card-title">{{ $event->name }}</h5>
                 <p class="card-text">{{ $event->description }}</p>
                 <ul class="list-group list-group-flush">
-                    <!-- ... other list items ... -->
                     <li class="list-group-item"><strong>Current Tickets Quantity:</strong> {{ $event->current_tickets_qty }}</li>
                     <li class="list-group-item"><strong>Ticket Price:</strong> ${{ number_format($event->current_price, 2) }}</li>
-                    <!-- ... other list items ... -->
                 </ul>
                 @if(auth()->check())
                     @php
@@ -29,13 +27,27 @@
                     @if(!$userHasTicket && $ticketsAvailable)
                         <a href="{{ route('ticket.buy', ['event' => $event->id]) }}" class="btn btn-success mt-3">Buy Ticket</a>
                     @endif
-                    @if($userHasTicket || $isOwnerOrAdmin)
-                        <a href="{{ route('discussion.show', ['event' => $event->id]) }}" class="btn btn-primary mt-3">Access Discussion</a>
+                        @php
+                            $userTicket = null;
+                            if ($event->ticket) {
+                                $userTicket = $event->ticket->firstWhere('user_id', auth()->id());
+                            }
+                        @endphp
+
+                        @if($userHasTicket || $isOwnerOrAdmin)
+                            <a href="{{ route('discussion.show', ['event' => $event->id]) }}" class="btn btn-primary mt-3">Access Discussion</a>
+
+                            @if($userTicket)
+                                <a href="{{ route('ticket.show', ['event' => $event->id, 'ticket' => $userTicket->id]) }}" class="btn btn-success mt-3">Access Ticket</a>
+                            @endif
+                        @endif
+
                     @endif
-                @endif
                     @if(auth()->check())
                         @if(auth()->user()->isAdmin() || auth()->id() === $event->owner->user_id)
-                        <a href="{{ route('events.edit', $event->id) }}" class="btn btn-primary mt-3">Edit Event</a>
+                            <a href="{{ route('ticket.authorize', $event->id) }}" class="btn btn-info mt-3">Authenticate ticket</a>
+                            <a href="{{ route('events.edit', $event->id) }}" class="btn btn-warning mt-3">Edit Event</a>
+
                         <form action="{{ route('events.destroy', $event->id) }}" method="POST" class="d-inline">
                             @csrf
                             @method('DELETE')
