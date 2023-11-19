@@ -16,6 +16,10 @@ class Ticket extends Model
         'event_id',
         'user_id',
         'price_paid',
+        'is_used',
+    ];
+    protected $attributes = [
+        'is_used' => false,
     ];
 
 

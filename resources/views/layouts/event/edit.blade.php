@@ -36,7 +36,7 @@
                     <div class="mb-3">
                         <label for="category_id" class="form-label">Category</label>
                         <select class="form-select" id="category_id" name="category_id" required>
-                            @foreach($category as $category)
+                            @foreach($categories as $category)
                                 <option value="{{ $category->id }}" {{ $event->category_id == $category->id ? 'selected' : '' }}>
                                     {{ $category->name }}
                                 </option>
@@ -47,7 +47,7 @@
                     <div class="mb-3">
                         <label for="city_id" class="form-label">City</label>
                         <select class="form-select" id="city_id" name="city_id" required>
-                            @foreach($city as $city)
+                            @foreach($cities as $city)
                                 <option value="{{ $city->id }}" {{ $event->city_id == $city->id ? 'selected' : '' }}>
                                     {{ $city->name }}
                                 </option>
