@@ -140,6 +140,7 @@ CREATE TABLE Ticket
 (
     id        UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     price_paid DECIMAL(10, 2) NOT NULL,
+    is_used   BOOLEAN        DEFAULT FALSE,
     event_id  UUID           NOT NULL,
     user_id   UUID           NOT NULL,
     FOREIGN KEY (event_id) REFERENCES Event (id),

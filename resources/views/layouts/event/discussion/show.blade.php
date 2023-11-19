@@ -32,7 +32,7 @@
                             @forelse($discussion->commentsOrderedByVotes() as $comment)
                                 <div class="d-flex flex-start mt-3">
                                     <img class="rounded-circle shadow-1-strong me-3"
-                                         src="{{ $comment->user->image_url ? asset('storage/' . $comment->user->image_url) : 'https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(23).webp' }}"
+                                         src="{{ $comment->user->image_url ? asset('storage/' . $comment->user->image_url) : 'https://static-00.iconduck.com/assets.00/user-icon-2048x2048-ihoxz4vq.png' }}"
                                          {{--                                         src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(23).webp"--}}
                                          alt="avatar" width="60"
                                          height="60"/>
