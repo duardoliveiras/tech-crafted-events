@@ -1,13 +1,22 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Vote extends Model
 {
-    protected $fillable = ['voteType', 'votedAt', 'user_id', 'comment_id'];
-    protected $keyType = 'string';
+    protected $table = 'vote';
+    public $timestamps = false;
+
+    use HasFactory;
+    protected $fillable = [
+        'vote_type',
+        'voted_at',
+        'user_id',
+        'comment_id',
+    ];
 
     public function user()
     {

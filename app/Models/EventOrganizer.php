@@ -14,7 +14,7 @@ class EventOrganizer extends Model
 
     public $timestamps = false;
     protected $fillable = [
-        'legalid',
+        'legal_id',
         'user_id',
     ];
 

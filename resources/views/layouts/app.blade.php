@@ -13,20 +13,27 @@
     <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
 
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.6/cropper.css" rel="stylesheet">
+
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+
+    <!-- map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 </head>
-<body class="d-flex flex-column h-100">
-<div id="app">
+<body class="">
+<div id="app" class="d-flex flex-column min-vh-100">
     @include('partials.navbar')
 
-    <main class="flex-shrink-0 py-4">
+    <main class="flex-fill py-4">
         @yield('content')
     </main>
 
-    <footer class="text-white text-center text-lg-start mt-auto"
+    <footer class="text-white text-center text-lg-start"
             style="background-color: #10107B !important;">
-        <div class="container pt-5">
+        <div class="container pt-5 mt-auto">
             <div class="row mt-2">
                 <div class="col-lg-6 col-md-12 mb-4 mb-md-0 text-center d-flex justify-content-center w-100">
                     <h2>Tech Crafted</h2>
@@ -36,13 +43,13 @@
                 <div class="col-lg-3 col-md-6 mb-4 mb-md-0 w-100 d-flex justify-content-center">
                     <ul class="list-unstyled mb-0 d-flex flex-row justify-content-between w-50">
                         <li style="display: inline-block;">
-                            <a href="#!" class="text-white text-decoration-none text-reset">Home</a>
+                            <a href="/home" class="text-white text-decoration-none text-reset">Home</a>
                         </li>
                         <li style="display: inline-block;">
-                            <a href="#!" class="text-white text-decoration-none text-reset">About</a>
+                            <a href="/about" class="text-white text-decoration-none text-reset">About</a>
                         </li>
                         <li style="display: inline-block;">
-                            <a href="#!" class="text-white text-decoration-none text-reset">FAQs</a>
+                            <a href="/help" class="text-white text-decoration-none text-reset">FAQs</a>
                         </li>
                     </ul>
                 </div>

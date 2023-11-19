@@ -1,6 +1,6 @@
 CREATE SCHEMA IF NOT EXISTS tech_crafted;
 SET
-search_path TO tech_crafted;
+    search_path TO tech_crafted;
 
 DROP TABLE IF EXISTS Vote CASCADE;
 DROP TABLE IF EXISTS Comment CASCADE;
@@ -45,7 +45,7 @@ CREATE TABLE State
     id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name       VARCHAR(255) NOT NULL,
     initials   CHAR(3),
-    country_id UUID          NOT NULL,
+    country_id UUID         NOT NULL,
     UNIQUE (initials),
     FOREIGN KEY (country_id) REFERENCES Country (id)
 );
@@ -54,7 +54,7 @@ CREATE TABLE City
 (
     id       UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name     VARCHAR(255) NOT NULL,
-    state_id UUID          NOT NULL,
+    state_id UUID         NOT NULL,
     FOREIGN KEY (state_id) REFERENCES State (id)
 );
 
@@ -63,7 +63,7 @@ CREATE TABLE University
     id      UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     address VARCHAR(255) NOT NULL,
     name    VARCHAR(255) NOT NULL,
-    city_id UUID          NOT NULL,
+    city_id UUID         NOT NULL,
     FOREIGN KEY (city_id) REFERENCES City (id)
 );
 
@@ -75,35 +75,36 @@ CREATE TABLE Users
     email         VARCHAR(255) NOT NULL UNIQUE,
     password      VARCHAR(255) NOT NULL,
     birthDate     DATE         NOT NULL,
-    university_id UUID          NOT NULL,
+    university_id UUID         NOT NULL,
     FOREIGN KEY (university_id) REFERENCES University (id),
     is_banned     BOOLEAN          DEFAULT FALSE,
-    is_deleted    BOOLEAN          DEFAULT FALSE
+    is_deleted    BOOLEAN          DEFAULT FALSE,
+    image_url     VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE EventOrganizer
 (
     id      UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    legalId CHAR(50) NOT NULL,
-    user_id UUID      NOT NULL,
+    legal_id CHAR(50) NOT NULL,
+    user_id UUID     NOT NULL,
     FOREIGN KEY (user_id) REFERENCES Users (id)
 );
 
-
 CREATE TABLE Event
 (
-    id                UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name              VARCHAR(255)   NOT NULL,
-    description       TEXT           NOT NULL,
-    startDate         DATE           NOT NULL,
-    endDate           DATE           NOT NULL,
-    startTicketsQty   INT            NOT NULL,
-    currentTicketsQty INT            NOT NULL,
-    currentPrice      DECIMAL(10, 2) NOT NULL,
-    address           VARCHAR(255)   NOT NULL,
-    category_id       UUID            NOT NULL,
-    city_id           UUID            NOT NULL,
-    owner_id          UUID            NOT NULL,
+    id                    UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name                  VARCHAR(255)   NOT NULL,
+    description           TEXT           NOT NULL,
+    start_date            timestamp      NOT NULL,
+    end_date              timestamp      NOT NULL,
+    start_tickets_qty     INT            NOT NULL CHECK (start_tickets_qty >= 0),
+    current_tickets_qty   INT            NOT NULL CHECK (current_tickets_qty >= 0),
+    current_price        DECIMAL(10, 2) NOT NULL CHECK (current_price >= 0),
+    address               VARCHAR(255)   NOT NULL,
+    image_url             VARCHAR(255)   NOT NULL,
+    category_id           UUID           NOT NULL,
+    city_id               UUID           NOT NULL,
+    owner_id              UUID           NOT NULL,
     FOREIGN KEY (owner_id) REFERENCES EventOrganizer (id),
     FOREIGN KEY (category_id) REFERENCES Category (id),
     FOREIGN KEY (city_id) REFERENCES City (id)
@@ -117,7 +118,7 @@ CREATE TABLE Notification
     text             TEXT             NOT NULL,
     expiresAt        DATE             NOT NULL,
     notificationType NotificationType NOT NULL,
-    user_id          UUID              NOT NULL,
+    user_id          UUID             NOT NULL,
     FOREIGN KEY (user_id) REFERENCES Users (id)
 );
 
@@ -138,9 +139,10 @@ CREATE TABLE Discussion
 CREATE TABLE Ticket
 (
     id        UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    pricePaid DECIMAL(10, 2) NOT NULL,
-    event_id  UUID            NOT NULL,
-    user_id   UUID            NOT NULL,
+    price_paid DECIMAL(10, 2) NOT NULL,
+    is_used   BOOLEAN        DEFAULT FALSE,
+    event_id  UUID           NOT NULL,
+    user_id   UUID           NOT NULL,
     FOREIGN KEY (event_id) REFERENCES Event (id),
     FOREIGN KEY (user_id) REFERENCES Users (id)
 );
@@ -148,10 +150,10 @@ CREATE TABLE Ticket
 CREATE TABLE Comment
 (
     id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    text          TEXT NOT NULL,
-    commentedAt   DATE NOT NULL,
-    user_id       UUID  NOT NULL,
-    discussion_id UUID  NOT NULL,
+    text          TEXT      NOT NULL,
+    commented_at  TIMESTAMP NOT NULL,
+    user_id       UUID      NOT NULL,
+    discussion_id UUID      NOT NULL,
     FOREIGN KEY (user_id) REFERENCES Users (id),
     FOREIGN KEY (discussion_id) REFERENCES Discussion (id)
 );
@@ -159,11 +161,11 @@ CREATE TABLE Comment
 
 CREATE TABLE Vote
 (
-    id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    voteType   smallint NOT NULL, -- 1 for upvote, -1 for downvote
-    votedAt    TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
-    user_id    UUID      NOT NULL,
-    comment_id UUID      NOT NULL,
+    id         UUID PRIMARY KEY            DEFAULT uuid_generate_v4(),
+    vote_type  smallint NOT NULL, -- 1 for upvote, -1 for downvote
+    voted_at   TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
+    user_id    UUID     NOT NULL,
+    comment_id UUID     NOT NULL,
     FOREIGN KEY (user_id) REFERENCES Users (id),
     FOREIGN KEY (comment_id) REFERENCES Comment (id)
 );
@@ -206,77 +208,28 @@ VALUES (uuid_generate_v4(), 'University of California, Los Angeles', '405 Hilgar
        (uuid_generate_v4(), 'Universidade do Porto', 'Praça de Gomes Teixeira',
         (SELECT id FROM City WHERE name = 'Porto'));
 
-INSERT INTO Users (id, name, phone, email, password, birthDate, university_id, is_banned, is_deleted)
-VALUES (uuid_generate_v4(), 'Tiririca', '+55 77997890', 'tiririca@gmail.com', '902fab49244e61e09d9568aedebc84daa1da7b2a',
+INSERT INTO Users (id, name, phone, email, password, birthDate, university_id, is_banned, is_deleted, image_url)
+VALUES (uuid_generate_v4(), 'Tiririca', '+55 77997890', 'tiririca@gmail.com',
+        '902fab49244e61e09d9568aedebc84daa1da7b2a',
         '1990-03-15',
-        (SELECT id FROM University WHERE name = 'University of California, Los Angeles'), false, false),
+        (SELECT id FROM University WHERE name = 'University of California, Los Angeles'), false, false, ''),
        (uuid_generate_v4(), 'Manoel Gomes', '+1 654-3210', 'caneta-azul@azul-caneta.com',
         '3dbd406aad81722b7311188ab5600ea0239f7965',
-        '1988-08-20', (SELECT id FROM University WHERE name = 'Columbia University'), false, false);
+        '1988-08-20', (SELECT id FROM University WHERE name = 'Columbia University'), false, false, '');
 
-INSERT INTO eventorganizer (id, legalid, user_id)
+INSERT INTO eventorganizer (id, legal_id, user_id)
 VALUES (uuid_generate_v4(), '123456', (SELECT id FROM Users WHERE name = 'Tiririca')),
        (uuid_generate_v4(), '125656', (SELECT id FROM Users WHERE name = 'Manoel Gomes'));
 
-insert into event (id, name, description, startdate, enddate, startticketsqty, currentticketsqty, currentprice, address,
-                   category_id, city_id, owner_id)
-values (uuid_generate_v4(), 'Music Festival', 'A three-day music extravaganza', '2023-09-27', '2023-09-30', 1000, 750,
-        75.00, '123 Main St, Cityville', (SELECT id FROM Category WHERE name = 'Concerts'),
-        (SELECT id FROM City WHERE name = 'Los Angeles'), (SELECT id FROM eventorganizer WHERE legalid = '123456'));
+INSERT INTO Users (id, name, phone, email, password, birthDate, university_id, is_banned, is_deleted, image_url)
+VALUES (uuid_generate_v4(), 'Tiririca Pior Que Tá Não Fica', '+55 99997890', 'admin@gmail.com',
+        '$2y$10$/cAIN8kgiGZR3jDakznSreoEZYQ6NNXnfEAUPEeWmgB9gd3.IdKaG',
+        '1990-03-15',
+        (SELECT id FROM University WHERE name = 'University of California, Los Angeles'), false, false, '');
+INSERT INTO admin (id, user_id)
+VALUES (uuid_generate_v4(), (SELECT id FROM Users WHERE name = 'Tiririca Pior Que Tá Não Fica'));
 
-insert into event (id, name, description, startdate, enddate, startticketsqty, currentticketsqty, currentprice, address,
-                   category_id, city_id, owner_id)
-values (uuid_generate_v4(), 'Art Exhibition', 'Featuring local artists', '2023-09-11', '2023-09-16', 500, 400, 28.50,
-        '456 Elm St, Townsville', (SELECT id FROM Category WHERE name = 'Sports'),
-        (SELECT id FROM City WHERE name = 'New York City'), (SELECT id FROM eventorganizer WHERE legalid = '123456'));
 
-insert into event (id, name, description, startdate, enddate, startticketsqty, currentticketsqty, currentprice, address,
-                   category_id, city_id, owner_id)
-values (uuid_generate_v4(), 'Sports Event', 'Soccer championship', '2023-02-18', '2023-02-22', 1000, 850, 59.99,
-        '789 Oak St, Sports City', (SELECT id FROM Category WHERE name = 'Sports'),
-        (SELECT id FROM City WHERE name = 'Toronto'), (SELECT id FROM eventorganizer WHERE legalid = '125656'));
-
-insert into event (id, name, description, startdate, enddate, startticketsqty, currentticketsqty, currentprice, address,
-                   category_id, city_id, owner_id)
-values (uuid_generate_v4(), 'Food Festival', 'A culinary delight', '2023-04-19', '2023-04-23', 800, 700, 80.50,
-        '567 Pine St, Foodtown', (SELECT id FROM Category WHERE name = 'Concerts'),
-        (SELECT id FROM City WHERE name = 'São Paulo'), (SELECT id FROM eventorganizer WHERE legalid = '123456'));
-
-insert into event (id, name, description, startdate, enddate, startticketsqty, currentticketsqty, currentprice, address,
-                   category_id, city_id, owner_id)
-values (uuid_generate_v4(), 'Tech Conference', 'Innovation and technology', '2023-09-27', '2023-09-30', 500, 450, 60.00,
-        '345 Cedar St, Techville', (SELECT id FROM Category WHERE name = 'Conferences'),
-        (SELECT id FROM City WHERE name = 'Porto'), (SELECT id FROM eventorganizer WHERE legalid = '125656'));
-
-insert into event (id, name, description, startdate, enddate, startticketsqty, currentticketsqty, currentprice, address,
-                   category_id, city_id, owner_id)
-values (uuid_generate_v4(), 'Comedy Show', 'Laughs and entertainment', '2022-11-18', '2022-11-20', 300, 250, 45.00,
-        '101 Maple St, Laughsville', (SELECT id FROM Category WHERE name = 'Concerts'),
-        (SELECT id FROM City WHERE name = 'Los Angeles'), (SELECT id FROM eventorganizer WHERE legalid = '123456'));
-
-insert into event (id, name, description, startdate, enddate, startticketsqty, currentticketsqty, currentprice, address,
-                   category_id, city_id, owner_id)
-values (uuid_generate_v4(), 'Film Festival', 'Celebrating cinema', '2023-05-04', '2023-05-07', 600, 550, 65.00,
-        '222 Film St, Movietown', (SELECT id FROM Category WHERE name = 'Conferences'),
-        (SELECT id FROM City WHERE name = 'New York City'), (SELECT id FROM eventorganizer WHERE legalid = '125656'));
-
-insert into event (id, name, description, startdate, enddate, startticketsqty, currentticketsqty, currentprice, address,
-                   category_id, city_id, owner_id)
-values (uuid_generate_v4(), 'Fashion Show', 'Latest fashion trends', '2023-04-22', '2023-04-25', 400, 350, 40.00,
-        '777 Runway St, Fashionville', (SELECT id FROM Category WHERE name = 'Concerts'),
-        (SELECT id FROM City WHERE name = 'Toronto'), (SELECT id FROM eventorganizer WHERE legalid = '125656'));
-
-insert into event (id, name, description, startdate, enddate, startticketsqty, currentticketsqty, currentprice, address,
-                   category_id, city_id, owner_id)
-values (uuid_generate_v4(), 'Science Symposium', 'Exploring scientific discoveries', '2022-11-30', '2022-12-02', 200,
-        150, 70.00, '999 Lab St, Sciencetown', (SELECT id FROM Category WHERE name = 'Conferences'),
-        (SELECT id FROM City WHERE name = 'São Paulo'), (SELECT id FROM eventorganizer WHERE legalid = '123456'));
-
-insert into event (id, name, description, startdate, enddate, startticketsqty, currentticketsqty, currentprice, address,
-                   category_id, city_id, owner_id)
-values (uuid_generate_v4(), 'Dance Performance', 'A mesmerizing dance showcase', '2023-07-26', '2023-07-28', 300, 250,
-        25.00, '444 Rhythm St, Dancetown', (SELECT id FROM Category WHERE name = 'Sports'),
-        (SELECT id FROM City WHERE name = 'Porto'), (SELECT id FROM eventorganizer WHERE legalid = '125656'));
 
 
 
