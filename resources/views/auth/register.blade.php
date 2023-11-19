@@ -12,11 +12,20 @@
                     <div class="card-header">{{ __('Register') }}</div>
 
                     <div class="card-body">
-                        <form method="POST" action="{{route('register') }}" enctype="multipart/form-data"
-                              id="form-register">
+                        <form method="POST" action="{{route('register') }}" enctype="multipart/form-data">
                             @csrf
 
-                            <!-- Step 1: Informar Nome e Data de Nascimento -->
+                            @if ($errors->any())
+                                <div class="alert alert-danger">
+                                    <ul>
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+
+                            <!-- Step 1: provide name, birthdate and university -->
                             <div id="step-1" class="form-step">
                                 <div class="row mb-3">
                                     <label for="name"
@@ -85,7 +94,7 @@
                                 <button type="button" class="btn btn-primary next-step">Next Step</button>
                             </div>
 
-                            <!-- Step 2: Informar Email e Senha -->
+                            <!-- Step 2: credentials -> email and password -->
                             <div id="step-2" class="form-step">
                                 <div class="row mb-3">
                                     <label for="email"
@@ -136,7 +145,7 @@
                                 <button type="button" class="btn btn-primary next-step">Next Step</button>
                             </div>
 
-                            <!-- Step 3: Inserir Imagem do Perfil -->
+                            <!-- Step 3: insert profile image -->
                             <div id="step-3" class="form-step">
                                 <div class="row mb-3">
                                     <label for="image_url">User Image:</label>
@@ -144,19 +153,22 @@
                                            required>
                                 </div>
 
-                                <div class="modal fade" id="cropImageModal" tabindex="-1" role="dialog" aria-labelledby="cropImageModalLabel"
+                                <div class="modal fade" id="cropImageModal" tabindex="-1" role="dialog"
+                                     aria-labelledby="cropImageModalLabel"
                                      aria-hidden="true">
                                     <div class="modal-dialog modal-lg" role="document">
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h5 class="modal-title" id="cropImageModalLabel">Crop image</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                        aria-label="Fechar">
                                                     <span aria-hidden="true">&times;</span>
                                                 </button>
                                             </div>
                                             <div class="modal-body d-flex align-items-center justify-content-center">
                                                 <div class="img-container d-flex justify-content-center">
-                                                    <img id="image" src="#" style="width: 100%; height: 100%;" alt="img">
+                                                    <img id="image" src="#" style="width: 100%; height: 100%;"
+                                                         alt="img">
                                                 </div>
                                             </div>
                                             <div class="modal-footer">
@@ -176,6 +188,8 @@
                                 <button type="submit" class="btn btn-primary">
                                     {{ __('Register') }}
                                 </button>
+
+
                             </div>
                         </form>
                     </div>
@@ -196,9 +210,11 @@
 
             document.querySelectorAll('.next-step').forEach(function (button) {
                 button.addEventListener('click', function () {
-                    document.getElementById('step-' + currentStep).style.display = 'none';
-                    currentStep++;
-                    document.getElementById('step-' + currentStep).style.display = 'block';
+                    if (validateStep(currentStep)) {
+                        document.getElementById('step-' + currentStep).style.display = 'none';
+                        currentStep++;
+                        document.getElementById('step-' + currentStep).style.display = 'block';
+                    }
                 });
             });
 
@@ -209,6 +225,45 @@
                     document.getElementById('step-' + currentStep).style.display = 'block';
                 });
             });
+
+            function validateStep(step) {
+                let valid = true;
+                if (step === 1) {
+                    valid = validateStep1();
+                } else if (step === 2) {
+                    valid = validateStep2();
+                }
+                return valid;
+            }
+
+            function validateStep1() {
+                let valid = true;
+                let name = document.getElementById('name').value;
+                let universityId = document.getElementById('university_id').value;
+                let phone = document.getElementById('phone').value;
+                let birthdate = document.getElementById('birthdate').value;
+
+                if (!name || !universityId || !phone || !birthdate) {
+                    alert('Please fill in all fields in Step 1');
+                    valid = false;
+                }
+
+                return valid;
+            }
+
+            function validateStep2() {
+                let valid = true;
+                let email = document.getElementById('email').value;
+                let password = document.getElementById('password').value;
+                let confirmPassword = document.getElementById('password-confirm').value;
+
+                if (!email || !password || !confirmPassword) {
+                    alert('Please fill in all fields in Step 2');
+                    valid = false;
+                }
+
+                return valid;
+            }
         });
 
         let $modal = $('#cropImageModal');
@@ -244,8 +299,8 @@
             cropper = new Cropper(image, {
                 aspectRatio: 1,
                 viewMode: 3,
-                minContainerWidth: image.width < 200 && image.height < 200 ? image.width*2 : image.width,
-                minContainerHeight: image.width < 200 && image.height < 200 ? image.height*2 : image.height,
+                minContainerWidth: image.width < 200 && image.height < 200 ? image.width * 2 : image.width,
+                minContainerHeight: image.width < 200 && image.height < 200 ? image.height * 2 : image.height,
             });
             console.log(image.height)
             console.log(image.width)

@@ -27,7 +27,7 @@ class MyEventsController extends Controller
             return $ticket->event;
         })->unique('id');
 
-        return view('layouts.myevents.index', compact('organizedEvents', 'eventsWithTickets'));
+        return view('layouts.my_events.index', compact('organizedEvents', 'eventsWithTickets'));
     }
 
 }
