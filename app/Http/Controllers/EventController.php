@@ -190,10 +190,10 @@ class EventController extends Controller
 
         $this->authorize('update', $event);
 
-        $request->validate(array_merge($this->validationRules, [
-            'current_tickets_qty' => 'required|integer',
+        $updateValidationRules = array_merge($this->validationRules, [
             'image_url' => 'sometimes|image|max:2048',
-        ]));
+        ]);
+        unset($updateValidationRules['start_tickets_qty']);
 
         $startDate = Carbon::parse($request->input('start_date'));
         $endDate = Carbon::parse($request->input('end_date'));
