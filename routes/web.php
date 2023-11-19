@@ -49,6 +49,12 @@ Route::resource('events', EventController::class);
 //Ticket
 Route::get('/events/{event}/ticket/buy', [TicketController::class, 'showBuyTicketForm'])->name('ticket.buy');
 Route::post('/events/{event}/ticket/acquire', [TicketController::class, 'acquireTicket'])->name('ticket.acquire');
+Route::get('/events/{event}/ticket/authorize', [TicketController::class, 'authorizeTicket'])->name('ticket.authorize');
+Route::get('/events/{event}/ticket/{ticket}', [TicketController::class, 'showTicket'])
+    ->name('ticket.show')
+    ->middleware(['auth', 'acess.ticket']);
+Route::post('/events/{event}/ticket/authenticate', [TicketController::class, 'authenticateTicket'])->name('ticket.authenticate');
+
 
 //Discussion
 Route::get('/events/{event}/discussion', [DiscussionController::class, 'show'])

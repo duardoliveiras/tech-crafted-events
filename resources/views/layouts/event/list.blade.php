@@ -87,11 +87,14 @@
         <h2 class="title-events black">Trending</h2>
         <h2 class="title-events purple"> Colleges</h2>
         <div class="row mt-3">
-            @foreach($universities as $university)
+            @foreach($universities as $index => $university)
                 <div class="col-md-4">
                     <div class="card mb-4">
-                        <img src="https://4.bp.blogspot.com/-mUQETPUdsgw/T75cjv545FI/AAAAAAAAAhs/SlutqeCKR2Y/s1600/Wallpaper-1-1024-768.jpg"
-                             class="card-img-top" alt="{{ $university->name }}">
+                        @php
+                            $imageName = 'university' . ($index + 1) . '.jpeg';
+                            $imageUrl = asset("assets/universities/{$imageName}");
+                        @endphp
+                        <img src="{{ $imageUrl }}" class="card-img-top" alt="Imagem de {{ $university->name }}">
                         <div class="card-body">
                             <h5 class="card-title">{{ $university->name }}</h5>
                             <p class="card-text">Localization: {{ $university->address }}</p>
