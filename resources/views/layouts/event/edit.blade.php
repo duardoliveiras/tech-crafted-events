@@ -65,11 +65,6 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="start_tickets_qty" class="form-label">Starting Ticket Quantity</label>
-                        <input type="number" class="form-control" id="start_tickets_qty" name="start_tickets_qty" value="{{ old('start_tickets_qty', $event->start_tickets_qty) }}" required>
-                    </div>
-
-                    <div class="mb-3">
                         <label for="current_tickets_qty" class="form-label">Current Ticket Quantity</label>
                         <input type="number" class="form-control" id="current_tickets_qty" name="current_tickets_qty" value="{{ old('current_tickets_qty', $event->current_tickets_qty) }}" required>
                     </div>
