@@ -59,6 +59,7 @@ class RegisterController extends Controller
             'phone' => ['string', 'max:15'],
             'birthdate' => ['date'],
             'university_id' => 'required|exists:university,id',
+            'image_url' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
         ]);
     }
 

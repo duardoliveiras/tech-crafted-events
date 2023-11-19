@@ -47,8 +47,13 @@ class EventController extends Controller
         $eventType = $request->query('eventType');
         $location = $request->query('location');
         $dateFilter = $request->query('date-filter');
+        $nameFilter = $request->query('full-text-search');
 
         $query = Event::query();
+
+        if ($nameFilter) {
+            $query->where('name', 'like', '%' . $nameFilter . '%');
+        }
 
         if ($eventType) {
             $query->where('category_id', $eventType);
@@ -59,7 +64,7 @@ class EventController extends Controller
         }
 
         if ($dateFilter) {
-            $query->where('start_date', $dateFilter);
+            $query->whereDate('start_date', '=', date('Y-m-d', strtotime($dateFilter)));
         }
 
         $events = $query->get();
@@ -153,10 +158,6 @@ class EventController extends Controller
     private function uploadImage($imageFile)
     {
         $image = Image::make($imageFile);
-
-        $image->resize(null, 1050, function ($constraint) {
-            $constraint->aspectRatio();
-        })->resizeCanvas(1050, 1050, 'center', false, 'ffffff');
 
         $imagePath = 'events/' . $imageFile->hashName();
         Storage::disk('public')->put($imagePath, (string)$image->encode());
