@@ -44,9 +44,9 @@ class TicketController extends Controller
             $ticket = new Ticket([
                 'user_id' => Auth::id(),
                 'event_id' => $eventId,
-                'price_paid' => $price_paid,
+                'price_paid' => 0.0,
             ]);
-
+            $ticket->markTicketAsPaid();
             $event->decrement('current_tickets_qty');
             $ticket->save();
 
@@ -116,13 +116,17 @@ class TicketController extends Controller
         if (!$ticket) {
             return redirect()->back()->with('error', 'Invalid ticket.');
         }
-
-        if ($ticket->is_used) {
+        if ($ticket->status === 'READ') {
             return redirect()->back()->with('error', 'Ticket already used.');
         }
 
-        $ticket->is_used = true;
+        if ($ticket->status !== 'PAID') {
+            return redirect()->back()->with('error', 'Ticket not valid for use.');
+        }
+
+        $ticket->markTicketAsRead();
         $ticket->save();
+
         return redirect()->route('events.show', ['event' => $eventId])->with('success', 'Ticket authenticated successfully!');
     }
 }

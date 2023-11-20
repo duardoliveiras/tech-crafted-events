@@ -20,6 +20,8 @@ DROP TABLE IF EXISTS Category CASCADE;
 
 DROP EXTENSION IF EXISTS "uuid-ossp";
 CREATE EXTENSION "uuid-ossp";
+CREATE TYPE ticket_status AS ENUM ('PENDING', 'PAID', 'READ', 'CANCELED', 'ERROR');
+
 
 
 -------------------------
@@ -157,7 +159,9 @@ CREATE TABLE Ticket
 (
     id        UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     price_paid DECIMAL(10, 2) NOT NULL,
-    is_used   BOOLEAN        DEFAULT FALSE,
+    status ticket_status DEFAULT 'PENDING',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     event_id  UUID           NOT NULL,
     user_id   UUID           NOT NULL,
     FOREIGN KEY (event_id) REFERENCES Event (id),
