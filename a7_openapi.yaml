@@ -1,448 +1,432 @@
 openapi: 3.0.0
 
 info:
-	version: "1.0"
-	title: "Event"
-	description: "Web Resources Specification (A7)"
+  version: "1.0"
+  title: "Event"
+  description: "Web Resources Specification (A7)"
 
 servers:
-- url: http://lbaw.fe.up.pt
-	description: Production server
+  - url: http://lbaw.fe.up.pt
+    description: Production server
 
-tags:
-    - name: "M01: Authentication and User Profile"
 
 paths:
-	/login:
-		get:
-			operationId: R101
-			summary: "R101: Login Form"
-			description: "Display login form. Access: PUB"
-            tags:
-                - "M01: Authentication"
-			responses:
-				"200":
-					description: "OK; Display Login UI."
-		post:
-			operationId: R102
-			summary: "R102: Login Action"
-			description: "Process login form submission. Access: PUB"
-            tags:
-                - "M01: Authentication"
-			requestbody:
-				required: true
-				content:
-					application/x-www-form-urlencoded:
-						schema:
-							type: object
-							properties:
-								email:
-									type: string
-								password:
-									type: string
-							required:
-								- email
-								- password
-			responses:
-				"302":
-					description: "Redirect after processing is finished."
-					headers:
-						Location:
-							schema:
-								type: string
-							examples:
-								302Success:
-									description: "Authentication successful; redirect to main page."
-									value: "/"
-								302Error:
-									description "Authentication failed; redirect to login page."
-									value: "/login"
-	/logout:
-		post:
-			operationId: R103
-			summary: "R103: Logout Action"
-			description: "Logout current authenticated user. Access: USR, ADM"
-            tags:
-                - "M01: Authentication"
-            responses:
-                "302":
-                    description: "Redirect after porcessing end."
-                    headers:
-                        Location:
-                            schema:
-                                type: string
-                            examples:
-                                302Success:
-                                    description: "Logout successful; redirect to login page."
-                                    value: "/login"
-    /register:
-        get:
-            operationId: R104
-            summary: "R104: Register Form"
-            description: "Display new user registration form. Access: PUB"
-            tags:
-                - "M01: Authentication"
-            responses:
-				"200":
-					description: "OK; Display Registration UI."
-		post:
-			operationId: R105
-			summary: "R106: Register Action"
-			description: "Process registration form submission. Access: PUB"
-			requestbody:
-				required: true
-				content:
-					application/x-www-form-urlencoded:
-						schema:
-							type: object
-							properties:
-                                username:
-                                    type: string
-								email:
-									type: string
-								password:
-									type: string
-							required:
-                                - username
-								- email
-								- password
-			responses:
-				"302":
-					description: "Redirect after processing is finished."
-					headers:
-						Location:
-							schema:
-								type: string
-							examples:
-								302Success:
-									description: "Registration successful; redirect to main page."
-									value: "/"
-								302Error:
-									description "Registration failed; redirect to register page."
-									value: "/register"
-    /profile/{id}:
-        get:
-            operationId: R201
-            summary: "R201: View user profile"
-            description: "Display individual user profile. Access: USR"
-            tags:
-                - "M02: User"
-            parameters:
-                - in: path
-                    name: id
-                    schema:
-                        type: integer
-                    required: true
-            responses:
-                "200":
-                    description: "OK; Display Account Profile."
-    /profile/{id}/edit:
-        get:
-            operationId: R202
-            summary: "R202: Show user profile editor"
-            description: "Display individual user profile editor. Access: USR"
-            tags:
-                - "M02: User"
-            parameters:
-                - in: path
-                    name: id
-                    schema:
-                        type: integer
-                    required: true
-            responses:
-                "200":
-                    description: "OK; Display Account Profile Editor."
-        post:
-            operationId: R203
-            summary: "R203: Process user profile changes"
-            description: "Process changes made to individual user profile. Access: USR"
-            tags:
-                - "M02: User"
-            parameters:
-                - in: path
-                    name: id
-                    schema:
-                        type: integer
-                    required: true
-            requestBody:
+  /login:
+    get:
+      operationId: R101
+      summary: "R101: Login Form"
+      description: "Display login form. Access: PUB"
+      tags:
+        - "M01: Authentication"
+      responses:
+        "200":
+          description: "OK; Display Login UI."
+    post:
+      operationId: R102
+      summary: "R102: Login Action"
+      description: "Process login form submission. Access: PUB"
+      tags:
+        - "M01: Authentication"
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - email
+                - password
+      responses:
+        "302":
+          description: "Redirect after processing is finished."
+          headers:
+            Location:
+              schema:
+                type: string
+              examples:
+                302Success:
+                  description: "Authentication successful; redirect to the main page."
+                  value: "/"
+                302Error:
+                  description: "Authentication failed; redirect to the login page."
+                  value: "/login"
+  /logout:
+    post:
+      operationId: R103
+      summary: "R103: Logout Action"
+      description: "Logout current authenticated user. Access: USR, ADM"
+      tags:
+        - "M01: Authentication"
+      responses:
+        "302":
+          description: "Redirect after processing ends."
+          headers:
+            Location:
+              schema:
+                type: string
+              examples:
+                302Success:
+                  description: "Logout successful; redirect to the login page."
+                  value: "/login"
+  /register:
+    get:
+      operationId: R104
+      summary: "R104: Register Form"
+      description: "Display new user registration form. Access: PUB"
+      tags:
+        - "M01: Authentication"
+      responses:
+        "200":
+          description: "OK; Display Registration UI."
+    post:
+      operationId: R105
+      summary: "R106: Register Action"
+      description: "Process registration form submission. Access: PUB"
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username
+                - email
+                - password
+      responses:
+        "302":
+          description: "Redirect after processing is finished."
+          headers:
+            Location:
+              schema:
+                type: string
+              examples:
+                302Success:
+                  description: "Registration successful; redirect to the main page."
+                  value: "/"
+                302Error:
+                  description: "Registration failed; redirect to the register page."
+                  value: "/register"
+  /profile/{id}:
+    get:
+      operationId: R201
+      summary: "R201: View user profile"
+      description: "Display individual user profile. Access: USR"
+      tags:
+        - "M02: User"
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      responses:
+        "200":
+          description: "OK; Display Account Profile."
+  /profile/{id}/edit:
+    post:
+      operationId: R203
+      summary: "R203: Process user profile changes"
+      description: "Process changes made to individual user profile. Access: USR"
+      tags:
+        - "M02: User"
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                phoneno:
+                  type: string
+                birthdate:
+                  type: string
+      responses:
+        "302":
+          description: "Redirect after processing is finished."
+          headers:
+            Location:
+              schema:
+                type: string
+              examples:
+                302Success:
+                  description: "OK; Redirect to user profile page."
+                  value: "/profile/{id}"
+                302Error:
+                  description: "Edit failed; Redirect to edit page."
+                  value: "/profile/{id}/edit"
+  /profile/{id}/destroy:
+    post:
+      operationId: R204
+      summary: "R204: Remove User"
+      description: "Removes access to a user account. Access: USR, ADM"
+      tags:
+        - "M02: User"
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      responses:
+        "200":
+          description: "OK; Account access removed."
+  /notifications:
+    get:
+      operationId: R205
+      summary: "R205: Show notifications page"
+      description: "Renders notifications index page. Access: USR, ADM"
+      tags:
+        - "M02: User"
+      responses:
+        "200":
+          description: "OK; Show notifications page."
+  /notifications/mark-read/{notification}:
+    post:
+      operationId: R206
+      summary: "R206: Mark notification as read"
+      description: "Flags a notification as read. Access: USR, ADM"
+      tags:
+        - "M02: User"
+      parameters:
+        - in: path
+          name: notification
+          schema:
+            type: integer
+          required: true
+      responses:
+        "200":
+          description: "Object containing response details."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+  /home:
+    get:
+      operationId: R301
+      summary: "R301: Show homepage"
+      description: "Renders home page. Access: PUB"
+      tags:
+        - "M03: Administration/Static Pages"
+      responses:
+        "200":
+          description: "OK; Display home page."
+  /help:
+    get:
+      operationId: R302
+      summary: "R302: Show help page"
+      description: "Renders help page. Access: PUB"
+      tags:
+        - "M03: Administration/Static Pages"
+      responses:
+        "200":
+          description: "OK; Display help page."
+  /about:
+    get:
+      operationId: R303
+      summary: "R303: Show 'About us' page"
+      description: "Renders 'About us' page. Access: PUB"
+      tags:
+        - "M03: Administration/Static Pages"
+      responses:
+        "200":
+          description: "OK; Display 'About us' page."
+  /admin/dashboard:
+    get:
+      operationId: R304
+      summary: "R304: Show administration dashboard"
+      description: "Displays the administrator's dashboard, containing administrator exclusive actions. Access: ADM"
+      tags:
+        - "M03: Administration/Static Pages"
+      responses:
+        "200":
+          description: "OK; Display administration dashboard."
+  /events/{event}:
+    get:
+      operationId: R401
+      summary: "R401: Show event page"
+      description: "Renders event page. Access: PUB"
+      tags:
+        - "M04: Events"
+      parameters:
+        - in: path
+          name: event
+          schema:
+            type: integer
+          required: true
+      responses:
+        "200":
+          description: "OK; Show event page."
+  /my-events:
+    get:
+      operationId: R402
+      summary: "R402: Show own events list page"
+      description: "Renders event organiser's events list page. Access: EVO"
+      tags:
+        - "M04: Events"
+      responses:
+        "200":
+          description: "OK; Show own events list page."
+  /events/{event}/ticket/buy:
+    get:
+      operationId: R403
+      summary: "R403: Show ticket purchase page"
+      description: "Renders ticket purchase page. Access: USR"
+      tags:
+        - "M04: Events"
+      parameters:
+        - in: path
+          name: event
+          schema:
+            type: integer
+          required: true
+      responses:
+        "200":
+          description: "OK; Show ticket purchase page."
+  /events/{event}/ticket/acquire:
+    post:
+      operationId: R404
+      summary: "R404: Reserve a ticket for the current user. Access: USR"
+      description: "Reserves a ticket for the current user; status is promoted to ATT for this event. If the event has a cost, this redirects to the purchase page."
+      tags:
+        - "M04: Events"
+      parameters:
+        - in: path
+          name: event
+          schema:
+            type: integer
+          required: true
+      responses:
+        "302":
+          description: "Redirect after processing is finished."
+          headers:
+            Location:
+              schema:
+                type: string
+              examples:
+                302SuccessFree:
+                  description: "OK; Redirect to the event page."
+                  value: "/events/{event}"
+                302SuccessPaid:
+                  description: "OK; Redirect to the payment page."
+                  value: "/events/{event}/ticket/buy"
+                302Error:
+                  description: "Edit failed; Redirect to the previous page."
+  /events/{event}/discussion:
+    get:
+      operationId: R405
+      summary: "R405: Show event discussion page"
+      description: "Renders ticket purchase page. Access: ATT, ADM, EVO"
+      tags:
+        - "M04: Events"
+      parameters:
+        - in: path
+          name: event
+          schema:
+            type: integer
+          required: true
+      responses:
+        "200":
+          description: "OK; Show ticket purchase page."
+        "403":
+          description: "Refused; the user does not have enough privileges."
+  /events/{event}/discussion/{discussion}/comment:
+    post:
+      operationId: R406
+      summary: "R406: Post comment"
+      description: "Posts a new comment under the specified discussion. Access: ATT, ADM, EVO"
+      tags:
+        - "M04: Events"
+      parameters:
+        - in: path
+          name: event
+          schema:
+            type: integer
+          required: true
+        - in: path
+          name: discussion
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
                 content:
-                    application/x-www-form-urlencoded:
-                        schema:
-                            type: object
-                                properties:
-                                    username:
-                                        type: string
-                                    email:
-                                        type: string
-                                    phoneno:
-                                        type: string
-                                    birthdate:
-                                        type: string
-            responses:
-                "302":
-                    description: "Redirect after processing is finished."
-                    headers:
-                        Location:
-                            schema:
-                                type: string
-                            examples:
-                                302Success:
-                                    description: "OK; Redirect to user profile page."
-                                    value: "/profile/{id}"
-                                302Error:
-                                    description: "Edit failed; Redirect to edit page."
-                                    value: "/profile/{id}/edit"
-    /profile/{id}/destroy:
-        post:
-            operationId: R204
-            summary: "R204: Remove User"
-            description: "Removes access to a user account. Access: USR, ADM"
-            tags:
-                - "M02: User"
-            parameters:
-                - in: path
-                    name: id
-                    schema:
-                        type: integer
-                    required: true
-            responses:
-                "200":
-                    description: "OK; Account access removed."
-    /notifications:
-        get:
-            operationId: R205
-            summary: "R205: Show notifications page"
-            description: "Renders notifications index page. Access: USR, ADM"
-            tags:
-                - "M02: User"
-            responses:
-                "200":
-                    description: "OK; Show notifications page."
-    /notifications/mark-read/{notification}:
-        post:
-            operationId: R206
-            summary: "R206: Mark notification as read"
-            description: "Flags a notification as read. Access: USR, ADM"
-            tags:
-                - "M02: User"
-            parameters:
-                - in: path
-                    name: notification
-                    schema:
-                        type: integer
-                    required: true
-            responses:
-                "200":
-                    description: "Object containing response details."
-                    content:
-                        application/json:
-                            schema:
-                                type: object
-                                properties:
-                                    success:
-                                        type: boolean
-    /home:
-        get:
-            operationId: R301
-            summary: "R301: Show homepage"
-            description: "Renders home page. Access: PUB"
-            tags:
-                - "M03: Administration/Static Pages"
-            responses:
-                "200":
-                    description: "OK; Display home page."
-    /help:
-        get:
-            operationId: R302
-            summary: "R302: Show help page"
-            description: "Renders help page. Access: PUB"
-            tags:
-                - "M03: Administration/Static Pages"
-            responses:
-                "200":
-                    description: "OK; Display help page."
-    /about:
-        get:
-            operationId: R303
-            summary: "R303: Show 'About us' page"
-            description: "Renders 'About us' page. Access: PUB"
-            tags:
-                - "M03: Administration/Static Pages"
-            responses:
-                "200":
-                    description: "OK; Display 'About us' page."
-    /admin/dashboard:
-        get:
-            operationId: R304
-            summary: "R304: Show administration dashboard"
-            description: "Displays the administrator's dashobard, containing admininstrator exclusive actions. Access: ADM"
-            tags:
-                - "M03: Administration/Static Pages"
-            responses:
-                "200":
-                    description: "OK; Display administration dashboard".
-    /event/{event}:
-        get:
-            operationId: R401
-            summary: "R401: Show event page"
-            description: "Renders event page. Access: PUB"
-            tags:
-                - "M04: Events"
-            parameters:
-                - in: path
-                    name: event
-                    schema:
-                        type: integer
-                    required: true
-            responses:
-                "200":
-                    description: "OK; Show event page."
-    /myevents:
-        get:
-            operationId: R402
-            summary: "R402: Show own events list page"
-            description: "Renders event organiser's events list page. Access: EVO"
-            tags:
-                - "M04: Events"
-            parameters:
-                - in: path
-                    name: event
-                    schema:
-                        type: integer
-                    required: true
-            responses:
-                "200":
-                    description: "OK; Show own events list page."
-    /event/{event}/ticket/buy:
-        get:
-            operationId: R403
-            summary: "R403: Show ticket purchase page"
-            description: "Renders ticket purchase page. Access: USR"
-            tags:
-                - "M04: Events"
-            parameters:
-                - in: path
-                    name: event
-                    schema:
-                        type: integer
-                    required: true
-            responses:
-                "200":
-                    description: "OK; Show ticket purchase page."
-    /event/{event}/ticket/acquire:
-        post:
-            operationId: R404
-            summary: "R404: Reserve a ticket for the current user. Access: USR"
-            description: "Reserves a ticket for the current user; status is promoted to ATT for this event. If the event has a cost, this redirects to the purchase page."
-            tags:
-                - "M04: Events"
-            parameters:
-                - in: path
-                    name: event
-                    schema:
-                        type: integer
-                    required: true
-            responses:
-                "302":
-                    description: "Redirect after processing is finished."
-                    headers:
-                        Location:
-                            schema:
-                                type: string
-                            examples:
-                                302SuccessFree:
-                                    description: "OK; Redirect to event page."
-                                    value: "/event/{event}"
-                                302SuccessPaid:
-                                    description: "OK; Redirect to payment page."
-                                    value: "/event/{event}/ticket/buy"
-                                302Error:
-                                    description: "Edit failed; Redirect to previous page."
-    /event/{event}/discussion:
-        get:
-            operationId: R405
-            summary: "R405: Show event discussion page"
-            description: "Renders ticket purchase page. Access: ATT, ADM, EVO"
-            tags:
-                - "M04: Events"
-            parameters:
-                - in: path
-                    name: event
-                    schema:
-                        type: integer
-                    required: true
-            responses:
-                "200":
-                    description: "OK; Show ticket purchase page."
-                "403":
-                    description: "Refused; user does not have enough privileges."
-    /events/{event}/discussion/{discussion}/comment:
-        post:
-            operationId: R406
-            summary: "R406: Post comment"
-            description: "Posts a new comment under the specified discussion. Access: ATT, ADM, EVO"
-            tags:
-                - "M04: Events"
-            parameters:
-                - in: path
-                    name: event
-                    schema:
-                        type: integer
-                    required: true
-                - in: path
-                    name: discussion
-                    schema:
-                        type: integer
-                    required: true
-            requestBody:
+                  type: string
+      responses:
+        "302":
+          description: "OK; Redirect to discussion page."
+          headers:
+            Location:
+              schema:
+                type: string
+              examples:
+                302Success:
+                  description: "OK; Redirect to discussion page."
+                  value: "/events/{event}/discussion/{discussion}"
+  /comments/{comment}/toggle-vote/{voteType}:
+    post:
+      operationId: R407
+      summary: "R406: Vote on comment"
+      description: "Creates a new vote on a certain comment. Access: ATT, ADM, EVO"
+      tags:
+        - "M04: Events"
+      parameters:
+        - in: path
+          name: comment
+          schema:
+            type: integer
+          required: true
+        - in: path
+          name: voteType
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
                 content:
-                    application/x-www-form-urlencoded:
-                        schema:
-                            type: object
-                                properties:
-                                    content:
-                                        type: string
-            responses:
-                "302":
-                    description: "OK; Redirect to discussion page."
-                    value: "/events/{event}/discussion/{discussion}"
-    /comments/{comment}/toggle-vote/{voteType}:
-        post:
-            operationId: R407
-            summary: "R406: Vote on comment"
-            description: "Creates a new vote on a certain comment. Access: ATT, ADM, EVO"
-            tags:
-                - "M04: Events"
-            parameters:
-                - in: path
-                    name: event
-                    schema:
-                        type: integer
-                    required: true
-                - in: path
-                    name: discussion
-                    schema:
-                        type: integer
-                    required: true
-            requestBody:
-                content:
-                    application/x-www-form-urlencoded:
-                        schema:
-                            type: object
-                                properties:
-                                    content:
-                                        type: string
-            responses:
-                "200":
-                    description: "Object containing response details."
-                    content:
-                        application/json:
-                            schema:
-                                type: object
-                                properties:
-                                    success:
-                                        type: boolean
-                                    newVoteType:
-                                        type: integer
-                                    voteCount:
-                                        type: integer
+                  type: string
+      responses:
+        "200":
+          description: "Object containing response details."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  newVoteType:
+                    type: integer
+                  voteCount:
+                    type: integer
