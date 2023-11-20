@@ -58,14 +58,14 @@ class TicketController extends Controller
             ]);
 
             $event->decrement('current_tickets_qty');
-            dd($event->current_price);
             $ticket->save();
 
             // Add the ticket ID to the redirect if you need to reference it later
             return redirect()->route('payment', ['ticketId' => $ticket->id])->with('success', 'Your ticket has been reserved. Please proceed with payment.');
         }
     }
-    public function showTicket($eventId,$ticketId)
+
+    public function showTicket($eventId, $ticketId)
     {
         $event = Event::findOrFail($eventId);
         $ticket = Ticket::where('event_id', $eventId)->findOrFail($ticketId);
@@ -92,8 +92,9 @@ class TicketController extends Controller
 
     public function authorizeTicket(Event $event)
     {
-        return view('layouts.event.ticket.authenticate',compact('event'));
+        return view('layouts.event.ticket.authenticate', compact('event'));
     }
+
     public function authenticateTicket(Request $request, $eventId)
     {
         if (!Str::isUuid($eventId)) {
