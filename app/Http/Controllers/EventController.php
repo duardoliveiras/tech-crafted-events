@@ -52,7 +52,7 @@ class EventController extends Controller
         $query = Event::query();
 
         if ($nameFilter) {
-            $query->where('name', 'like', '%' . $nameFilter . '%');
+            $query->whereRaw('LOWER(name) like ?', ['%' . strtolower($nameFilter) . '%']);
         }
 
         if ($eventType) {

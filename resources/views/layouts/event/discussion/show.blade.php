@@ -38,7 +38,13 @@
                                          height="60"/>
                                     <div class="w-100">
                                         <h6 class="fw-bold mb-0"
-                                            style="font-size: 1.05rem;">{{ $comment->user->name }}</h6>
+                                            style="font-size: 1.05rem;">{{ $comment->user->name }} @if($comment->isOwner())
+                                                <span class="badge rounded-pill bg-success ms-2"><strong>Event Organizer</strong></span>
+                                            @endif
+
+                                            @if($comment->isAdmin())
+                                                <span class="badge rounded-pill bg-secondary ms-2"><strong>Admin</strong></span>
+                                            @endif</h6>
                                         <div class="d-flex align-items-center mb-2">
                                             <p class="mb-0" style="color: #7E7E7E;">
                                                 {{ $comment->commented_at->format('d M Y, H:i') }}
