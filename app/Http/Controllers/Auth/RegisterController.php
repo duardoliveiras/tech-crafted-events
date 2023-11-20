@@ -6,11 +6,17 @@ use App\Http\Controllers\Controller;
 use App\Models\University;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Intervention\Image\Facades\Image;
+use Illuminate\Http\Request;
 
 class RegisterController extends Controller
 {
@@ -59,7 +65,6 @@ class RegisterController extends Controller
             'phone' => ['string', 'max:15'],
             'birthdate' => ['date'],
             'university_id' => 'required|exists:university,id',
-            'image_url' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
         ]);
     }
 
@@ -97,6 +102,28 @@ class RegisterController extends Controller
             'image_url' => $imageUrl
         ]);
     }
+
+    public function register(Request $request)
+    {
+        $validator = $this->validator($request->all());
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        event(new Registered($user = $this->create($request->all())));
+
+        $this->guard()->login($user);
+
+        if ($response = $this->registered($request, $user)) {
+            return $response;
+        }
+
+        return $request->wantsJson()
+            ? new JsonResponse([], 201)
+            : redirect($this->redirectPath());
+    }
+
 
     public function showRegistrationForm()
     {
