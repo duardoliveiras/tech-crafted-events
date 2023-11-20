@@ -11,7 +11,6 @@ class Event extends Model
 
     protected $table = 'event';
     protected $keyType = 'string';
-    protected $dates = ['start_date', 'end_date'];
     public $timestamps = false;
     protected $fillable = [
         'name',
@@ -29,6 +28,8 @@ class Event extends Model
     ];
     protected $casts = [
         'current_price' => 'float',
+        'start_date' => 'datetime',
+        'end_date' => 'datetime',
     ];
 
     public function category()
