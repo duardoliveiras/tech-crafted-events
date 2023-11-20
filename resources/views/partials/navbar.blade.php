@@ -9,7 +9,6 @@
                         <li class="nav-item"><a class="nav-link" href="{{ route('admin.dashboard') }}">Admin Dashboard</a></li>
                     @endif
                     <li class="nav-item"><a class="nav-link" href="/home">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/events">Events</a></li>
                     <li class="nav-item"><a class="nav-link" href="/about">About us</a></li>
                     <li class="nav-item"><a class="nav-link" href="/help">Help/FAQ</a></li>
                 </ul>
@@ -38,7 +37,7 @@
                         </a>
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                             @auth
-                                <a class="dropdown-item" href="{{route('myevents.index')}}">My events</a>
+                                <a class="dropdown-item" href="{{route('my_events.index')}}">My events</a>
                                 <a class="dropdown-item" href="{{ route('profile.show', ['profile' => Auth::user()->id]) }}">Profile</a>
                             @endauth
                             <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

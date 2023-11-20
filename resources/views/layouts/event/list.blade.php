@@ -4,32 +4,15 @@
 
 @section('content')
     <div class="container my-3 filters-container">
-        <form class="mb-0">
-            <div class="form-row d-flex flex-row justify-content-around mx-3">
-                <div class="col mx-2">
-                    <label for="eventType" class="text-white label-filter">Looking for</label>
-                    <select id="eventType" name="eventType" class="form-control">
-                        <option value="">Choose event type</option>
-                        @foreach ($categories as $eventType)
-                            <option value="{{ $eventType->id }}" {{ request('eventType') == $eventType->id ? 'selected' : '' }}>{{ $eventType->name }}</option>
-                        @endforeach
-                    </select>
+        <form class="mb-0" id="filter-form">
+            <div class="form-row d-flex flex-row justify-content-around mx-4">
+                <div class="col">
+                    <label for="full-text-search" class="text-white label-filter">Search for event</label>
+                    <input type="text" class="form-control" id="full-text-search" name="full-text-search"
+                           placeholder="Type name of a event..."
+                           value="{{ request('full-text-search') }}">
                 </div>
-                <div class="col mx-2">
-                    <label for="location" class="text-white label-filter">Location</label>
-                    <select id="location" name="location" class="form-control">
-                        <option value="">Choose location</option>
-                        @foreach ($locations as $location)
-                            <option value="{{ $location->id }}" {{ request('location') == $location->id ? 'selected' : '' }}>{{ $location->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col mx-2">
-                    <label for="dateTime" class="text-white label-filter">When</label>
-                    <input type="date" class="form-control" id="date-filter" name="date-filter"
-                           value="{{ request('date-filter') }}">
-                </div>
-                <div class="col-1 align-self-end mx-2">
+                <div class="col-1 align-self-end d-flex justify-content-center ms-3">
                     <button type="submit" class="btn button-search p-3">
                         <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor"
                              class="bi bi-search" viewBox="0 0 16 16">
@@ -38,6 +21,49 @@
                     </button>
                 </div>
             </div>
+            <div class="accordion accordion-flush" id="fullTextSearch">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="flush-headingOne" style="width: 15% !important;">
+                        <button class="accordion-button collapsed ms-2" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#flush-collapseOne" aria-expanded="false"
+                                aria-controls="flush-collapseOne">
+                            Advanced search
+                        </button>
+                    </h2>
+                    <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne"
+                         data-bs-parent="#fullTextSearch">
+                        <div class="accordion-body pt-0">
+                            <div class="form-row d-flex flex-row justify-content-around mx-2">
+                                <div class="col mx-2">
+                                    <label for="eventType" class="text-white label-filter">Looking for</label>
+                                    <select id="eventType" name="eventType" class="form-control">
+                                        <option value="">Choose event type</option>
+                                        @foreach ($categories as $eventType)
+                                            <option value="{{ $eventType->id }}" {{ request('eventType') == $eventType->id ? 'selected' : '' }}>{{ $eventType->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col mx-2">
+                                    <label for="location" class="text-white label-filter">Location</label>
+                                    <select id="location" name="location" class="form-control">
+                                        <option value="">Choose location</option>
+                                        @foreach ($locations as $location)
+                                            <option value="{{ $location->id }}" {{ request('location') == $location->id ? 'selected' : '' }}>{{ $location->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col mx-2">
+                                    <label for="date-filter" class="text-white label-filter">When</label>
+                                    <input type="date" class="form-control" id="date-filter" name="date-filter"
+                                           value="{{ request('date-filter') }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <a onclick="clearForm()" id="clear-filters" class="text-decoration-none text-white ms-4"
+               style="cursor: pointer;"><u>Clear filter options</u></a>
         </form>
     </div>
 
@@ -60,8 +86,10 @@
                                  class="card-img-top" alt="{{ $event->name }}">
                             <div class="card-body">
                                 <h5 class="card-title">{{ $event->name }}</h5>
-                                <p class="card-text mb-1" style="color: #7848F4;">{{ $event->start_date->format('d M Y, H:i') }}</p>
-                                <p class="card-text" style="color: #7E7E7E;">{{ $event->address }}, {{ $event->city->name }}</p>
+                                <p class="card-text mb-1"
+                                   style="color: #7848F4;">{{ \Carbon\Carbon::parse($event->startdate)->format('l, F j, g:i A') }}</p>
+                                <p class="card-text" style="color: #7E7E7E;">{{ $event->address }}
+                                    , {{ $event->city->name }}</p>
                             </div>
                         </a>
                     </div>
@@ -78,8 +106,10 @@
         <img src="{{URL::asset('/assets/make-your-event.png')}}" class="image-mye"/>
         <div class="banner-content text-center">
             <h1>Make your own Event</h1>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-            <a href="{{route('events.create')}}"><button class="btn banner-button">Create Events</button></a>
+            <p>Publish your own event here!</p>
+            <a href="{{route('events.create')}}">
+                <button class="btn banner-button">Create Events</button>
+            </a>
         </div>
     </div>
 
@@ -108,6 +138,19 @@
             @endforeach
         </div>
     </div>
+
+    <script>
+        function clearForm() {
+            let currentUrl = new URL(window.location.href);
+
+            let formFields = ["full-text-search", "eventType", "location", "date-filter"];
+            formFields.forEach(function (field) {
+                currentUrl.searchParams.delete(field);
+            });
+
+            window.location.href = currentUrl.href;
+        }
+    </script>
 
 @endsection
 
