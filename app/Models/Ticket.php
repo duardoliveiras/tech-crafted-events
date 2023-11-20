@@ -16,10 +16,9 @@ class Ticket extends BaseModel
         'event_id',
         'user_id',
         'price_paid',
-        'is_used',
-    ];
-    protected $attributes = [
-        'is_used' => false,
+        'status',
+        'created_at',
+        'updated_at'
     ];
 
 
@@ -31,6 +30,35 @@ class Ticket extends BaseModel
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function markTicketAsPending()
+    {
+        $this->status = 'PENDING';
+        $this->save();
+    }
+    public function markTicketAsPaid()
+    {
+        $this->status = 'PAID';
+        $this->save();
+    }
+
+    public function markTicketAsRead()
+    {
+        $this->status = 'READ';
+        $this->save();
+    }
+
+    public function markTicketAsCanceled()
+    {
+        $this->status = 'CANCELED';
+        $this->save();
+    }
+
+    public function markTicketAsError()
+    {
+        $this->status = 'ERROR';
+        $this->save();
     }
 
 }
