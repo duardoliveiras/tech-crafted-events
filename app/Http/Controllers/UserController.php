@@ -8,9 +8,7 @@ use App\Models\User;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     // JUST AUTHENTICATED USERS
     public function __construct()
     {
@@ -44,13 +42,13 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        $user = User::find($id);
+        $user = User::findOrFail($id);
 
-        if ($user && Auth::user()->id === $user->id) {
-            return view('layouts.profile.show', ['user' => $user]);
-        } else {
-            return redirect()->route('home')->with('error', 'Você não tem permissão para acessar este perfil.');
+        if (Auth::user()->id !== $user->id && !Auth::user()->isAdmin()) {
+            return redirect()->route('home')->with('error', 'You are not allowed to access this profile.');
         }
+
+        return view('layouts.profile.show', ['user' => $user]);
     }
 
     /**
@@ -58,19 +56,14 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        $user = User::find($id);
+        $user = User::findOrFail($id);
 
-        if (!$user) {
-            // In case of profile not found
-            abort(404);
+        // Verificar se é o próprio usuário ou se é administrador
+        if (!(Auth::user()->id === $user->id || Auth::user()->isAdmin)) {
+            return redirect()->route('home')->with('error', 'You do not have permission to edit this profile.');
         }
 
-        if (Auth::user()->id !== $user->id) {
-            // Prevent users from editing other users' profiles
-            return redirect()->route('home')->with('error', 'You do not have permission to edit.');
-        }
-
-        return view('layouts.profile.edit')->with('user', $user);
+        return view('layouts.profile.edit', compact('user'));
     }
 
     /**
@@ -78,33 +71,22 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $user = User::find($id);
+        $user = User::findOrFail($id);
 
-        if (!$user) {
-            // Profile not found
-            abort(404);
+        if (Auth::user()->id !== $user->id && !Auth::user()->isAdmin()) {
+            return redirect()->route('home')->with('error', 'You do not have permission to update this profile.');
         }
 
-        if (Auth::user()->id !== $user->id) {
-            // Prevent users from updating other users' profiles
-            return redirect()->route('home')->with('error', 'You do not have permission to edit');
-        }
-
-        // Data validation
         $validatedData = $request->validate([
             'name' => 'required|max:255',
             'birthdate' => 'required|date',
-            // Note: The unique validation rule should reference the correct table
-            'email' => 'required|email|max:255|unique:users,email,'.$id,
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'phone_number' => 'required|max:20'
         ]);
 
-        // Update profile
         $user->update($validatedData);
 
-        // Redirect to the profile show
-        // Note: Make sure the route name is correct. It should not include the view path.
-        return redirect()->route('profile.show', $user->id)->with('success', 'Profile updated sucessfully!');
+        return redirect()->route('profile.show', $user->id)->with('success', 'Profile updated successfully!');
     }
 
 
@@ -119,14 +101,22 @@ class UserController extends Controller
             abort(404);
         }
 
-        // User deleted
-        $user->isDeleted = true;
-        $user->save();
+        $authUser = Auth::user();
 
-        //Logout
-        Auth::logout();
+        if ($authUser->isAdmin() || $authUser->id == $user->id) {
 
-        return redirect()->route('login')->with('success', 'Account has been deleted.');
+            $user->is_deleted = true;
+            $user->save();
+
+            if (!$authUser->isAdmin() || $authUser->id == $user->id) {
+                Auth::logout();
+                return redirect()->route('login')->with('success', 'Account has been deleted.');
+            } else {
+                return redirect()->route('profile.index')->with('success', 'User account has been deleted.');
+            }
+        } else {
+            return redirect()->route('home')->with('error', 'You do not have permission to delete this account.');
+        }
     }
 
 }

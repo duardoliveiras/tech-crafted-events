@@ -5,29 +5,36 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-use App\Models\Category;
-
-class Event extends Model
+class Event extends BaseModel
 {
     use HasFactory;
 
+    protected $table = 'event';
+    protected $keyType = 'string';
+    public $timestamps = false;
     protected $fillable = [
         'name',
         'description',
-        'startdate',
-        'enddate',
-        'startticketsqty',
-        'currentticketsqty',
-        'currentprice',
+        'start_date',
+        'end_date',
+        'start_tickets_qty',
+        'current_tickets_qty',
+        'current_price',
         'address',
         'category_id',
         'city_id',
-        'owner_id'
+        'owner_id',
+        'image_url'
+    ];
+    protected $casts = [
+        'current_price' => 'float',
+        'start_date' => 'datetime',
+        'end_date' => 'datetime',
     ];
 
     public function category()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(Category::class, 'category_id');
     }
 
     public function city()
@@ -37,6 +44,24 @@ class Event extends Model
 
     public function owner()
     {
-        return $this->belongsTo(User::class, 'owner_id');
+        return $this->belongsTo(EventOrganizer::class, 'owner_id');
+    }
+
+    public function ticket()
+    {
+        return $this->hasMany(Ticket::class);
+    }
+    public function discussion()
+    {
+        return $this->hasOne(Discussion::class);
+    }
+
+    protected static function booted()
+    {
+        static::created(function ($event) {
+            Discussion::create([
+                'event_id' => $event->id
+            ]);
+        });
     }
 }

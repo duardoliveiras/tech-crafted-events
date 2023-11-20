@@ -12,7 +12,14 @@ class LoginController extends Controller
 {
     use AuthenticatesUsers;
 
-    protected $redirectTo = RouteServiceProvider::HOME;
+    protected function redirectPath()
+    {
+        if (Auth::user()->isAdmin()) {
+            return route('admin.dashboard');
+        }
+
+        return property_exists($this, 'redirectTo') ? $this->redirectTo : '/home';
+    }
 
     public function __construct()
     {
@@ -29,7 +36,7 @@ class LoginController extends Controller
     {
         return array_merge(
             $request->only($this->username(), 'password'),
-            ['isDeleted' => false] // Garante que apenas usuários não deletados possam fazer login
+            ['is_deleted' => false] // Garante que apenas usuários não deletados possam fazer login
         );
     }
 
