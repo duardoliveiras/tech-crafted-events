@@ -6,10 +6,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 
 // Added to define Eloquent relationships.
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -19,6 +19,8 @@ class User extends Authenticatable
     public $timestamps = false;
     protected $table = 'users';
     protected $keyType = 'string';
+    public $incrementing = false;
+    protected $primaryKey = 'id';
 
     /**
      * The attributes that are mass assignable.
@@ -62,6 +64,7 @@ class User extends Authenticatable
     {
         return $this->hasMany(Event::class, 'owner_id', 'id');
     }
+
     public function ticket()
     {
         return $this->hasMany(Ticket::class);
@@ -87,6 +90,16 @@ class User extends Authenticatable
         return Vote::whereIn('comment_id', $discussion->comment()->pluck('id'))
             ->where('user_id', $this->id)
             ->pluck('vote_type', 'comment_id');
+    }
+
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            $model->{$model->getKeyName()} = (string)Str::uuid();
+        });
     }
 
 }
