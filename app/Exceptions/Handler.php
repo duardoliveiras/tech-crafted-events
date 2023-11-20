@@ -3,7 +3,9 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Auth\Access\AuthorizationException;
 use Throwable;
+
 
 class Handler extends ExceptionHandler
 {
@@ -17,6 +19,15 @@ class Handler extends ExceptionHandler
         'password',
         'password_confirmation',
     ];
+
+    public function render($request, Throwable $exception)
+    {
+        if ($exception instanceof AuthorizationException) {
+            return redirect()->route('events.index')->with('error', 'You have no permission.');
+        }
+
+        return parent::render($request, $exception);
+    }
 
     /**
      * Register the exception handling callbacks for the application.

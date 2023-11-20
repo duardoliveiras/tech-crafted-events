@@ -1,22 +1,16 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
-
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\DiscussionController;
+use App\Http\Controllers\EventController;
+use App\Http\Controllers\MyEventsController;
+use App\Http\Controllers\NotificationsController;
+use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UserController;
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
+use Illuminate\Support\Facades\Route;
 
 // Home
 Route::redirect('/', '/home');
@@ -33,12 +27,51 @@ Route::controller(RegisterController::class)->group(function () {
     Route::post('/register', 'register');
 });
 
-Auth::routes();
+\Illuminate\Support\Facades\Auth::routes();
 
 // Home
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/home', [EventController::class, 'index'])->name('home');
+Route::view('/help', 'help')->name('help');
+Route::view('/about', 'about')->name('about');
 
 // User
+Route::resource('profile', UserController::class);
 
-Route::resource('profile',UserController::class);
+Route::get('/my-events', [MyEventsController::class, 'index'])->name('my_events.index');
+
+Route::get('/notifications', [NotificationsController::class, 'index'])->name('notifications.index');
+Route::match(['post', 'put'], '/notifications/mark-read/{notification}', [NotificationsController::class, 'markRead'])->name('notificationscontroller.markRead');
+
+//Admin
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+});
+//Events
+Route::resource('events', EventController::class);
+
+//Ticket
+Route::get('/events/{event}/ticket/buy', [TicketController::class, 'showBuyTicketForm'])->name('ticket.buy');
+Route::post('/events/{event}/ticket/acquire', [TicketController::class, 'acquireTicket'])->name('ticket.acquire');
+Route::get('/events/{event}/ticket/authorize', [TicketController::class, 'authorizeTicket'])->name('ticket.authorize');
+Route::get('/events/{event}/ticket/{ticket}', [TicketController::class, 'showTicket'])
+    ->name('ticket.show')
+    ->middleware(['auth', 'acess.ticket']);
+Route::post('/events/{event}/ticket/authenticate', [TicketController::class, 'authenticateTicket'])->name('ticket.authenticate');
+
+
+//Discussion
+Route::get('/events/{event}/discussion', [DiscussionController::class, 'show'])
+    ->name('discussion.show')
+    ->middleware(['auth', 'acess.ticket']);
+
+// add comments
+Route::post('/events/{event}/discussion/{discussion}/comment', [CommentController::class, 'store'])
+    ->name('discussion.comment')
+    ->middleware(['auth']);
+
+// add vote to comment
+Route::middleware(['auth'])->group(function () {
+    Route::post('/comments/{comment}/toggle-vote/{voteType}', [CommentController::class, 'toggleVote'])
+        ->name('comment.toggleVote');
+});;
+
