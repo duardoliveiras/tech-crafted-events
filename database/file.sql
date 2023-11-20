@@ -17,6 +17,8 @@ DROP TABLE IF EXISTS City CASCADE;
 DROP TABLE IF EXISTS State CASCADE;
 DROP TABLE IF EXISTS Country CASCADE;
 DROP TABLE IF EXISTS Category CASCADE;
+DROP TABLE IF EXISTS EventNotifications CASCADE;
+DROP TABLE IF EXISTS UsersEventNotifications CASCADE;
 
 -------------------------
 -- TABLES ---------------
