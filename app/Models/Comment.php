@@ -35,6 +35,17 @@ class Comment extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function isOwner(): bool
+    {
+        return $this->discussion->event->owner->user->id === $this->user->id;
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->user->isAdmin();
+    }
+
+
     public function votes(): HasMany
     {
         return $this->hasMany(Vote::class, 'comment_id');
