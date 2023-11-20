@@ -12,7 +12,7 @@
                     <div class="card-header">{{ __('Register') }}</div>
 
                     <div class="card-body">
-                        <form method="POST" action="{{route('register') }}" enctype="multipart/form-data" id="form-register">
+                        <form method="POST" action="{{route('register') }}" enctype="multipart/form-data">
                             @csrf
 
                             @if ($errors->any())
@@ -64,10 +64,10 @@
                                     <div class="col-md-6">
                                         <input id="phone" type="text"
                                                class="form-control @error('phone') is-invalid @enderror" name="phone"
-                                               value="{{ old('phone') }}" required>
+                                               value="{{ old('phone') }}" oninput="validatePhoneInput(this)" required>
 
                                         @error('phone')
-                                        <span class="invalid-feedback" role="alert">
+                                        <span class="invalid-feedback" role="alert" id="error-message-phone">
                                                                             <strong>{{ $message }}</strong>
                                                                         </span>
                                         @enderror
@@ -83,11 +83,7 @@
                                                class="form-control @error('birthdate') is-invalid @enderror"
                                                name="birthdate" value="{{ old('birthdate') }}" required>
 
-                                        @error('birthdate')
-                                        <span class="invalid-feedback" role="alert">
-                                                                            <strong>{{ $message }}</strong>
-                                                                        </span>
-                                        @enderror
+                                        <span class="invalid-feedback" role="alert" id="error-message-birthdate"></span>
                                     </div>
                                 </div>
 
@@ -105,11 +101,7 @@
                                                class="form-control @error('email') is-invalid @enderror" name="email"
                                                value="{{ old('email') }}" required autocomplete="email">
 
-                                        @error('email')
-                                        <span class="invalid-feedback" role="alert">
-                                                                            <strong>{{ $message }}</strong>
-                                                                        </span>
-                                        @enderror
+                                        <span class="invalid-feedback" role="alert" id="error-message-email"></span>
                                     </div>
                                 </div>
 
@@ -123,11 +115,7 @@
                                                name="password"
                                                required autocomplete="new-password">
 
-                                        @error('password')
-                                        <span class="invalid-feedback" role="alert">
-                                                                            <strong>{{ $message }}</strong>
-                                                                        </span>
-                                        @enderror
+                                        <span class="invalid-feedback" role="alert" id="error-message-password"></span>
                                     </div>
                                 </div>
 
@@ -138,6 +126,8 @@
                                     <div class="col-md-6">
                                         <input id="password-confirm" type="password" class="form-control"
                                                name="password_confirmation" required autocomplete="new-password">
+                                        <span class="invalid-feedback" role="alert"
+                                              id="error-message-password-confirm"></span>
                                     </div>
                                 </div>
 
@@ -160,7 +150,8 @@
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h5 class="modal-title" id="cropImageModalLabel">Crop image</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body d-flex align-items-center justify-content-center">
                                                 <div class="img-container d-flex justify-content-center">
@@ -243,23 +234,67 @@
                 if (!name || !universityId || !phone || !birthdate) {
                     alert('Please fill in all fields in Step 1');
                     valid = false;
+                } else {
+                    let currentDate = new Date();
+                    let inputDate = new Date(birthdate);
+
+                    if (inputDate > currentDate) {
+                        displayError('Birthdate cannot be greater than the current date', 'birthdate');
+                        valid = false;
+                    } else {
+                        clearError('birthdate');
+                    }
                 }
 
                 return valid;
             }
 
+
             function validateStep2() {
                 let valid = true;
+
                 let email = document.getElementById('email').value;
                 let password = document.getElementById('password').value;
                 let confirmPassword = document.getElementById('password-confirm').value;
 
-                if (!email || !password || !confirmPassword) {
-                    alert('Please fill in all fields in Step 2');
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+                if (!email || !emailRegex.test(email)) {
+                    displayError('Invalid email address', 'email');
                     valid = false;
+                } else {
+                    clearError('email');
+                }
+
+                if (!password || password.length < 8) {
+                    displayError('Password must be at least 8 characters', 'password');
+                    valid = false;
+                } else {
+                    clearError('password');
+                }
+
+                if (password !== confirmPassword) {
+                    displayError('Passwords do not match', 'password-confirm');
+                    valid = false;
+                } else {
+                    clearError('password-confirm');
                 }
 
                 return valid;
+            }
+
+            function displayError(message, input) {
+                let errorMessageElement = $("#error-message-" + input);
+                errorMessageElement.html(`<strong>${message}</strong>`);
+                errorMessageElement.css('display', 'inherit');
+                document.getElementById(input).classList.add('is-invalid');
+            }
+
+            function clearError(input) {
+                let errorMessageElement = $("#error-message-" + input);
+                errorMessageElement.html('');
+                errorMessageElement.css('display', 'none');
+                document.getElementById(input).classList.remove('is-invalid')
             }
         });
 
@@ -319,13 +354,14 @@
             });
         })
 
-        document.getElementById('form-register').addEventListener('submit', function (e) {
+        document.querySelector('form[action="{{ route("register") }}"]').addEventListener('submit', function (e) {
             e.preventDefault();
 
             let form = e.target;
             let formData = new FormData(form);
 
             let imageSrc = document.getElementById('preview').src;
+
             fetch(imageSrc)
                 .then(res => res.blob())
                 .then(blob => formData.append('image_url', blob, 'user_image.png'))
@@ -335,14 +371,81 @@
                         body: formData
                     })
                         .then(response => {
-                            if (response.redirected) {
+                            if (!response.ok) {
+                                treatError(response)
+                                return
+                            } else if (response.redirected) {
                                 window.location.href = response.url;
-                            } else {
-                                return response.json();
                             }
+                            return response.json();
                         })
-                })
+                });
         });
+
+        function treatError(response) {
+            response.json().then(data => {
+                displayErrors(data.errors)
+            })
+        }
+
+        function displayErrors(errors) {
+            clearErrors();
+
+            let alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger';
+
+            let errorList = document.createElement('ul');
+
+            Object.keys(errors).forEach(field => {
+                let input = document.querySelector(`[name="${field}"]`);
+                if (input) {
+                    input.classList.add('is-invalid');
+                    let errorContainer = document.createElement('span');
+                    errorContainer.className = 'invalid-feedback';
+                    errorContainer.setAttribute('role', 'alert');
+                    errorContainer.style.display = 'inherit';
+                    errorContainer.innerHTML = `<strong>${errors[field][0]}</strong>`;
+                    input.parentNode.appendChild(errorContainer);
+
+                    let errorItem = document.createElement('li');
+                    errorItem.textContent = errors[field][0];
+                    errorList.appendChild(errorItem);
+                }
+            });
+
+            alertDiv.appendChild(errorList);
+
+            let form = document.querySelector('form');
+            form.insertBefore(alertDiv, form.firstChild);
+        }
+
+        function clearErrors() {
+            let errorMessages = document.querySelectorAll('.invalid-feedback');
+            errorMessages.forEach(message => message.parentNode.removeChild(message));
+
+            let inputs = document.querySelectorAll('.is-invalid');
+            inputs.forEach(input => input.classList.remove('is-invalid'));
+
+            let alertDiv = document.querySelector('.alert-danger');
+            if (alertDiv) {
+                alertDiv.parentNode.removeChild(alertDiv);
+            }
+        }
+
+        function validatePhoneInput(inputField) {
+            inputField.value = inputField.value.replace(/[^0-9+ ]/g, '');
+            const errorMessageBox = $("#error-message-phone")
+
+            if (/[^0-9+ ]/.test(inputField.value)) {
+                errorMessageBox.innerHTML = '<strong>Invalid input. Please enter only numbers, +, or space.</strong>';
+                errorMessageBox.css('display', 'inherit')
+            } else {
+                errorMessageBox.innerHTML = '';
+                errorMessageBox.css('display', 'none')
+            }
+        }
+
+
     </script>
 
     <style>

@@ -72,11 +72,3 @@ Route::middleware(['auth'])->group(function () {
         ->name('comment.toggleVote');
 });;
 
-//Vote in the comments
-Route::post('/comments/{comment}/upvote', 'CommentController@upvote')->name('comment.upvote');
-Route::post('/comments/{comment}/downvote', 'CommentController@downvote')->name('comment.downvote');
-
-
-
-
-
