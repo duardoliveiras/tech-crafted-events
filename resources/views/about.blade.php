@@ -3,6 +3,17 @@
 @section('title', 'About Us - TechCrafted')
 
 @section('content')
+    <style>
+        .card-hover-effect {
+            transition: transform .3s, box-shadow .3s;
+            border: none;
+        }
+
+        .card-hover-effect:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
     <div class="container py-5">
         <h2 class="text-center mb-4">About Us</h2>
         <p class="text-center mb-5">TechCrafted is dedicated to enhancing the faculty event management experience at FEUP, engineered by students for students.</p>
@@ -19,7 +30,7 @@
 
             @foreach ($developers as $developer)
                 <div class="col">
-                    <div class="card h-100">
+                    <div class="card h-100 card-hover-effect">
                         <img src="{{ asset('assets/developers/'.$developer['image']) }}" class="card-img-top" alt="{{ $developer['name'] }}">
                         <div class="card-body">
                             <h5 class="card-title text-center">{{ $developer['name'] }}</h5>

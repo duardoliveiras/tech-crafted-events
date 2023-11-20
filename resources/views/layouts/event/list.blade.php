@@ -3,6 +3,17 @@
 <link rel="stylesheet" type="text/css" href="{{URL::asset('/assets/css/list-event.scss')}}">
 
 @section('content')
+    <style>
+        .card-hover-effect {
+            transition: transform .3s, box-shadow .3s;
+            border: none;
+        }
+
+        .card-hover-effect:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
     <div class="container my-3 filters-container">
         <form class="mb-0">
             <div class="form-row d-flex flex-row justify-content-around mx-3">
@@ -47,7 +58,7 @@
         <div class="row mt-3">
             @foreach($events as $event)
                 <div class="col-md-4">
-                    <div class="card mb-4 shadow" style="border-width: 0;">
+                    <div class="card mb-4 shadow card-hover-effect" style="border-width: 0;">
                         <a href="/events/{{ $event->id }}" class="text-decoration-none text-reset">
                             <div style="position: absolute; top: 10px; left: 20px; background: white; color: #7848F4; padding: 8px; border-radius: 10px;">
                                 @if ($event->currentprice == 0)
@@ -89,7 +100,7 @@
         <div class="row mt-3">
             @foreach($universities as $index => $university)
                 <div class="col-md-4">
-                    <div class="card mb-4">
+                    <div class="card mb-4 card-hover-effect">
                         @php
                             $imageName = 'university' . ($index + 1) . '.jpeg';
                             $imageUrl = asset("assets/universities/{$imageName}");
