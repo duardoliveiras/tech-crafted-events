@@ -35,6 +35,25 @@
   border-radius: 20px;
 }
 
+#fullTextSearch > div,
+#flush-headingOne > button,
+.accordion-body,
+#flush-collapseOne {
+  background-color: #10107B;
+  color: white;
+}
+
+.accordion-button.collapsed::after,
+.accordion-button:not(.collapsed)::after {
+  filter: brightness(0%) invert(70%);
+}
+
+.accordion-button:focus,
+.accordion-button {
+  outline: 0 !important;
+  box-shadow: 0 0 0 0 rgba(0, 0, 0, 0) !important;
+}
+
 .button-search {
   color: white !important;
   background-color: #7848F4 !important;
