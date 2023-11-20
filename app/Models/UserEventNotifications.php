@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 
-class UserEventNotifications extends Model
+class UserEventNotifications extends BaseModel
 {
     use HasFactory;
 
