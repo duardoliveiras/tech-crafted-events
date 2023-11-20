@@ -12,8 +12,8 @@
                         <h4 class="text-primary">Event Details:</h4>
                         <p>{{ $event->description }}</p>
                         <hr>
-                        <p><strong>Start Time:</strong> {{ \Carbon\Carbon::parse($event->start_time)->format('g:i A, d M Y') }}</p>
-                        <p><strong>End Time:</strong> {{ \Carbon\Carbon::parse($event->end_time)->format('g:i A, d M Y') }}</p>
+                        <p><strong>Start Time:</strong> {{ $event->start_date->format('d M Y, H:i') }}</p>
+                        <p><strong>End Time:</strong> {{ $event->start_date->format('d M Y, H:i') }}</p>
                         <p><strong>Location:</strong> {{ $event->address }}</p>
                     </div>
                     <div class="col-lg-4 text-center">
