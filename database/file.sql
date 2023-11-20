@@ -122,6 +122,23 @@ CREATE TABLE Notification
     FOREIGN KEY (user_id) REFERENCES Users (id)
 );
 
+CREATE TABLE EventNotifications (
+    id                  UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    event_id            UUID              NOT NULL,
+    notification_text   TEXT              NOT NULL,
+    FOREIGN KEY (event_id) REFERENCES Event(id)
+);
+
+
+CREATE TABLE UsersEventNotifications (
+    id                   UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id              UUID              NOT NULL,
+    read                 BOOLEAN           NOT NULL,
+    notification_id      UUID              NOT NULL,
+    FOREIGN KEY (notification_id) REFERENCES eventNotifications(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES Users (id)
+);
+
 CREATE TABLE Admin
 (
     id      UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -169,6 +186,30 @@ CREATE TABLE Vote
     FOREIGN KEY (user_id) REFERENCES Users (id),
     FOREIGN KEY (comment_id) REFERENCES Comment (id)
 );
+
+create or replace function NOTIFY_EVENT_UPDATE()
+returns trigger as $$
+declare id_notification UUID;
+begin 	
+		insert into tech_crafted.eventnotifications(event_id, notification_text)
+		values(new.id, new.name || ' has been updated.')
+		returning id into id_notification;
+	
+		insert into tech_crafted.userseventnotifications(user_id, notification_id, read)
+		select user_id, id_notification, false 
+		from ticket
+		where event_id = new.id;
+	
+		return new;
+end;
+
+$$ language plpgsql;
+
+create trigger event_update_trigger
+after update
+on event 
+for each row 
+execute function notify_event_update();
 
 
 INSERT INTO Category (id, name)

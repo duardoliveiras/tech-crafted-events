@@ -10,6 +10,7 @@ use App\Http\Controllers\DiscussionController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\MyEventsController;
+use App\Http\Controllers\NotificationsController;
 use Illuminate\Support\Facades\Route;
 
 // Home
@@ -38,6 +39,9 @@ Route::view('/about', 'about')->name('about');
 Route::resource('profile', UserController::class);
 
 Route::get('/my-events', [MyEventsController::class, 'index'])->name('my_events.index');
+
+Route::get('/notifications', [NotificationsController::class, 'index'])->name('notifications.index');
+Route::match(['post', 'put'], '/notifications/mark-read/{notification}', [NotificationsController::class, 'markRead'])->name('notificationscontroller.markRead');
 
 //Admin
 Route::middleware(['auth', 'admin'])->group(function () {
