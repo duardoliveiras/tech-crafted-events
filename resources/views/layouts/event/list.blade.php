@@ -3,17 +3,6 @@
 <link rel="stylesheet" type="text/css" href="{{URL::asset('/assets/css/list-event.css')}}">
 
 @section('content')
-    <style>
-        .card-hover-effect {
-            transition: transform .3s, box-shadow .3s;
-            border: none;
-        }
-
-        .card-hover-effect:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-    </style>
     <div class="container my-3 filters-container">
         <form class="mb-0" id="filter-form">
             <div class="form-row d-flex flex-row justify-content-around mx-4">
@@ -79,8 +68,27 @@
     </div>
 
     <div class="container mt-5">
-        <h2 class="title-events black">Upcoming</h2>
-        <h2 class="title-events purple"> Events</h2>
+        <div class="row">
+            <div class="title col">
+                <h2 class="title-events black">Upcoming</h2>
+                <h2 class="title-events purple"> Events</h2>
+            </div>
+            <div class="sort-options col justify-content-end d-flex flex-row align-items-center">
+                <div class="event-type-select">
+                    <select id="eventType" name="eventType" class="form-control">
+                        <option value="">Event Type</option>
+                        @foreach ($categories as $eventType)
+                            <option value="{{ $eventType->id }}" {{ request('eventType') == $eventType->id ? 'selected' : '' }}>{{ $eventType->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="sort-by-select">
+
+                </div>
+            </div>
+        </div>
+
         <div class="row mt-3">
             @foreach($events as $event)
                 <div class="col-md-4">
@@ -150,18 +158,7 @@
         </div>
     </div>
 
-    <script>
-        function clearForm() {
-            let currentUrl = new URL(window.location.href);
-
-            let formFields = ["full-text-search", "eventType", "location", "date-filter"];
-            formFields.forEach(function (field) {
-                currentUrl.searchParams.delete(field);
-            });
-
-            window.location.href = currentUrl.href;
-        }
-    </script>
+    <script type="text/javascript" src="{{ URL::asset ('js/event/list-event.js') }}"></script>
 
 @endsection
 

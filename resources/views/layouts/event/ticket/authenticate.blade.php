@@ -39,7 +39,7 @@
                                 <input type="text" class="form-control" id="user_id" name="user_id" readonly>
                             </div>
                             <div class="mb-3">
-                                <button type="submit" class="btn btn-primary" id="submitForm">Enviar</button>
+                                <button type="submit" class="btn btn-primary" id="submitForm">Send</button>
                             </div>
                         </form>
                     </div>
@@ -50,27 +50,6 @@
 
     <!-- JavaScript para ler o QR Code -->
     <script src="{{ asset('js/html5-qrcode.min.js') }}"></script>
-    <script type="text/javascript">
-        function onScanSuccess(qrCodeMessage) {
-            document.getElementById('result').innerHTML = qrCodeMessage;
+    <script type="text/javascript" src="{{ URL::asset ('js/event/ticket-auth.js') }}"></script>
 
-            var parts = qrCodeMessage.split(','); // Separar por vírgulas
-
-            // Preencher os campos do formulário
-            var form = document.getElementById('qrForm');
-            form.action = '/events/' + parts[0] + '/ticket/authenticate'; // Event ID
-            document.getElementById('ticket_id').value = parts[1]; // Ticket ID
-            document.getElementById('user_id').value = parts[2]; // User ID
-            document.getElementById('submitForm').click();
-        }
-
-        function onScanError(errorMessage) {
-            // Tratar erro de leitura do QR Code
-            console.error(errorMessage);
-        }
-
-        var html5QrcodeScanner = new Html5QrcodeScanner(
-            "reader", { fps: 10, qrbox: 250 });
-        html5QrcodeScanner.render(onScanSuccess, onScanError);
-    </script>
 @endsection

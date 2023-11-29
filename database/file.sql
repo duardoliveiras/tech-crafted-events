@@ -129,13 +129,12 @@ CREATE TABLE EventNotifications
     FOREIGN KEY (event_id) REFERENCES Event (id)
 );
 
-
 CREATE TABLE UsersEventNotifications
 (
-    id SERIAL PRIMARY KEY,
+    id              SERIAL PRIMARY KEY,
     user_id         UUID    NOT NULL,
     read            BOOLEAN NOT NULL,
-    notification_id SERIAL    NOT NULL,
+    notification_id SERIAL  NOT NULL,
     FOREIGN KEY (notification_id) REFERENCES eventNotifications (id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES Users (id)
 );
@@ -193,19 +192,21 @@ CREATE TABLE Vote
 );
 
 create or replace function NOTIFY_EVENT_UPDATE()
-returns trigger as $$
-declare id_notification INTEGER;
-begin 	
-		insert into tech_crafted.eventnotifications(event_id, notification_text)
-		values(new.id, new.name || ' has been updated.')
-		returning id into id_notification;
-	
-		insert into tech_crafted.userseventnotifications(user_id, notification_id, read)
-		select user_id, id_notification, false 
-		from ticket
-		where event_id = new.id;
-	
-		return new;
+    returns trigger as
+$$
+declare
+    id_notification INTEGER;
+begin
+    insert into tech_crafted.eventnotifications(id, event_id, notification_text)
+    values (DEFAULT, new.id, new.name || ' has been updated.')
+    returning id into id_notification;
+
+    insert into tech_crafted.userseventnotifications(user_id, notification_id, read)
+    select user_id, id_notification, false
+    from ticket
+    where event_id = new.id;
+
+    return new;
 end;
 
 $$ language plpgsql;
