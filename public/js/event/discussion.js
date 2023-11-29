@@ -8,10 +8,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                 },
             })
                 .then(response => response.json())
-                .then(function (data) {
+                .then(data => {
                     let newVoteType = data.newVoteType;
                     let voteCount = data.voteCount;
 
@@ -32,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     let voteCountElement = document.getElementById(`vote-count-${commentId}`);
                     voteCountElement.innerText = voteCount;
                 })
-                .catch(function (error) {
+                .catch(error => {
                     console.error('Erro ao processar a solicitação:', error);
                 });
         });
