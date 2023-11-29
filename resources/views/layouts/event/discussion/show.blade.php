@@ -1,7 +1,5 @@
 @extends('layouts.app')
 
-<script src="/public/js/event/discussion.js"></script>
-
 @section('content')
     <div class="container mt-4">
         <h2 class="mb-4">Discussion for "{{ $event->name }}"</h2>
@@ -9,7 +7,8 @@
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Add a Comment</h5>
-                <form action="{{ route('discussion.comment', ['event' => $event->id, 'discussion' => $discussion->id]) }}" method="POST">
+                <form action="{{ route('discussion.comment', ['event' => $event->id, 'discussion' => $discussion->id]) }}"
+                      method="POST">
                     @csrf
                     <div class="form-group">
                         <label for="content">Your Comment:</label>
@@ -45,4 +44,8 @@
             </div>
         </div>
     </div>
+
 @endsection
+
+
+
