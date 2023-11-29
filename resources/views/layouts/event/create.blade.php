@@ -78,7 +78,8 @@
                                     <input type="text" class="form-control" id="address_search" name="address_search"
                                            placeholder="Type address..." required>
                                     <div class="input-group-append">
-                                        <button class="btn btn-outline-secondary" type="button" onclick="searchInMap()">
+                                        <button id="searchBtn" class="btn btn-outline-secondary" type="button"
+                                                onclick="searchInMap()">
                                             Search in Map
                                         </button>
                                     </div>
@@ -113,49 +114,22 @@
                     </div>
                 </div>
             </div>
+
+            <!-- toast alert -->
+            <div class="toast" id="errorToast" role="alert" aria-live="assertive" aria-atomic="true" data-delay="5000">
+                <div class="toast-header">
+                    <strong class="mr-auto">Error</strong>
+                    <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="toast-body">
+                    <span id="errorToastMessage"></span>
+                </div>
+            </div>
         </div>
 
-        <script>
-            let mapPreview;
-            let mapMarker;
-
-            function initMap() {
-                mapPreview = L.map('preview-map').setView([-23.550520, -46.633308], 12); // Coordenadas iniciais (São Paulo, por exemplo)
-
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '© OpenStreetMap contributors'
-                }).addTo(mapPreview);
-
-                mapMarker = L.marker([-23.550520, -46.633308], {draggable: true}).addTo(mapPreview);
-
-                mapMarker.on('dragend', function (event) {
-                    updateLatAndLonInputs(mapMarker.getLatLng().lat, mapMarker.getLatLng().lng);
-                });
-            }
-
-            function searchInMap() {
-                const address = document.getElementById('address_search').value;
-
-                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${address}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        const location = data[0];
-                        mapPreview.setView([location.lat, location.lon], 12);
-                        mapMarker.setLatLng([location.lat, location.lon]);
-                        updateLatAndLonInputs(location.lat, location.lon);
-                    })
-                    .catch(error => {
-                        console.error('Error searching:', error);
-                    });
-            }
-
-            function updateLatAndLonInputs(lat, lng) {
-                document.getElementById('lat').value = lat;
-                document.getElementById('lon').value = lng;
-            }
-
-            window.onload = initMap;
-        </script>
+        <script type="text/javascript" src="{{ URL::asset ('js/event/create-event.js') }}"></script>
 
     </div>
     @if(session('success'))
