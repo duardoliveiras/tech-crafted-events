@@ -46,8 +46,10 @@ Route::match(['post', 'put'], '/notifications/mark-read/{notification}', [Notifi
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
 });
+
 //Events
 Route::resource('events', EventController::class);
+Route::get('/events/{event}', [EventController::class, 'show'])->name('event.details.show');
 
 //Ticket
 Route::get('/events/{event}/ticket/buy', [TicketController::class, 'showBuyTicketForm'])->name('ticket.buy');
@@ -73,5 +75,19 @@ Route::post('/events/{event}/discussion/{discussion}/comment', [CommentControlle
 Route::middleware(['auth'])->group(function () {
     Route::post('/comments/{comment}/toggle-vote/{voteType}', [CommentController::class, 'toggleVote'])
         ->name('comment.toggleVote');
-});;
+});
+
+// Payment Routes
+Route::prefix('payment')->group(function () {
+    Route::get('/checkout', [\App\Http\Controllers\StripeController::class, 'checkout'])
+        ->name('payment.checkout');
+    Route::post('/session', [\App\Http\Controllers\StripeController::class, 'session'])
+        ->name('payment.session');
+    Route::get('/success', [\App\Http\Controllers\StripeController::class, 'success'])
+        ->name('payment.success');
+    Route::get('/connect', [\App\Http\Controllers\StripeController::class, 'connect'])
+        ->name('payment.connect');
+    Route::get('/callback', [\App\Http\Controllers\StripeController::class, 'callback'])
+        ->name('payment.stripe.connect.callback');
+});
 

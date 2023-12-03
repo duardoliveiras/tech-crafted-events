@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Event;
 use App\Models\Ticket;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Str;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class TicketController extends Controller
 {
@@ -29,7 +29,7 @@ class TicketController extends Controller
     public function acquireTicket(Request $request, $eventId)
     {
         $event = Event::findOrFail($eventId);
-        $price_paid = $event->current_price > 0 ? $event->current_price : 0.0;
+        $pricePaid = $event->current_price > 0 ? $event->current_price : 0.0;
 
         if ($event->current_tickets_qty <= 0) {
             return back()->withError('Sorry, there are no more tickets available for this event.');
@@ -55,13 +55,14 @@ class TicketController extends Controller
             $ticket = new Ticket([
                 'user_id' => Auth::id(),
                 'event_id' => $eventId,
+                'price_paid' => $pricePaid
             ]);
 
             $event->decrement('current_tickets_qty');
             $ticket->save();
 
             // Add the ticket ID to the redirect if you need to reference it later
-            return redirect()->route('payment', ['ticketId' => $ticket->id])->with('success', 'Your ticket has been reserved. Please proceed with payment.');
+            return redirect()->route('payment.session', ['ticketId' => $event->id, 'eventId' => $event->id, 'amount' => $event->current_price, 'eventName' => $event->name]);
         }
     }
 
