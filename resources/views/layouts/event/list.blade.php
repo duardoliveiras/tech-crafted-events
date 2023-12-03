@@ -74,23 +74,23 @@
                 <h2 class="title-events purple"> Events</h2>
             </div>
             <div class="sort-options col justify-content-end d-flex flex-row align-items-center">
-                <div class="event-type-select">
-                    <select id="eventType" name="eventType" class="form-control">
-                        <option value="">Event Type</option>
-                        @foreach ($categories as $eventType)
-                            <option value="{{ $eventType->id }}" {{ request('eventType') == $eventType->id ? 'selected' : '' }}>{{ $eventType->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
+                {{--                <div class="event-type-select">--}}
+                {{--                    <select id="eventType" name="eventType" class="form-control">--}}
+                {{--                        <option value="">Event Type</option>--}}
+                {{--                        @foreach ($categories as $eventType)--}}
+                {{--                            <option value="{{ $eventType->id }}" {{ request('eventType') == $eventType->id ? 'selected' : '' }}>{{ $eventType->name }}</option>--}}
+                {{--                        @endforeach--}}
+                {{--                    </select>--}}
+                {{--                </div>--}}
 
-                <div class="sort-by-select">
+                {{--                <div class="sort-by-select">--}}
 
-                </div>
+                {{--                </div>--}}
             </div>
         </div>
 
         <div class="row mt-3">
-            @foreach($events as $event)
+            @forelse($events as $event)
                 <div class="col-md-4">
                     <div class="card mb-4 shadow card-hover-effect" style="border-width: 0;">
                         <a href="/events/{{ $event->id }}" class="text-decoration-none text-reset">
@@ -101,7 +101,7 @@
                                     € {{ number_format($event->current_price, 2) }}
                                 @endif
                             </div>
-                            <img src="{{('storage/' . $event->image_url) }}"
+                            <img src="{{ asset('storage/' . $event->image_url) }}"
                                  class="card-img-top" alt="{{ $event->name }}">
                             <div class="card-body">
                                 <h5 class="card-title">{{ $event->name }}</h5>
@@ -117,9 +117,14 @@
         </div>
         <div class="row">
             @endif
-            @endforeach
+            @empty
+                <div class="col-12 text-center">
+                    <p class="lead">No upcoming events found.</p>
+                </div>
+            @endforelse
         </div>
     </div>
+
 
     <div class="banner mt-5">
         <img src="{{URL::asset('/assets/make-your-event.png')}}" class="image-mye"/>
