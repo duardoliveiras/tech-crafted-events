@@ -27,7 +27,7 @@
 </head>
 <body class="">
 <div id="app" class="d-flex flex-column min-vh-100">
-    @if(\Illuminate\Support\Facades\Route::getCurrentRoute()->uri != 'register')
+    @if(optional(\Illuminate\Support\Facades\Route::getCurrentRoute())->uri != 'register')
         @include('partials.navbar')
     @endif
 

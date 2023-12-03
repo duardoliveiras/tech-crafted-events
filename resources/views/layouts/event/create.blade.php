@@ -27,10 +27,15 @@
                                 <label for="name">Event Name:</label>
                                 <input type="text" class="form-control" id="name" name="name" required>
                             </div>
+
                             <div class="form-group mb-3">
                                 <label for="image_url">Event Image:</label>
-                                <input type="file" class="form-control" id="image_url" name="image_url" required>
+                                <input type="file" class="form-control" id="image_url" name="image_url"
+                                       accept="image/jpeg, image/png, image/jpg, image/gif, image/svg+xml" required>
+                                <small class="form-text text-muted">Image must be in JPEG, PNG, JPG, GIF, or SVG format
+                                    and have a maximum size of 2MB.</small>
                             </div>
+
                             <div class="form-group mb-3">
                                 <label for="category_id">Category</label>
                                 <select class="form-control" id="category_id" name="category_id">
@@ -61,8 +66,7 @@
 
                             <div class="form-group mb-3">
                                 <label for="start_tickets_qty">Start Tickets Quantity:</label>
-                                <input type="number" class="form-control" id="start_tickets_qty"
-                                       name="start_tickets_qty"
+                                <input type="number" class="form-control" id="start_tickets_qty" name="start_tickets_qty"
                                        required>
                             </div>
 
@@ -79,8 +83,7 @@
                                            placeholder="Type address..." required>
                                     <div class="input-group-append">
                                         <button id="searchBtn" class="btn btn-outline-secondary" type="button"
-                                                onclick="searchInMap()">
-                                            Search in Map
+                                                onclick="searchInMap()">Search in Map
                                         </button>
                                     </div>
                                 </div>
@@ -99,7 +102,6 @@
                                 <input type="text" class="form-control" id="address" name="address"
                                        placeholder="Type address's number, neighborhood, reference..." required>
                             </div>
-
 
                             @if(!$hasLegalId)
                                 <div class="form-group mb-3">
@@ -129,7 +131,7 @@
             </div>
         </div>
 
-        <script type="text/javascript" src="{{ URL::asset ('js/event/create-event.js') }}"></script>
+        <script type="text/javascript" src="{{ URL::asset('js/event/create-event.js') }}"></script>
 
     </div>
     @if(session('success'))
