@@ -49,7 +49,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
 //Events
 Route::resource('events', EventController::class);
-Route::get('/events/{event}', [EventController::class, 'show'])->name('event.details.show');
+Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
 
 //Ticket
 Route::get('/events/{event}/ticket/buy', [TicketController::class, 'showBuyTicketForm'])->name('ticket.buy');

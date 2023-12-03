@@ -53,7 +53,7 @@ class StripeController extends Controller
                 ],
             ],
             'mode' => 'payment',
-            'success_url' => route('event.details.show', ['event' => $eventId]),
+            'success_url' => route('events.show', ['event' => $eventId]),
             'cancel_url' => route('ticket.buy', ['event' => $eventId])
         ]);
 

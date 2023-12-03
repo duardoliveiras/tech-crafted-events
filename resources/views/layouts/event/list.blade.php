@@ -107,8 +107,7 @@
                                 <h5 class="card-title">{{ $event->name }}</h5>
                                 <p class="card-text mb-1"
                                    style="color: #7848F4;">{{ \Carbon\Carbon::parse($event->start_date)->format('l, F j, g:i A') }}</p>
-                                <p class="card-text" style="color: #7E7E7E;">{{ $event->address }}
-                                    , {{ $event->city->name }}</p>
+                                <p class="card-text" style="color: #7E7E7E;">{{ $event->address }}, {{ $event->city->name }}</p>
                             </div>
                         </a>
                     </div>
