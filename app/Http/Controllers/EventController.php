@@ -9,6 +9,7 @@ use App\Models\Discussion;
 use App\Models\Event;
 use App\Models\EventOrganizer;
 use App\Models\University;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +17,6 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Intervention\Image\Facades\Image;
-use Carbon\Carbon;
 
 class EventController extends Controller
 {
@@ -68,6 +68,7 @@ class EventController extends Controller
             $query->whereDate('start_date', '=', date('Y-m-d', strtotime($dateFilter)));
         }
 
+        $query->where('status', 'ONGOING')->orWhere('status', 'UPCOMING');
         $events = $query->get();
 
         return view('layouts.event.list', compact('events', 'universities', 'categories', 'locations'));
@@ -109,10 +110,14 @@ class EventController extends Controller
 
     public function show($id): View
     {
-        $event = Event::with('ticket')->findOrFail($id);
-        $userHasTicket = auth()->check() && $event->ticket->contains('user_id', auth()->id());
+        try {
+            $event = Event::with('ticket')->findOrFail($id);
+            $userHasTicket = auth()->check() && $event->ticket->contains('user_id', auth()->id());
 
-        return view('layouts.event.details', compact('event', 'userHasTicket'));
+            return view('layouts.event.details', compact('event', 'userHasTicket'));
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            abort(404);
+        }
     }
 
     public function create()
