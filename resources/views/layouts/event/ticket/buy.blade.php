@@ -7,7 +7,8 @@
                 Purchase Ticket
             </div>
             <div class="card-body">
-                <form  action="{{ route('ticket.acquire', ['event' => $event->id]) }}" method="POST">
+                <form action="{{ $event->current_price != 0 ? route('payment.session', ['eventId' => $event->id, 'amount' => $event->current_price, 'eventName' => $event->name]) : route('ticket.acquire', ['event' => $event->id]) }}"
+                      method="POST">
                     @csrf
                     <input type="hidden" name="event_id" value="{{ $event->id }}">
                     @if ($errors->any())
@@ -24,7 +25,8 @@
                         <button type="submit" class="btn btn-success">Get Free Ticket</button>
                     @else
                         <p class="card-text">Price: ${{ number_format($event->current_price, 2) }}</p>
-                        <button type="submit" class="btn btn-primary">Buy Ticket for ${{ number_format($event->current_price, 2) }}</button>
+                        <button type="submit" class="btn btn-primary" id="checkout-live-button">Buy Ticket for
+                            €{{ number_format($event->current_price, 2) }}</button>
                     @endif
                 </form>
             </div>
