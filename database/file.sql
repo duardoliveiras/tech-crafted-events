@@ -9,8 +9,9 @@ DROP TABLE IF EXISTS Discussion CASCADE;
 DROP TABLE IF EXISTS EventOrganizer CASCADE;
 DROP TABLE IF EXISTS Admin CASCADE;
 DROP TABLE IF EXISTS Notification CASCADE;
-DROP TYPE IF EXISTS NotificationType;
-DROP TYPE IF EXISTS ticket_status;
+DROP TYPE IF EXISTS NotificationType CASCADE;
+DROP TYPE IF EXISTS ticket_status CASCADE;
+DROP TYPE IF EXISTS event_status CASCADE;
 DROP TABLE IF EXISTS Users CASCADE;
 DROP TABLE IF EXISTS University CASCADE;
 DROP TABLE IF EXISTS Event CASCADE;
@@ -89,6 +90,8 @@ CREATE TABLE EventOrganizer
     FOREIGN KEY (user_id) REFERENCES Users (id)
 );
 
+CREATE TYPE event_status AS ENUM ('UPCOMING', 'ONGOING', 'FINISHED', 'CANCELLED', 'BANNED', 'DELETED');
+
 CREATE TABLE Event
 (
     id                  UUID PRIMARY KEY,
@@ -104,6 +107,7 @@ CREATE TABLE Event
     category_id         UUID           NOT NULL,
     city_id             UUID           NOT NULL,
     owner_id            UUID           NOT NULL,
+    status event_status DEFAULT 'UPCOMING' NOT NULL,
     FOREIGN KEY (owner_id) REFERENCES EventOrganizer (id),
     FOREIGN KEY (category_id) REFERENCES Category (id),
     FOREIGN KEY (city_id) REFERENCES City (id)

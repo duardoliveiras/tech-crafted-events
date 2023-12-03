@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 
 class Event extends BaseModel
 {
@@ -24,7 +23,8 @@ class Event extends BaseModel
         'category_id',
         'city_id',
         'owner_id',
-        'image_url'
+        'image_url',
+        'status'
     ];
     protected $casts = [
         'current_price' => 'float',
@@ -51,6 +51,7 @@ class Event extends BaseModel
     {
         return $this->hasMany(Ticket::class);
     }
+
     public function discussion()
     {
         return $this->hasOne(Discussion::class);
