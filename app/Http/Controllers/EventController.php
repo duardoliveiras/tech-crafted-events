@@ -53,9 +53,8 @@ class EventController extends Controller
         $query = Event::query();
 
         if ($nameFilter) {
-            $query->whereRaw('LOWER(name) like ?', ['%' . strtolower($nameFilter) . '%']);
+            $query->whereRaw("to_tsvector('english', name) @@ to_tsquery('english', ?)", [$nameFilter])->get();
         }
-
         if ($eventType) {
             $query->where('category_id', $eventType);
         }
