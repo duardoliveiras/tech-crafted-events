@@ -20,6 +20,6 @@ class UserEventNotifications extends Model
 
     public function eventNotification()
     {
-        return $this->belongsTo(EventNotification::class);
+        return $this->belongsTo(EventNotification::class, 'notification_id');
     }
 }
