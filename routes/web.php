@@ -39,7 +39,10 @@ Route::resource('profile', UserController::class);
 
 Route::get('/my-events', [MyEventsController::class, 'index'])->name('my_events.index');
 
-Route::get('/notifications', [NotificationsController::class, 'index'])->name('notifications.index');
+
+Route::get('/load-notifications', [NotificationsController::class, 'index'])->name('notifications.index');
+
+
 Route::match(['post', 'put'], '/notifications/mark-read/{notification}', [NotificationsController::class, 'markRead'])->name('notificationscontroller.markRead');
 
 //Admin
