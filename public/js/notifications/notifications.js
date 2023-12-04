@@ -8,7 +8,7 @@ function getNotifications() {
             $('#notificacoesLista').empty();
 
             data.forEach(function(notifications) {
-                $('#notificacoesLista').append('<li>' + notifications.notification_id + '</li>');
+                $('#notificacoesLista').append('<li>' + notifications.event_notification.notification_text + '</li>');
             });
 
             $('#popupNotificacoes').show();
