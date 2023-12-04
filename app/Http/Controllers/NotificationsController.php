@@ -23,33 +23,15 @@ class NotificationsController extends Controller
     {   
         $user_id = Auth::id();
 
-        $notifications = UserEventNotifications::where('user_id', $user_id)
-            ->where('read', false)
-            ->get();
+        $userEventNotifications = UserEventNotifications::where('user_id', $user_id)
+                                                        ->where('read', false)
+                                                        ->get();
 
-
-        $eventNotifications = [];
-
-        $eventNotifications = [];
-
-        foreach ($notifications as $notification) {
-
-            $eventNotification = EventNotification::find($notification->notification_id);
-
-            if ($eventNotification) {
-
-                $event = Event::find($eventNotification->event_id);
-
-                if ($event) {
-                    $eventNotifications[] = [
-                        'eventNotification' => $eventNotification,
-                        'eventName' => $event->name,
-                    ];
-                }
-            }
+        foreach ($userEventNotifications as $notification) {
+            $eventNotification = $notification->eventNotification;
         }
 
-        return view('layouts.notifications.index', compact('eventNotifications'));
+        return response()->json($userEventNotifications);
     }
 
     public function markRead($notificationId)
