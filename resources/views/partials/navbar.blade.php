@@ -1,3 +1,4 @@
+
 <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm d-flex">
     <div class="container d-flex align-items-center">
         <a href="{{ url('/home') }}" class="logo">
@@ -39,7 +40,7 @@
                 @else
                     <!-- Notifications -->
                     <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button"
+                        <a class="nav-link" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" onClick="getNotifications()"
                            aria-controls="offcanvasExample">
                             <svg xmlns="http://www.w3.org/2000/svg" height="1.5em" viewBox="0 0 448 512"
                                  style="fill: rgba(0, 0, 0, 0.65);">
@@ -87,3 +88,6 @@
         </ul>
     </div>
 </div>
+
+<script src="{{ asset('js/notifications/notifications.js') }}"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
