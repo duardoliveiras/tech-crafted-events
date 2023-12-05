@@ -31,28 +31,16 @@ class NotificationsController extends Controller
         return response()->json($userEventNotifications);
     }
 
-    public function markRead($notificationId)
-  
-  
+    public function updateRead($notificationId)
     {
-
         $notification = UserEventNotifications::find($notificationId);
 
-        if($notification) {
-            
-            $notification->update([
-                'read' => true,
-            ]);
-            error_log($notification);
-            echo "Nome: " . $notification . "<br>";
-
-            return response()->json([
-                'success' => true,
-            ]);
+        if($notification) {     
+            $notification->update(['read' => true]);
+            return response()->json(['message' => 'Marcado como lido com sucesso.']);
+        }   
+        else{
+            return response()->json(['error' => 'Notificação não encontrada.'], 404);
         }
-            return response()->json([
-                'success' => false,
-            ]);
-            
     }
-}
+} 
