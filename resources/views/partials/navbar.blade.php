@@ -90,3 +90,7 @@
 </div>
 
 <script src="{{ asset('js/notifications/notifications.js') }}"></script>
+
+<script>
+    var routeEventsShow = "{{ route('events.show', ':id') }}";
+</script>
