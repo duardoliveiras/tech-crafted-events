@@ -1,4 +1,3 @@
-
 <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm d-flex">
     <div class="container d-flex align-items-center">
         <a href="{{ url('/home') }}" class="logo">
