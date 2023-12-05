@@ -93,3 +93,7 @@
 <script>
     var routeEventsShow = "{{ route('events.show', ':id') }}";
 </script>
+
+<script>
+    var assetUrl = '{{ asset('storage/') }}';
+</script>
