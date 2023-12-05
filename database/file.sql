@@ -238,17 +238,17 @@ begin
 	
 	elsif new.name = old.name and new.description = old.description and new.start_date <> old.start_date and new.end_date = old.end_date
 		and new.address = old.address then
-		v_notification_text := old.name || ' start date has been updated to ' || new.start_date;
+		v_notification_text := old.name || ' start date has been updated to ' || to_char(new.start_date, 'dd/mm/yyyy hh:mi');
 		v_update = true;
 	
 	elsif new.name = old.name and new.description = old.description and new.start_date = old.start_date and new.end_date <> old.end_date
 		and new.address = old.address then
-		v_notification_text := old.name || ' end date has been updated to ' || new.end_date;
+		v_notification_text := old.name || ' end date has been updated to ' || to_char(new.end_date, 'dd/mm/yyyy hh:mi');
 		v_update = true;
 	
 	elsif new.name = old.name and new.description = old.description and new.start_date = old.start_date and new.end_date = old.end_date
 		and new.address <> old.address then
-		v_notification_text := old.name || ' address has been updated to ' || new.end_date;
+		v_notification_text := old.name || ' address has been updated.';
 		v_update = true;
 	else
 		v_update = false;

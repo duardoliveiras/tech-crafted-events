@@ -15,7 +15,7 @@ function getNotifications(){
                 var cardHtml = '<div class="card mb-4 border-0 shadow-sm">';
                 cardHtml += '<div class="card-body">';
                 cardHtml += '<div class="d-flex align-items-center">';
-                cardHtml += '<img class="rounded-circle shadow-1-strong me-2" src="' + asset('storage/' + notification.event_notification.event.image_url ) + '" alt="event" width="50" height="50"/>';
+                cardHtml += '<img class="rounded-circle shadow-1-strong me-2" src="' + assetUrl + '/' + notification.event_notification.event.image_url + '" alt="' + '/' + notification.event_notification.event.name + '" width="50" height="50"/>';
                 cardHtml += '<p class="card-text text-muted mb-4">' + notification.event_notification.notification_text + '</p>';
                 cardHtml += '</div>';
                 cardHtml += '<a href="' + routeEventsShow.replace(':id', notification.event_notification.event.id) + '" class="btn btn-primary m-1 btn-sm">';
