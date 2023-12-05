@@ -65,4 +65,10 @@ class Event extends BaseModel
             ]);
         });
     }
+
+    public function eventNotifications()
+    {
+        return $this->hasMany(EventNotification::class, 'event_id');
+    }
+
 }
