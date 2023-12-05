@@ -23,7 +23,7 @@ class NotificationsController extends Controller
     {   
         $user_id = Auth::id();
 
-        $userEventNotifications = UserEventNotifications::with('eventNotification')
+        $userEventNotifications = UserEventNotifications::with('eventNotification.event')
         ->where('user_id', $user_id)
         ->where('read', false)
         ->get();
