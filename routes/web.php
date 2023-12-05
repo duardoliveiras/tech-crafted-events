@@ -8,6 +8,7 @@ use App\Http\Controllers\DiscussionController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\MyEventsController;
 use App\Http\Controllers\NotificationsController;
+use App\Http\Controllers\StripeController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -79,15 +80,15 @@ Route::middleware(['auth'])->group(function () {
 
 // Payment Routes
 Route::prefix('payment')->group(function () {
-    Route::get('/checkout', [\App\Http\Controllers\StripeController::class, 'checkout'])
+    Route::get('/checkout', [StripeController::class, 'checkout'])
         ->name('payment.checkout');
-    Route::post('/session', [\App\Http\Controllers\StripeController::class, 'session'])
+    Route::post('/session', [StripeController::class, 'session'])
         ->name('payment.session');
-    Route::get('/success', [\App\Http\Controllers\StripeController::class, 'success'])
+    Route::get('/success', [StripeController::class, 'success'])
         ->name('payment.success');
-    Route::get('/connect', [\App\Http\Controllers\StripeController::class, 'connect'])
+    Route::get('/connect', [StripeController::class, 'connect'])
         ->name('payment.connect');
-    Route::get('/callback', [\App\Http\Controllers\StripeController::class, 'callback'])
+    Route::get('/callback', [StripeController::class, 'callback'])
         ->name('payment.stripe.connect.callback');
 });
 

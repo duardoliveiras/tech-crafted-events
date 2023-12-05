@@ -131,7 +131,7 @@
             <h1>Make your own Event</h1>
             <p>Publish your own event here!</p>
             <a href="{{route('events.create')}}">
-                <button class="btn banner-button">Create Events</button>
+                <button class="btn btn-primary banner-button px-5">Create Events</button>
             </a>
         </div>
     </div>
@@ -150,7 +150,7 @@
                         <img src="{{ $imageUrl }}" class="card-img-top" alt="Imagem de {{ $university->name }}">
                         <div class="card-body">
                             <h5 class="card-title">{{ $university->name }}</h5>
-                            <p class="card-text">Localization: {{ $university->address }}</p>
+                            <p class="card-text">Location: {{ $university->address }}</p>
                         </div>
                     </div>
                 </div>

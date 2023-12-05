@@ -71,7 +71,7 @@ CREATE TABLE Users
 (
     id            UUID PRIMARY KEY,
     name          VARCHAR(255) NOT NULL,
-    phone         CHAR(15)     NOT NULL,
+    phone         CHAR(20)     NOT NULL,
     email         VARCHAR(255) NOT NULL UNIQUE,
     password      VARCHAR(255) NOT NULL,
     birthDate     DATE         NOT NULL,
