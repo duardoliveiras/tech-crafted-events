@@ -83,11 +83,10 @@
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
-        <ul id="notificacoesLista">
-            aqui vão as notificações
-        </ul>
+        <div id="notificacoesContainer">
+            <!-- Notifications generate by JS -->
+        </div>
     </div>
 </div>
 
 <script src="{{ asset('js/notifications/notifications.js') }}"></script>
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
