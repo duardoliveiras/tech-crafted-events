@@ -44,10 +44,11 @@ Route::get('/load-notifications', [NotificationsController::class, 'index'])->na
 Route::put('/update-read/{id}', [NotificationsController::class, 'updateRead'])->name('read-notification');
 
 Route::post('/password/reset', [ForgotPasswordController::class, 'forgetPasswordPost'])->name('password.email');
-Route::post('/password/reset/{token}', [ForgotPasswordController::class, 'resetPassword'])->name('reset.password');
-Route::get('/password/email', function () {
-    return view('auth.password.email');
-});
+Route::post('/password/reset/{token}', [ForgotPasswordController::class, 'resetPassword'])->name('password.update');
+
+Route::get('/password/reset', function(){
+    return view('auth.passwords.email');
+})->name('password.request');
 
 //Admin
 Route::middleware(['auth', 'admin'])->group(function () {

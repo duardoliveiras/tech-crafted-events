@@ -38,7 +38,14 @@ class ForgotPasswordController extends Controller
             'created_at' => Carbon::now(),
         ]);
 
-        Mail::send();
+        Mail::send('auth.passwords.forget', ['token' => $token], function($message) use ($request){
+            $message->to($request->email);
+            $message->subject("Reset Password Tech Crafted");
+        });
+
+        return redirect()->to(route('password.request'))->with(
+            "sucess", "We have sent you an email to reset your password"
+        );
 
     }
 
