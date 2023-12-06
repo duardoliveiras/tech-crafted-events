@@ -1,1 +1,1 @@
-<a href="{{ route('password.update', $token) }}" > Reset Password </a>
+<a href="{{ route('password.update.get', $token) }}" > Reset Password </a>

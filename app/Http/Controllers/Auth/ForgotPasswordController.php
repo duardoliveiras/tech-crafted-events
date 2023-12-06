@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 
@@ -44,12 +46,45 @@ class ForgotPasswordController extends Controller
         });
 
         return redirect()->to(route('password.request'))->with(
-            "sucess", "We have sent you an email to reset your password"
+            "success", "We have sent you an email to reset your password"
         );
 
     }
 
-    function resetPassword(){
+    function resetPassword($token){
+        return view('auth.passwords.reset', compact('token'));
+    }
+
+    function resetPasswordPost(Request $request){
+        $request->validate([
+            'email' => 'required|email|exists:users',
+            'password' => 'required|string|min:8|confirmed',
+            'password_confirmation' => 'required'
+        ]);
+
+        $update = DB::table('password_resets')->where([
+            'email' => $request->email,
+            'token' => $request->token
+        ])->first();
+
+        if(!$update){
+            return redirect()->to(route('password.request'))->with(
+                "error", "Invalid email"
+            );
+        }
+
+        User::where('email', $request->email)
+            ->update([
+                'password' => Hash::make($request->password)
+            ]);
+
+        DB::table('password_resets')->where([
+            'email' => $request->email
+        ])->delete();
+
+        return redirect()->to(route('login'))->with(
+            "success", "Password reset with success!"
+        );
 
     }
     

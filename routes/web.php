@@ -43,8 +43,11 @@ Route::get('/my-events', [MyEventsController::class, 'index'])->name('my_events.
 Route::get('/load-notifications', [NotificationsController::class, 'index'])->name('notifications.index');
 Route::put('/update-read/{id}', [NotificationsController::class, 'updateRead'])->name('read-notification');
 
-Route::post('/password/reset', [ForgotPasswordController::class, 'forgetPasswordPost'])->name('password.email');
-Route::post('/password/reset/{token}', [ForgotPasswordController::class, 'resetPassword'])->name('password.update');
+Route::post('/password/email', [ForgotPasswordController::class, 'forgetPasswordPost'])->name('password.email');
+
+Route::get('/password/reset/{token}', [ForgotPasswordController::class, 'resetPassword'])->name('password.update.get');
+
+Route::post('/password/reset', [ForgotPasswordController::class, 'resetPasswordPost'])->name('password.update');
 
 Route::get('/password/reset', function(){
     return view('auth.passwords.email');
