@@ -195,23 +195,6 @@ CREATE TABLE Vote
     FOREIGN KEY (comment_id) REFERENCES Comment (id)
 );
 
-create or replace function NOTIFY_EVENT_UPDATE()
-    returns trigger as
-$$
-declare
-    id_notification INTEGER;
-begin
-    insert into tech_crafted.eventnotifications(id, event_id, notification_text)
-    values (DEFAULT, new.id, new.name || ' has been updated.')
-    returning id into id_notification;
-
-    insert into tech_crafted.userseventnotifications(user_id, notification_id, read)
-    select user_id, id_notification, false
-    from ticket
-    where event_id = new.id;
-
-    return new;
-end;
 CREATE OR REPLACE FUNCTION notify_event_update()
     RETURNS trigger AS 
 $$
@@ -242,7 +225,7 @@ begin
 		v_update = true;
 	
 	elsif new.name = old.name and new.description = old.description and new.start_date = old.start_date and new.end_date <> old.end_date
-		and new.address = old.address then1
+		and new.address = old.address then
 		v_notification_text := old.name || ' end date has been updated to ' || to_char(new.end_date, 'mm/dd/yyyy hh:mi');
 		v_update = true;
 	
