@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CommentController;
@@ -42,7 +43,11 @@ Route::get('/my-events', [MyEventsController::class, 'index'])->name('my_events.
 Route::get('/load-notifications', [NotificationsController::class, 'index'])->name('notifications.index');
 Route::put('/update-read/{id}', [NotificationsController::class, 'updateRead'])->name('read-notification');
 
-Route::match(['post', 'put'], '/notifications/mark-read/{notification}', [NotificationsController::class, 'markRead'])->name('notificationscontroller.markRead');
+Route::post('/password/reset', [ForgotPasswordController::class, 'forgetPasswordPost'])->name('password.email');
+Route::post('/password/reset/{token}', [ForgotPasswordController::class, 'resetPassword'])->name('reset.password');
+Route::get('/password/email', function () {
+    return view('auth.password.email');
+});
 
 //Admin
 Route::middleware(['auth', 'admin'])->group(function () {
