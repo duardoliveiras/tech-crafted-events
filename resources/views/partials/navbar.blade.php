@@ -37,8 +37,9 @@
                         </li>
                     @endif
                 @else
+                    <!-- Notifications -->
                     <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button"
+                        <a class="nav-link" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" onClick="getNotifications()"
                            aria-controls="offcanvasExample">
                             <svg xmlns="http://www.w3.org/2000/svg" height="1.5em" viewBox="0 0 448 512"
                                  style="fill: rgba(0, 0, 0, 0.65);">
@@ -81,25 +82,18 @@
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
-        <ul id="notificacoesLista">
-{{--            @forelse($eventNotifications as $notification)--}}
-{{--                <div class="card mb-4 border-0 shadow-sm">--}}
-{{--                    <div class="card-body">--}}
-{{--                        <h3 class="card-title h4">{{ $notification['eventName'] }}</h3>--}}
-{{--                        <p class="card-text text-muted mb-4">{{ $notification['eventNotification']->notification_text }}</p>--}}
-{{--                        <a href="{{ route('events.show', $notification['eventNotification']->event_id) }}" class="btn btn-outline-primary btn-sm">--}}
-{{--                            <i class="bi bi-eye"></i> View Event--}}
-{{--                        </a>--}}
-{{--                        <form action="{{ route('notificationscontroller.markRead', $notification['eventNotification']) }}" method="POST" class="d-inline">--}}
-{{--                            @csrf--}}
-{{--                            @method('PUT')--}}
-{{--                            <button type="submit" class="btn btn-danger mt-3">Mark Read</button>--}}
-{{--                        </form>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--            @empty--}}
-{{--                <li>No notifications.</li>--}}
-{{--            @endforelse--}}
-        </ul>
+        <div id="notificacoesContainer">
+            <!-- Notifications generate by JS -->
+        </div>
     </div>
 </div>
+
+<script src="{{ asset('js/notifications/notifications.js') }}"></script>
+
+<script>
+    var routeEventsShow = "{{ route('events.show', ':id') }}";
+</script>
+
+<script>
+    var assetUrl = '{{ asset('storage/') }}';
+</script>
