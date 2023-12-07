@@ -9,8 +9,6 @@ class Event extends BaseModel
     use HasFactory;
 
     protected $table = 'event';
-    protected $keyType = 'string';
-    public $timestamps = false;
     protected $fillable = [
         'name',
         'description',
@@ -24,12 +22,14 @@ class Event extends BaseModel
         'city_id',
         'owner_id',
         'image_url',
-        'status'
+        'status',
+        'created_at'
     ];
     protected $casts = [
         'current_price' => 'float',
         'start_date' => 'datetime',
         'end_date' => 'datetime',
+        'created_at' => 'datetime',
     ];
 
     public function category()
@@ -65,4 +65,10 @@ class Event extends BaseModel
             ]);
         });
     }
+
+    public function isFinished(): bool
+    {
+        return $this['status'] === EventStatus::Finished->value;
+    }
 }
+

@@ -119,6 +119,7 @@
                                     <input type="text" class="form-control custom-input" id="legal_id" name="legal_id"
                                            placeholder="Enter your legal ID">
                                 </div>
+                                <a class="btn btn-primary next-step w-100 custom-button mt-3 mb-3" href="{{ route('payment.connect') }}">Connect Stripe Account</a>
                             @endif
 
                             <button type="submit" class="btn btn-primary next-step w-100 custom-button mt-3 mb-3">Create

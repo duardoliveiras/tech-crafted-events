@@ -17,6 +17,11 @@
                             <a href="{{ route('events.show', $event->id) }}" class="btn btn-outline-primary btn-sm">
                                 <i class="bi bi-eye"></i> View Event
                             </a>
+                            @if($event->isFinished())
+                                <a href="{{ route('payment.transfer', 10, 'stripe_account_id') }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-cash-coin"></i> Receive tickets cash
+                                </a>
+                            @endif
                         </div>
                     </div>
                 @empty

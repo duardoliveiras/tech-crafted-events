@@ -51,6 +51,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
 //Events
 Route::resource('events', EventController::class);
 Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
+Route::get('/events/byPass/{event_id}/{ticket_id}', [EventController::class, 'byPassTicketShow'])->name('events.byPassTicketShow');
 
 //Ticket
 Route::get('/events/{event}/ticket/buy', [TicketController::class, 'showBuyTicketForm'])->name('ticket.buy');
@@ -80,8 +81,6 @@ Route::middleware(['auth'])->group(function () {
 
 // Payment Routes
 Route::prefix('payment')->group(function () {
-    Route::get('/checkout', [StripeController::class, 'checkout'])
-        ->name('payment.checkout');
     Route::post('/session', [StripeController::class, 'session'])
         ->name('payment.session');
     Route::get('/success', [StripeController::class, 'success'])
@@ -90,5 +89,9 @@ Route::prefix('payment')->group(function () {
         ->name('payment.connect');
     Route::get('/callback', [StripeController::class, 'callback'])
         ->name('payment.stripe.connect.callback');
+    Route::get('/transfer', [StripeController::class, 'transfer'])
+        ->name('payment.transfer');
+    Route::get('/refund/{payment_intent_id}', [StripeController::class, 'refundPayment'])
+        ->name('payment.refund');
 });
 

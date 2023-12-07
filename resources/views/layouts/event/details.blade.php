@@ -49,6 +49,9 @@
                                         @if($userTicket)
                                             <a href="{{ route('ticket.show', ['event' => $event->id, 'ticket' => $userTicket->id]) }}"
                                                class="btn btn-info m-1">Access Ticket</a>
+
+                                            <a href="{{ route('events.leave', ['event_id' => $event->id, 'ticket_id' => $userTicket->id]) }}"
+                                               class="btn btn-info m-1">Leave Event</a>
                                         @endif
                                     @endif
                                     @if($isOwnerOrAdmin)
