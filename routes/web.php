@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CommentController;
@@ -40,8 +41,17 @@ Route::resource('profile', UserController::class);
 
 Route::get('/my-events', [MyEventsController::class, 'index'])->name('my_events.index');
 
-Route::get('/notifications', [NotificationsController::class, 'index'])->name('notifications.index');
-Route::match(['post', 'put'], '/notifications/mark-read/{notification}', [NotificationsController::class, 'markRead'])->name('notificationscontroller.markRead');
+Route::get('/load-notifications', [NotificationsController::class, 'index'])->name('notifications.index');
+Route::put('/update-read/{id}', [NotificationsController::class, 'updateRead'])->name('read-notification');
+
+// Forget Password
+Route::post('/password/email', [ForgotPasswordController::class, 'forgetPasswordPost'])->name('password.email');
+Route::get('/password/reset/{token}', [ForgotPasswordController::class, 'resetPassword'])->name('password.update.get');
+Route::post('/password/reset', [ForgotPasswordController::class, 'resetPasswordPost'])->name('password.update');
+
+Route::get('/password/reset', function(){
+    return view('auth.passwords.email');
+})->name('password.request');
 
 //Admin
 Route::middleware(['auth', 'admin'])->group(function () {

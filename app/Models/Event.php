@@ -70,5 +70,9 @@ class Event extends BaseModel
     {
         return $this['status'] === EventStatus::Finished->value;
     }
-}
 
+    public function eventNotifications()
+    {
+        return $this->hasMany(EventNotification::class, 'event_id');
+    }
+}

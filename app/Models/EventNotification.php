@@ -17,4 +17,14 @@ class EventNotification extends Model
         'notification_text',
     ];
 
+    public function userEventNotifications()
+    {
+        return $this->hasMany(UserEventNotifications::class, 'notification_id');
+    }
+
+    public function event()
+    {
+        return $this->belongsTo(Event::class, 'event_id');
+    }
+
 }

@@ -197,24 +197,62 @@ CREATE TABLE Vote
     FOREIGN KEY (comment_id) REFERENCES Comment (id)
 );
 
-create or replace function NOTIFY_EVENT_UPDATE()
-    returns trigger as
+CREATE OR REPLACE FUNCTION notify_event_update()
+    RETURNS trigger AS 
 $$
 declare
     id_notification INTEGER;
+   	v_notification_text VARCHAR;
+   	v_update bool;
 begin
-    insert into tech_crafted.eventnotifications(id, event_id, notification_text)
-    values (DEFAULT, new.id, new.name || ' has been updated.')
-    returning id into id_notification;
+	
+	if new is distinct from old then
+		v_notification_text := new.name || ' the event underwent several changes.';
+		v_update = true;
+	end if;
+	
+	if new.name <> old.name and new.description = old.description and new.start_date = old.start_date and new.end_date = old.end_date
+		and new.address = old.address then
+		v_notification_text := old.name || ' name has been updated.';
+		v_update = true;
+	
+	elsif new.name = old.name and new.description <> old.description and new.start_date = old.start_date and new.end_date = old.end_date
+		and new.address = old.address then
+		v_notification_text := old.name || ' description has been updated.';
+		v_update = true;
+	
+	elsif new.name = old.name and new.description = old.description and new.start_date <> old.start_date and new.end_date = old.end_date
+		and new.address = old.address then
+		v_notification_text := old.name || ' start date has been updated to ' || to_char(new.start_date, 'mm/dd/yyyy hh:mi');
+		v_update = true;
+	
+	elsif new.name = old.name and new.description = old.description and new.start_date = old.start_date and new.end_date <> old.end_date
+		and new.address = old.address then
+		v_notification_text := old.name || ' end date has been updated to ' || to_char(new.end_date, 'mm/dd/yyyy hh:mi');
+		v_update = true;
+	
+	elsif new.name = old.name and new.description = old.description and new.start_date = old.start_date and new.end_date = old.end_date
+		and new.address <> old.address then
+		v_notification_text := old.name || ' address has been updated.';
+		v_update = true;
+	else
+		v_update = false;
+	end if;
 
-    insert into tech_crafted.userseventnotifications(user_id, notification_id, read)
-    select user_id, id_notification, false
-    from ticket
-    where event_id = new.id;
-
-    return new;
+	if v_update = true then
+	
+	    insert into tech_crafted.eventnotifications(id, event_id, notification_text)
+	    values (DEFAULT, new.id, v_notification_text)
+	    returning id into id_notification;
+	
+	    insert into tech_crafted.userseventnotifications(user_id, notification_id, read)
+	    select user_id, id_notification, false
+	    from ticket
+	    where event_id = new.id;
+	 end if;
+	
+	return new;
 end;
-
 $$ language plpgsql;
 
 create trigger event_update_trigger
