@@ -10,9 +10,6 @@ class EventOrganizer extends BaseModel
     use HasFactory;
 
     protected $table = 'eventorganizer';
-    protected $keyType = 'string';
-
-    public $timestamps = false;
     protected $fillable = [
         'legal_id',
         'user_id',

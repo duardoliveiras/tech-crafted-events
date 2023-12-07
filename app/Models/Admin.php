@@ -10,7 +10,6 @@ class Admin extends BaseModel
     use HasFactory;
 
     protected $table = 'admin';
-    protected $keyType = 'string';
     protected $fillable = ['user_id'];
 
     public function user()

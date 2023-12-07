@@ -11,8 +11,6 @@ class Discussion extends BaseModel
 {
     use HasFactory;
 
-    protected $keyType = 'string';
-    public $timestamps = false;
     protected $table = 'discussion';
     protected $fillable = ['event_id'];
 
