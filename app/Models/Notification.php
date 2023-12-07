@@ -12,9 +12,6 @@ class Notification extends BaseModel
     use HasFactory;
 
     protected $table = 'notification';
-    protected $keyType = 'string';
-
-    public $timestamps = false;
     protected $fillable = [
         'id',
         'text',

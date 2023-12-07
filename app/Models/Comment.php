@@ -11,10 +11,7 @@ class Comment extends BaseModel
 {
     use HasFactory;
 
-    protected $keyType = 'string';
-    public $timestamps = false;
     protected $table = 'comment';
-
     protected $casts = [
         'commented_at' => 'datetime',
     ];
