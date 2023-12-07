@@ -86,6 +86,7 @@ CREATE TABLE EventOrganizer
 (
     id       UUID PRIMARY KEY,
     legal_id CHAR(50) NOT NULL,
+    stripe_account_id VARCHAR(255),
     user_id  UUID     NOT NULL,
     FOREIGN KEY (user_id) REFERENCES Users (id)
 );
@@ -108,6 +109,7 @@ CREATE TABLE Event
     city_id             UUID           NOT NULL,
     owner_id            UUID           NOT NULL,
     status event_status DEFAULT 'UPCOMING' NOT NULL,
+    created_at   TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
     FOREIGN KEY (owner_id) REFERENCES EventOrganizer (id),
     FOREIGN KEY (category_id) REFERENCES Category (id),
     FOREIGN KEY (city_id) REFERENCES City (id)

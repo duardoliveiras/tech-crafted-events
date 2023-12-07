@@ -8,8 +8,10 @@ use App\Models\Country;
 use App\Models\Discussion;
 use App\Models\Event;
 use App\Models\EventOrganizer;
+use App\Models\Ticket;
 use App\Models\University;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -21,6 +23,7 @@ use Intervention\Image\Facades\Image;
 class EventController extends Controller
 {
     const NOMINATIM_API_URL = "https://nominatim.openstreetmap.org/reverse?format=json";
+    protected StripeController $stripeController;
 
     private $validationRules = [
         'name' => 'required|string|max:255',
@@ -34,9 +37,10 @@ class EventController extends Controller
         'image_url' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
     ];
 
-    public function __construct()
+    public function __construct(StripeController $stripeController)
     {
         $this->middleware('auth')->except(['index', 'show']);
+        $this->stripeController = $stripeController;
     }
 
     public function index(Request $request): View
@@ -109,12 +113,35 @@ class EventController extends Controller
 
     public function show($id): View
     {
+        if (!$this->isValidUuid($id)) {
+            abort(404);
+        }
+
         try {
             $event = Event::with('ticket')->findOrFail($id);
-            $userHasTicket = auth()->check() && $event->ticket->contains('user_id', auth()->id());
+            $userHasTicket = Auth::check() && $event->ticket->contains('user_id', Auth::id());
 
             return view('layouts.event.details', compact('event', 'userHasTicket'));
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
+            abort(404);
+        }
+    }
+
+    public function byPassTicketShow($eventId, $ticketId): View
+    {
+        error_log('byPassTicketShow ' . $eventId);
+
+        if (!$this->isValidUuid($ticketId) || !$this->isValidUuid($eventId)) {
+            abort(404);
+        }
+
+        try {
+            $ticket = $this->findTicketById($ticketId);
+
+            $ticket->markTicketAsPaid();
+
+            return self::show($eventId);
+        } catch (ModelNotFoundException $e) {
             abort(404);
         }
     }
@@ -179,7 +206,7 @@ class EventController extends Controller
 
     public function edit($id)
     {
-        $event = Event::findOrFail($id);
+        $event = $this->findEventById($id);
 
         $this->authorize('update', $event);
 
@@ -191,7 +218,7 @@ class EventController extends Controller
 
     public function update(Request $request, $id)
     {
-        $event = Event::findOrFail($id);
+        $event = $this->findEventById($id);
 
         $this->authorize('update', $event);
 
@@ -219,15 +246,64 @@ class EventController extends Controller
 
     public function destroy($id)
     {
-        $event = Event::findOrFail($id);
-
-        $this->authorize('delete', $event);
+        if (!$this->isValidUuid($id)) {
+            abort(404);
+        }
 
         try {
-            DB::transaction(function () use ($event) {
-                Discussion::where('event_id', $event->id)->delete();
-                $event->delete();
-            });
+            $event = $this->findEventById($id);
+
+            $this->authorizeDeletion($event);
+
+            $this->deleteEventWithDiscussion($event);
+
+            return redirect()->route('events.index')->with('success', 'Event deleted successfully.');
+        } catch (\Exception $e) {
+            return redirect()->route('events.index')->with('error', 'Error deleting event');
+        }
+    }
+
+    private function isValidUuid(string $uuid): bool
+    {
+        $pattern = '/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i';
+
+        return (bool)preg_match($pattern, $uuid);
+    }
+
+    private function findEventById($id)
+    {
+        return Event::findOrFail($id);
+    }
+
+    private function findTicketById($id)
+    {
+        return Ticket::findOrFail($id);
+    }
+
+    private function authorizeDeletion($event): void
+    {
+        $this->authorize('delete', $event);
+    }
+
+    private function deleteEventWithDiscussion($event): void
+    {
+        DB::transaction(function () use ($event) {
+            Discussion::where('event_id', $event->id)->delete();
+            $event->delete();
+        });
+    }
+
+    public function leave($eventId, $ticketId)
+    {
+        if (!$this->isValidUuid($eventId) || !$this->isValidUuid($ticketId)) {
+            abort(404);
+        }
+
+        try {
+            $event = $this->findEventById($eventId);
+            $ticket = $this->findTicketById($ticketId);
+
+            $this->stripeController->refund();
 
             return redirect()->route('events.index')->with('success', 'Event deleted successfully.');
         } catch (\Exception $e) {
