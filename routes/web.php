@@ -59,7 +59,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
 });
 
-//Events
+// Events
 Route::resource('events', EventController::class);
 Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
 Route::get('/events/byPass/{event_id}/{ticket_id}', [EventController::class, 'byPassTicketShow'])->name('events.byPassTicketShow');

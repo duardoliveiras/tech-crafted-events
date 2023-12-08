@@ -161,7 +161,6 @@ class StripeController extends Controller
             // fazer reembolso de um pagamento
             $this->refundPayment($payment[0]['payment_intent']);
         }
-
     }
 
     private function isPaymentForEvent($payment, $event): bool
@@ -191,10 +190,3 @@ class StripeController extends Controller
     }
 
 }
-
-/*
- * - preciso fazer reembolso de vários pagamentos, assim que um evento for cancelado -> listar todos pagamentos de um EVENT_ID e então, para cada um, fazer o reembolso
- * - listar todos pagamentos que foram pagos associados a um determinado evento -> listar tudo pelo EVENT_ID (depois do created_at) considerando STATUS = PAID
- * - listar também pagamentos negados do evento -> listar tudo que não seja STATUS = _PAID_
- * - fazer reembolso de um pagamento, quando um usuário quiser sair do evento que pertence -> encontrar pagamento que o usuário XXX fez no evento YYY
- */
