@@ -5,6 +5,7 @@
 @section('content')
     @section('breadcrumbs')
         <li> &nbsp; / Help - FAQ </li>
+    @endsection
     <div class="container py-5">
         <h2 class="text-center mb-4">Help & Frequently Asked Questions</h2>
         <div class="accordion accordion-flush" id="faqAccordion">

@@ -3,11 +3,14 @@
 @section('content')
     @section('breadcrumbs')
         <li>
-            <a href="{{ route('events.show', $event->id) }}"> &nbsp; / {{ $event->name }} </a>
+            <a href="{{ route('events.show', $event->id) }} "> &nbsp; / {{ $event->name }} </a>
         </li>
+        
         <li>
-            &nbsp; / 1Discussion
+            &nbsp; / Discussion
         </li>
+    @endsection
+
     <div class="container mt-4">
         <h2 class="mb-4">Discussion for "{{ $event->name }}"</h2>
 

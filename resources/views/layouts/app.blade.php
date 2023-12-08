@@ -32,17 +32,15 @@
         @include('partials.navbar')
     @endif
 
-
-
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li>
-                <i class="fa fa-home"></i>
-                <a href="{{route('home')}}">Home</a>
-            </li>
-            @yield('breadcrumbs')
-        </ol>
-    </nav>
+            <nav aria-label="breadcrumb" class="mt-2 ms-3">
+                <ol class="breadcrumb">
+                    <li>
+                        <i class="fa fa-home"></i>
+                        <a href="{{route('home')}}">Home</a>
+                    </li>
+                    @yield('breadcrumbs')
+                </ol>
+            </nav>
 
 
 
