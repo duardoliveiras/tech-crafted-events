@@ -1,6 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
+    @section('breadcrumbs')
+        <li> 
+            &nbsp; / <a href="{{ route('events.show', $event->id) }}">{{$event->name}}</a>
+        </li>
+        <li> &nbsp; / Authenticate </li>
+    @endsection
+
     <div class="container mt-5">
         <div class="card">
             <div class="card-header">

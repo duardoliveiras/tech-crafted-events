@@ -5,6 +5,7 @@
 @section('content')
     @section('breadcrumbs')
         <li> &nbsp; / About us </li>
+    @endsection
     <style>
         .card-hover-effect {
             transition: transform .3s, box-shadow .3s;

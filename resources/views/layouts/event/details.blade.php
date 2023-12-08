@@ -6,6 +6,7 @@
 @section('content')
     @section('breadcrumbs')
         <li> &nbsp; / {{ $event->name }} </li>
+    @endsection
 
     <div class="container mt-5">
         <div class="row justify-content-center">
