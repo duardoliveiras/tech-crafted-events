@@ -22,6 +22,12 @@
                             </div>
                         @endif
 
+                        @if(!$hasLegalId)
+                            @php
+                                return redirect()->route('event-organizer.create');
+                            @endphp
+                        @endif
+
                         <form action="{{ route('events.store') }}" method="POST" enctype="multipart/form-data">
                             @csrf
 
@@ -112,15 +118,6 @@
                                 <input type="text" class="form-control custom-input" id="address" name="address"
                                        placeholder="Type address's number, neighborhood, reference..." required>
                             </div>
-
-                            @if(!$hasLegalId)
-                                <div class="form-group mb-3">
-                                    <label class="custom-label" for="legal_id">Legal ID:</label>
-                                    <input type="text" class="form-control custom-input" id="legal_id" name="legal_id"
-                                           placeholder="Enter your legal ID">
-                                </div>
-                                <a class="btn btn-primary next-step w-100 custom-button mt-3 mb-3" href="{{ route('payment.connect') }}">Connect Stripe Account</a>
-                            @endif
 
                             <button type="submit" class="btn btn-primary next-step w-100 custom-button mt-3 mb-3">Create
                                 Event

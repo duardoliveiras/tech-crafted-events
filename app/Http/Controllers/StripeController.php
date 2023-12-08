@@ -13,12 +13,14 @@ use Stripe\StripeClient;
 class StripeController extends Controller
 {
     protected TicketService $ticketService;
+    protected EventOrganizerController $eventOrganizerController;
     protected StripeClient $stripe;
 
-    public function __construct(TicketService $ticketService)
+    public function __construct(TicketService $ticketService, EventOrganizerController $eventOrganizerController)
     {
         $this->middleware('auth');
         $this->ticketService = $ticketService;
+        $this->eventOrganizerController = $eventOrganizerController;
         $this->stripe = new StripeClient(config('stripe.sk'));
     }
 
@@ -59,20 +61,34 @@ class StripeController extends Controller
         ]);
     }
 
-    public function connect(): RedirectResponse
+    public function connect(Request $request): RedirectResponse
     {
-        $connectUrl = $this->stripe->oauth->authorizeUrl([
-            'scope' => 'read_write',
-            'response_type' => 'code',
-            'redirect_uri' => route('payment.stripe.connect.callback'),
-            'client_id' => config('stripe.client_id')
-        ]);
+        $legalId = $request->query('legal_id');
 
-        return redirect()->away($connectUrl);
+        if ($legalId) {
+            session([Auth::id() . ":legal-id" => $legalId]);
+
+            $connectUrl = $this->stripe->oauth->authorizeUrl([
+                'scope' => 'read_write',
+                'response_type' => 'code',
+                'redirect_uri' => route('payment.stripe.connect.callback'),
+                'client_id' => config('stripe.client_id')
+            ]);
+
+            return redirect()->away($connectUrl);
+        }
+
+        return redirect()->back()->with('error', 'Legal Id is required.');
     }
 
     public function callback(Request $request): RedirectResponse
     {
+        $legalId = session(Auth::id() . ":legal-id");
+
+        if (!$legalId) {
+            return redirect()->back()->with('error', 'Legal Id is missing.');
+        }
+
         $code = $request->input('code');
 
         $response = $this->stripe->oauth->token([
@@ -80,9 +96,11 @@ class StripeController extends Controller
             'code' => $code,
         ]);
 
-        $this->transfer(1, $response->stripe_user_id);
+        $this->eventOrganizerController->create($legalId, $response->stripe_user_id);
 
-        return redirect()->away(route('home'));
+        session()->forget(Auth::id() . ":legal-id");
+
+        return redirect()->away(route('events.create'));
     }
 
     public function transfer($amount, $accountId): void
@@ -122,7 +140,7 @@ class StripeController extends Controller
     }
 
     // fazer reembolso de vários pagamentos, assim que um evento for cancelado -> listar todos pagamentos de um EVENT_ID e então, para cada um, fazer o reembolso
-    public function refundAllFromEvent(Event $event)
+    public function refundAllPaymentsFromEvent(Event $event)
     {
         // listar todos pagamentos de um EVENT_ID
         $allPayments = $this->listPaymentsForEvent($event);
@@ -137,9 +155,9 @@ class StripeController extends Controller
     public function refundPaymentFromUser(Event $event, string $userId)
     {
         // encontrar pagamento que o usuário XXX fez
-        $payment = $this->listPaymentsForEvent(event: $event, userId:  $userId);
+        $payment = $this->listPaymentsForEvent(event: $event, userId: $userId);
 
-        if($payment){
+        if ($payment) {
             // fazer reembolso de um pagamento
             $this->refundPayment($payment[0]['payment_intent']);
         }
