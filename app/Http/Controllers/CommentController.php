@@ -88,4 +88,23 @@ class CommentController extends Controller
             'updatedComment' => $comment,
         ]);
     }
+
+    public function destroy(Comment $comment): JsonResponse
+    {
+        // Check if the authenticated user is the owner of the comment
+        if (auth()->id() !== $comment->user_id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are not authorized to delete this comment.',
+            ], 403);
+        }
+
+        // Perform logical deletion by updating the is_deleted field
+        $comment->update(['is_deleted' => true]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Comment deleted successfully.',
+        ]);
+    }
 }

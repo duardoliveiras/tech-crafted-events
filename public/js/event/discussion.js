@@ -59,7 +59,7 @@ function saveChanges(commentId) {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
         },
         body: JSON.stringify({
             text: editedText,
@@ -79,4 +79,29 @@ function saveChanges(commentId) {
         .catch(error => {
             console.error('Error during the request:', error);
         });
+}
+
+function confirmDelete(commentId) {
+    let confirmation = window.confirm('Are you sure you want to delete this comment?');
+
+    if (confirmation) {
+        // Send a request to "delete" the comment (perform logical deletion)
+        fetch(`/comments/${commentId}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            },
+        })
+            .then(response => {
+                if (response.ok) {
+                    // Reload the page after deletion
+                    location.reload();
+                } else {
+                    console.error('Failed to delete comment');
+                }
+            })
+            .catch(error => {
+                console.error('Error during the request:', error);
+            });
+    }
 }
