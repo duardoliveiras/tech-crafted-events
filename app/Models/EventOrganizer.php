@@ -13,6 +13,7 @@ class EventOrganizer extends BaseModel
     protected $fillable = [
         'legal_id',
         'user_id',
+        'stripe_account_id'
     ];
 
     public function user()

@@ -289,7 +289,9 @@ class EventController extends Controller
     {
         DB::transaction(function () use ($event) {
             Discussion::where('event_id', $event->id)->delete();
-            $event->delete();
+            $this->stripeController->refundAllPaymentsFromEvent($event);
+            $event->status = 'DELETED';
+            $event->save();
         });
     }
 
@@ -301,9 +303,8 @@ class EventController extends Controller
 
         try {
             $event = $this->findEventById($eventId);
-            $ticket = $this->findTicketById($ticketId);
 
-            $this->stripeController->refund();
+            $this->stripeController->refundPaymentFromUser($event, Auth::id());
 
             return redirect()->route('events.index')->with('success', 'Event deleted successfully.');
         } catch (\Exception $e) {

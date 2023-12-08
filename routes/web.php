@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\DiscussionController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\EventOrganizerController;
 use App\Http\Controllers\MyEventsController;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\StripeController;
@@ -49,7 +50,7 @@ Route::post('/password/email', [ForgotPasswordController::class, 'forgetPassword
 Route::get('/password/reset/{token}', [ForgotPasswordController::class, 'resetPassword'])->name('password.update.get');
 Route::post('/password/reset', [ForgotPasswordController::class, 'resetPasswordPost'])->name('password.update');
 
-Route::get('/password/reset', function(){
+Route::get('/password/reset', function () {
     return view('auth.passwords.email');
 })->name('password.request');
 
@@ -105,3 +106,11 @@ Route::prefix('payment')->group(function () {
         ->name('payment.refund');
 });
 
+// event organizer routes
+Route::get('/event-organizer', [EventOrganizerController::class, 'show'])
+    ->name('event-organizer.create')
+    ->middleware(['auth']);
+
+Route::post('/event-organizer/{legal_id}/{stripe_account_id}', [EventOrganizerController::class, 'create'])
+    ->name('event-organizer.create')
+    ->middleware(['auth']);
