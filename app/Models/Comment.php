@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -19,8 +18,16 @@ class Comment extends BaseModel
         'text',
         'commented_at',
         'user_id',
-        'discussion_id'
+        'discussion_id',
+        'is_deleted'
     ];
+
+    public static function getCommentsForDiscussion($discussionId)
+    {
+        return static::where('discussion_id', $discussionId)
+            ->where('is_deleted', false)
+            ->get();
+    }
 
     public function discussion(): BelongsTo
     {

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Comment;
 use App\Models\Event;
 
 class DiscussionController extends Controller
@@ -32,7 +32,7 @@ class DiscussionController extends Controller
             abort(403, 'You do not have access to this discussion.');
         }
 
-        $comments = $discussion->comments ?? collect();
+        $comments = Comment::getCommentsForDiscussion($discussion->id) ?? collect();
         $userVotes = $user->votesForDiscussion($discussion);
 
         return view('layouts.event.discussion.show', compact('discussion', 'comments', 'event', 'userVotes'));

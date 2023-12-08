@@ -91,6 +91,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comment.update')->middleware(['auth']);
+Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comment.destroy')->middleware(['auth']);
 
 // Payment Routes
 Route::prefix('payment')->group(function () {

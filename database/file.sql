@@ -181,6 +181,7 @@ CREATE TABLE Comment
     commented_at  TIMESTAMP NOT NULL,
     user_id       UUID      NOT NULL,
     discussion_id UUID      NOT NULL,
+    is_deleted boolean DEFAULT FALSE,
     FOREIGN KEY (user_id) REFERENCES Users (id),
     FOREIGN KEY (discussion_id) REFERENCES Discussion (id)
 );
