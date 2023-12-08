@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Facades\Image;
 
 class UserController extends Controller
 {
@@ -19,22 +21,6 @@ class UserController extends Controller
         return view('profile.index', [
             'users' => User::all()
         ]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
     }
 
     /**
@@ -84,9 +70,19 @@ class UserController extends Controller
             'phone_number' => 'required|max:20'
         ]);
 
-        $user->update($validatedData);
+        $user->update(array_merge($validatedData, ['image_url' => $this->uploadImage($request->file('image_url'))]));
 
         return redirect()->route('profile.show', $user->id)->with('success', 'Profile updated successfully!');
+    }
+
+    private function uploadImage($imageFile)
+    {
+        $image = Image::make($imageFile);
+
+        $imagePath = 'users/' . $imageFile->hashName();
+        Storage::disk('public')->put($imagePath, (string)$image->encode());
+
+        return $imagePath;
     }
 
 
