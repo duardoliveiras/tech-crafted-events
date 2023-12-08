@@ -31,34 +31,16 @@
     @if(optional(\Illuminate\Support\Facades\Route::getCurrentRoute())->uri != 'register')
         @include('partials.navbar')
     @endif
+
+
+
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-
-
             <li>
                 <i class="fa fa-home"></i>
                 <a href="{{route('home')}}">Home</a>
             </li>
-        @if(count(Request::segments()) == 1 && Request::segments()[0] != "home")
-                @php
-                    $i = 1;
-                @endphp
-        @else   
-            @php
-                $i = 1;
-            @endphp
-        @endif
-
-
-        @for($i; $i <= count(Request::segments()); $i++)     
-            @if(Request::segment($i) == "events")
-                <p> {{ Request::segment($i) }} </p>
-            @endif
-            <li>
-                <a href="{{ URL::to( implode( '/', array_slice(Request::segments(), 0 ,$i, true)))}}"> &nbsp;/  {{ucwords(Request::segment($i))}} 
-                </a>
-            </li>
-        @endfor
+            @yield('breadcrumbs')
         </ol>
     </nav>
 
