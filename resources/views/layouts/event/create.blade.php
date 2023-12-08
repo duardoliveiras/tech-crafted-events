@@ -24,7 +24,7 @@
 
                         @if(!$hasLegalId)
                             @php
-                                return redirect()->route('event-organizer.create');
+                                return redirect()->route('event-organizer.show');
                             @endphp
                         @endif
 

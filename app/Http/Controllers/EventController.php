@@ -152,6 +152,11 @@ class EventController extends Controller
         $eventOrganizer = EventOrganizer::where('user_id', Auth::id())->first();
         $hasLegalId = $eventOrganizer && !is_null($eventOrganizer->legal_id);
 
+        if (!$hasLegalId) {
+            // needs to create event organizer account first
+            return redirect()->route('event-organizer.show');
+        }
+
         return view('layouts.event.create', compact('categories', 'hasLegalId'));
     }
 

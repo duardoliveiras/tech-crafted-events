@@ -62,6 +62,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
 // Events
 Route::resource('events', EventController::class);
 Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
+Route::post('/events/leave/{event_id}/{ticket_id}', [EventController::class, 'leave'])->name('events.leave');
 Route::get('/events/byPass/{event_id}/{ticket_id}', [EventController::class, 'byPassTicketShow'])->name('events.byPassTicketShow');
 
 //Ticket
@@ -86,9 +87,10 @@ Route::post('/events/{event}/discussion/{discussion}/comment', [CommentControlle
 
 // add vote to comment
 Route::middleware(['auth'])->group(function () {
-    Route::post('/comments/{comment}/toggle-vote/{voteType}', [CommentController::class, 'toggleVote'])
-        ->name('comment.toggleVote');
+    Route::post('/comments/{comment}/toggle-vote/{voteType}', [CommentController::class, 'toggleVote'])->name('comment.toggleVote');
 });
+
+Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comment.update')->middleware(['auth']);
 
 // Payment Routes
 Route::prefix('payment')->group(function () {
@@ -108,7 +110,7 @@ Route::prefix('payment')->group(function () {
 
 // event organizer routes
 Route::get('/event-organizer', [EventOrganizerController::class, 'show'])
-    ->name('event-organizer.create')
+    ->name('event-organizer.show')
     ->middleware(['auth']);
 
 Route::post('/event-organizer/{legal_id}/{stripe_account_id}', [EventOrganizerController::class, 'create'])

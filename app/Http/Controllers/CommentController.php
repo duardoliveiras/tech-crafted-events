@@ -64,5 +64,28 @@ class CommentController extends Controller
         ]);
     }
 
+    public function update(Request $request, Comment $comment): JsonResponse
+    {
+        $request->validate([
+            'text' => 'required|string',
+        ]);
 
+        // Check if the authenticated user is the owner of the comment
+        if (auth()->id() !== $comment->user_id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are not authorized to update this comment.',
+            ], 403);
+        }
+
+        // Update the comment text
+        $comment->text = $request->input('text');
+        $comment->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Comment updated successfully.',
+            'updatedComment' => $comment,
+        ]);
+    }
 }
