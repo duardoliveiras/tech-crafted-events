@@ -26,11 +26,20 @@ class AdminController extends Controller
         return view('layouts.admin.reports', compact('events'));
     }
 
-    public function eventReports($eventId)
+    public function eventReports($eventId, $reason)
     {
-        $eventReports = EventReport::where('event_id', $eventId)
+        if($reason == "All"){
+            $eventReports = EventReport::where('event_id', $eventId)
             ->with('user')
             ->get();
+        }else{
+            $eventReports = EventReport::where('event_id', $eventId)
+            ->where('reason', $reason)
+            ->with('user')
+            ->get();
+        }
+
+        
         
         return response()->json($eventReports);
     }

@@ -24,7 +24,7 @@
                             <td> {{ $event->event_report_count }} </td>
                         @endforeach
                         <td>
-                        <button type="button" class="btn btn-primary"  data-toggle="modal" data-target="#reportModal" onClick="getEventReports('{{ $event->id }}')">    
+                        <button type="button" class="btn btn-primary"  data-toggle="modal" data-target="#reportModal" onClick="getEventReportsView('{{ $event->id }}')">    
                             <svg class="bi" width="16" height="16"><use xlink:href="{{ asset('assets/svg/icons.svg#eye-fill') }}"></use></svg>
                             View
                         </button>
@@ -81,52 +81,52 @@
 
 
 <div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-labelledby="reportModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="reportModalLabel">Report {{ $event->name }} </h5>
-      </div>
-      <div class="container mt-3">
-            <div class="input-group">
-                <select class="form-control form-control-sm" id="reportReason" name="reportReason">
-                    <option value="All">All</option>
-                    <option value="Inappropriate content">Inappropriate content</option>
-                    <option value="Incorrect Information">Incorrect Information</option>
-                    <option value="Inappropriate Behavior at the Event">Inappropriate Behavior at the Event</option>
-                    <option value="Safety Conditions">Safety Conditions</option>
-                    <option value="Fraud or Suspicious Activity">Fraud or Suspicious Activity</option>
-                    <option value="Spam or Repetitive Content">Spam or Repetitive Content</option>
-                    <option value="Others">Others</option>
-                </select>
-                <div class="input-group-append ms-3">
-                    <button class="btn btn-outline-secondary btn-sm" type="button">Search</button>
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reportModalLabel">Report {{ $event->name }} </h5>
+            </div>
+            <div class="container mt-3">
+                <div class="input-group">
+                    <select class="form-control form-control-sm" id="reportReason" name="reportReason" onchange="getEventReports('{{ $event->id }}',1)">
+                        <option value="All">All</option>
+                        <option value="Inappropriate content">Inappropriate content</option>
+                        <option value="Incorrect Information">Incorrect Information</option>
+                        <option value="Inappropriate Behavior at the Event">Inappropriate Behavior at the Event</option>
+                        <option value="Safety Conditions">Safety Conditions</option>
+                        <option value="Fraud or Suspicious Activity">Fraud or Suspicious Activity</option>
+                        <option value="Spam or Repetitive Content">Spam or Repetitive Content</option>
+                        <option value="Others">Others</option>
+                    </select>
                 </div>
             </div>
+            <table class="table table-bordered mt-3">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Reason</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr>
+                        <!-- Insert JS -->
+                    </tr>
+                </tbody>
+            </table>
+                <nav aria-label="...">
+                    <ul class="pagination pagination-sm" id="pagination">
+                        <!-- Insert JS -->
+                    </ul>
+                </nav>
         </div>
-
-                <table class="table table-bordered mt-3">
-                    <thead>
-                        <tr>
-                            <th scope="col">Name</th>
-                            <th scope="col">Reason</th>
-                            <th scope="col">Description</th>
-                            <th scope="col">Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody id="tableBody">
-                        <tr>
-                                              <!-- Insert JS -->      
-                        </tr>
-                        </tbody>
-                   </table>
-                </div>
-             </div>
-      </div>
     </div>
-  </div>
 </div>
-
-
+    
+    <script>
+        var eventId = '{{ $event->id }}';
+    </script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
