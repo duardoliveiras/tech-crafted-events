@@ -19,8 +19,10 @@ class AdminController extends Controller
 
     public function reports()
     {
+        $events = Event::withCount('event_report')->get();
+        $events = $events->sortByDesc('event_report_count');
         
-        return view('layouts.admin.reports');
+        return view('layouts.admin.reports', compact('events'));
     }
 
 }
