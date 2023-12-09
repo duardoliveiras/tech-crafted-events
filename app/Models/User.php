@@ -97,6 +97,9 @@ class User extends Authenticatable
             ->pluck('vote_type', 'comment_id');
     }
 
+    public function event_report(){
+        return $this->hasMany(EventReport::class, 'user_id');
+    }
 
     protected static function boot()
     {

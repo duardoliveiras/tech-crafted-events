@@ -16,4 +16,11 @@ class AdminController extends Controller
         $events = Event::all();
         return view('layouts.admin.dashboard',compact('users', 'events'));
     }
+
+    public function reports()
+    {
+        
+        return view('layouts.admin.reports');
+    }
+
 }
