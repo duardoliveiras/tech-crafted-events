@@ -79,14 +79,48 @@
             </div>
     </div>
 
+
 <div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-labelledby="reportModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
+  <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="reportModalLabel">Report {{ $event->name }} </h5>
       </div>
-      <div class="modal-body" id="reportContainer">
-       <!--  Js insert -->
+      <div class="container mt-3">
+            <div class="input-group">
+                <select class="form-control form-control-sm" id="reportReason" name="reportReason">
+                    <option value="All">All</option>
+                    <option value="Inappropriate content">Inappropriate content</option>
+                    <option value="Incorrect Information">Incorrect Information</option>
+                    <option value="Inappropriate Behavior at the Event">Inappropriate Behavior at the Event</option>
+                    <option value="Safety Conditions">Safety Conditions</option>
+                    <option value="Fraud or Suspicious Activity">Fraud or Suspicious Activity</option>
+                    <option value="Spam or Repetitive Content">Spam or Repetitive Content</option>
+                    <option value="Others">Others</option>
+                </select>
+                <div class="input-group-append ms-3">
+                    <button class="btn btn-outline-secondary btn-sm" type="button">Search</button>
+                </div>
+            </div>
+        </div>
+
+                <table class="table table-bordered mt-3">
+                    <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Reason</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                        <tr>
+                                              <!-- Insert JS -->      
+                        </tr>
+                        </tbody>
+                   </table>
+                </div>
+             </div>
       </div>
     </div>
   </div>
