@@ -24,7 +24,7 @@
                             <td> {{ $event->event_report_count }} </td>
                         @endforeach
                         <td>
-                        <button type="button" class="btn btn-primary">    
+                        <button type="button" class="btn btn-primary"  data-toggle="modal" data-target="#reportModal" onClick="getEventReports('{{ $event->id }}')">    
                             <svg class="bi" width="16" height="16"><use xlink:href="{{ asset('assets/svg/icons.svg#eye-fill') }}"></use></svg>
                             View
                         </button>
@@ -79,8 +79,22 @@
             </div>
     </div>
 
+<div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-labelledby="reportModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="reportModalLabel">Report {{ $event->name }} </h5>
+      </div>
+      <div class="modal-body" id="reportContainer">
+       <!--  Js insert -->
+      </div>
+    </div>
+  </div>
+</div>
+
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="{{ asset('js/reports/report_event.js') }}"></script>
 @endsection

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EventReport;
 use App\Models\User;
 use App\Models\Event;
 use Illuminate\Support\Facades\Auth;
@@ -25,4 +26,12 @@ class AdminController extends Controller
         return view('layouts.admin.reports', compact('events'));
     }
 
+    public function eventReports($eventId)
+    {
+        $eventReports = EventReport::where('event_id', $eventId)
+            ->with('user')
+            ->get();
+        
+        return response()->json($eventReports);
+    }
 }
