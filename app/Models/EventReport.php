@@ -5,11 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class EventReport extends Model
+class EventReport extends BaseModel
 {
     use HasFactory;
 
     protected $table = "event_report";
+    protected $keyType = 'string';
     public $timestamps = false;
     protected $fillable = [
         'event_id',
