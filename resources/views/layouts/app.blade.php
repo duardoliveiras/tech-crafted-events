@@ -32,7 +32,7 @@
         @include('partials.navbar')
     @endif
 
-            <nav aria-label="breadcrumb" class="mt-2 ms-3">
+            <nav aria-label="breadcrumb" class="mt-2 ms-5">
                 <ol class="breadcrumb">
                     <li>
                         <i class="fa fa-home"></i>
