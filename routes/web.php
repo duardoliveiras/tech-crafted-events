@@ -1,17 +1,18 @@
 <?php
 
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\Auth\ForgotPasswordController;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\CommentController;
-use App\Http\Controllers\DiscussionController;
-use App\Http\Controllers\EventController;
-use App\Http\Controllers\MyEventsController;
-use App\Http\Controllers\NotificationsController;
-use App\Http\Controllers\TicketController;
-use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\EventController;
+use App\Http\Controllers\TicketController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\MyEventsController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\DiscussionController;
+use App\Http\Controllers\EventReportController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\NotificationsController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 
 // Home
 Route::redirect('/', '/home');
@@ -61,6 +62,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
 //Events
 Route::resource('events', EventController::class);
 Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
+//Reports
+Route::post('/events/{event}/report', [EventReportController::class, 'postReport'])->name('event-report.store');
 
 //Ticket
 Route::get('/events/{event}/ticket/buy', [TicketController::class, 'showBuyTicketForm'])->name('ticket.buy');
