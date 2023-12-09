@@ -206,7 +206,7 @@ create table event_report (
 	event_id UUID not null,
 	reason report_reason not null,
 	description text,
-	created_at date not null,
+	created_at date not null default now(),
     foreign key (user_id) references Users (id),
     foreign key (event_id) references Event (id)
 );

@@ -55,6 +55,7 @@ Route::get('/password/reset', function(){
 //Admin
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+    Route::get('/admin/reports', [AdminController::class, 'reports'])->name('admin.reports');
 });
 
 //Events
