@@ -116,7 +116,7 @@
                 </tbody>
             </table>
                 <nav aria-label="...">
-                    <ul class="pagination pagination-sm" id="pagination">
+                    <ul class="pagination justify-content-center" id="pagination">
                         <!-- Insert JS -->
                     </ul>
                 </nav>
