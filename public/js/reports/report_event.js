@@ -1,9 +1,21 @@
 var rowsPerPag = 5;
+var eventIdGlobal;
 
+function getEventReportsView(eventId, eventName){
 
-function getEventReportsView(eventId){
+    var title = document.getElementById('reportModalLabel');
+    title.innerText = "Report " + eventName;
+
+    eventIdGlobal = eventId;
+
     var reason = document.getElementById("reportReason");
     reason.value = "All";
+
+    reason.onchange = function() {
+        getEventReports(eventId,1);
+    };
+
+
     getEventReports(eventId, 1);
 }
 
@@ -36,12 +48,13 @@ function getEventReports(eventId, page){
                 for(i; i < len; i++){
                     var report = data[i];
                     const newRow = document.createElement('tr');
+                    newRow.id = `${report.id}`;
                     newRow.innerHTML = `
                         <td>${report.user.name}</td>
                         <td>${report.reason}</td>
                         <td>${report.description}</td>
                         <td>
-                            <button type="button" class="btn btn-success" onclick="checkOneReport('${report.id}')">Check</button>
+                            <button id="check" type="button" class="btn btn-success" onclick="checkOneReport('${report.id}')">Check</button>
                         </td>
                     `;
                     document.getElementById('tableBody').appendChild(newRow);
@@ -63,7 +76,7 @@ function pagination(data){
 
     document.getElementById('pagination').innerHTML = '';
     for(var i = 1; i <= pags; i++){
-        elementoHTML += '<li class="page-item" id="pg' + i + '"><a class="page-link" href="javascript:void(0);" onclick="getEventReports(\'' + eventId + '\', ' + i + ')">' + i + '</a></li>';
+        elementoHTML += '<li class="page-item" id="pg' + i + '"><a class="page-link" href="javascript:void(0);" onclick="getEventReports(\'' + eventIdGlobal + '\', ' + i + ')">' + i + '</a></li>';
 
     }
     document.getElementById('pagination').insertAdjacentHTML('beforeend', elementoHTML);
@@ -88,9 +101,21 @@ function checkOneReport(id){
                 throw Error(response.statusText);
             }
             console.log('check!');
+            getEventReports(eventIdGlobal, 1);
+            //updateLineColor(id);
 
         })
         .catch(error =>{
             console.error('Erro', error);
         });
 }   
+
+
+// wear out
+function updateLineColor(id){
+    var currLine = document.getElementById(id);
+    currLine.classList.add('table-success');   
+    var checkBtn = currLine.querySelector('#check');
+    checkBtn.classList.remove('btn-success');
+    checkBtn.classList.add('btn-secondary');
+}
