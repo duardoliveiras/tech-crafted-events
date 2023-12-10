@@ -37,10 +37,10 @@ class NotificationsController extends Controller
 
         if($notification) {     
             $notification->update(['read' => true]);
-            return response()->json(['message' => 'Marcado como lido com sucesso.']);
+            return response()->json(['message' => 'Read success.']);
         }   
         else{
-            return response()->json(['error' => 'Notificação não encontrada.'], 404);
+            return response()->json(['error' => 'Notification not found.'], 404);
         }
     }
 } 
