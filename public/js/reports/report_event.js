@@ -119,3 +119,29 @@ function updateLineColor(id){
     checkBtn.classList.remove('btn-success');
     checkBtn.classList.add('btn-secondary');
 }
+
+function banEvent(eventId){
+    
+    var url = '/admin/reports/ban/' + eventId;
+
+    var options = {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({}),
+    };
+
+    fetch(url, options)
+        .then(response => {
+            if(!response.ok){
+                throw Error(response.statusText);
+            }
+            window.location=route_reports;
+        })
+        .catch(error => {
+            console.error('Erro', error);
+
+        });
+}

@@ -20,7 +20,8 @@ class AdminController extends Controller
 
     public function reports()
     {
-        $events = Event::whereHas('event_report', fn($query) => $query->where('analyzed', false))
+        $events = Event::where('status', '!=', 'BANNED')
+        ->whereHas('event_report', fn($query) => $query->where('analyzed', false))
         ->withCount([
             'event_report as event_report_count' => function ($query) {
                 $query->where('analyzed', false);
