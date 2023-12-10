@@ -28,4 +28,19 @@ class EventReportController extends Controller
             "success", "Your report will be analyzed by the team"
         );
     }
+
+    public function checkOneReport($reportId)
+    {
+        $report = EventReport::find($reportId);
+        
+
+        if($report){
+            $report->update(['analyzed' => true]);
+            return response()->json(['message' => 'Check report success.']);
+        }else{
+            return response()->json(['error' => 'Report not found'], 404);
+        }
+
+
+    }
 }

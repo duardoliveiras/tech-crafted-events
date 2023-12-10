@@ -41,7 +41,7 @@ function getEventReports(eventId, page){
                         <td>${report.reason}</td>
                         <td>${report.description}</td>
                         <td>
-                            <button type="button" class="btn btn-success">Check</button>
+                            <button type="button" class="btn btn-success" onclick="checkOneReport('${report.id}')">Check</button>
                         </td>
                     `;
                     document.getElementById('tableBody').appendChild(newRow);
@@ -69,3 +69,28 @@ function pagination(data){
     document.getElementById('pagination').insertAdjacentHTML('beforeend', elementoHTML);
 }
 
+function checkOneReport(id){
+
+    var url = '/admin/reports/check/' + id;
+    console.log(url);
+    var options = {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({}),
+    };
+
+    fetch(url, options)
+        .then(response => {
+            if(!response.ok){
+                throw Error(response.statusText);
+            }
+            console.log('check!');
+
+        })
+        .catch(error =>{
+            console.error('Erro', error);
+        });
+}   

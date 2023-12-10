@@ -67,6 +67,8 @@ Route::get('/events/{event}', [EventController::class, 'show'])->name('events.sh
 Route::post('/events/{event}/report', [EventReportController::class, 'postReport'])->name('event-report.store');
 Route::get('/admin/reports/load-reports/{event}/{reason}', [AdminController::class, 'eventReports'])->name('event-reports');
 
+Route::put('admin/reports/check/{reportId}', [EventReportController::class, 'checkOneReport'])->name('check-event-report');
+
 //Ticket
 Route::get('/events/{event}/ticket/buy', [TicketController::class, 'showBuyTicketForm'])->name('ticket.buy');
 Route::post('/events/{event}/ticket/acquire', [TicketController::class, 'acquireTicket'])->name('ticket.acquire');

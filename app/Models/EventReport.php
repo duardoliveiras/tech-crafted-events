@@ -16,7 +16,8 @@ class EventReport extends BaseModel
         'event_id',
         'user_id',
         'reason',
-        'description'
+        'description',
+        'analyzed'
     ];
 
     public function user(){
