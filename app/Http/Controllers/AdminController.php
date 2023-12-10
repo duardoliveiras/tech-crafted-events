@@ -20,21 +20,30 @@ class AdminController extends Controller
 
     public function reports()
     {
-        $events = Event::withCount('event_report')->get();
+        $events = Event::whereHas('event_report', fn($query) => $query->where('analyzed', false))
+        ->withCount([
+            'event_report as event_report_count' => function ($query) {
+                $query->where('analyzed', false);
+            }
+        ])->get();
+
         $events = $events->sortByDesc('event_report_count');
-        
+    
         return view('layouts.admin.reports', compact('events'));
+        
     }
 
     public function eventReports($eventId, $reason)
     {
         if($reason == "All"){
             $eventReports = EventReport::where('event_id', $eventId)
+            ->where('analyzed', false)
             ->with('user')
             ->get();
         }else{
             $eventReports = EventReport::where('event_id', $eventId)
             ->where('reason', $reason)
+            ->where('analyzed', false)
             ->with('user')
             ->get();
         }

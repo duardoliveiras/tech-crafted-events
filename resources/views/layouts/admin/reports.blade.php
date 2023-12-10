@@ -17,29 +17,33 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr>
+                            @forelse ($events as $event )
+                                <tr>
+                                    <td> {{ $event->name }} </td>
+                                    <td> {{ $event->event_report_count }} </td>
+                                <td>
+                                    <button type="button" class="btn btn-primary"  data-toggle="modal" data-target="#reportModal" onClick="getEventReportsView('{{ $event->id }}','{{ $event->name}}')">    
+                                        <svg class="bi" width="16" height="16"><use xlink:href="{{ asset('assets/svg/icons.svg#eye-fill') }}"></use></svg>
+                                        View
+                                    </button>
 
-                        @foreach ($events as $event )
-                            <td> {{ $event->name }} </td>
-                            <td> {{ $event->event_report_count }} </td>
-                        @endforeach
-                        <td>
-                        <button type="button" class="btn btn-primary"  data-toggle="modal" data-target="#reportModal" onClick="getEventReportsView('{{ $event->id }}')">    
-                            <svg class="bi" width="16" height="16"><use xlink:href="{{ asset('assets/svg/icons.svg#eye-fill') }}"></use></svg>
-                            View
-                        </button>
+                                    <button type="button" class="btn btn-success">
+                                        <svg class="bi" width="16" height="16"><use xlink:href="{{ asset('assets/svg/icons.svg#check-square-fill') }}"></use></svg>
+                                        Check
+                                    </button>
 
-                        <button type="button" class="btn btn-success">
-                            <svg class="bi" width="16" height="16"><use xlink:href="{{ asset('assets/svg/icons.svg#check-square-fill') }}"></use></svg>
-                            Check
-                        </button>
+                                    <button type="button" class="btn btn-danger">
+                                        <svg class="bi" width="16" height="16"><use xlink:href="{{ asset('assets/svg/icons.svg#ban-fill') }}"></use></svg>
+                                        Ban
+                                    </button>   
+                                </td>
+                                </tr>
+                            @empty 
+                                <tr>
+                                </tr>
+                            @endforelse
 
-                        <button type="button" class="btn btn-danger">
-                            <svg class="bi" width="16" height="16"><use xlink:href="{{ asset('assets/svg/icons.svg#ban-fill') }}"></use></svg>
-                            Ban
-                        </button>   
-                        </td>
-                    </tr>
+                    
                     </tbody>
                  </table>
                 </div>
@@ -84,14 +88,14 @@
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="reportModalLabel">Report {{ $event->name }} </h5>
-                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal" aria-label="Close">
+                <h5 class="modal-title" id="reportModalLabel"></h5>
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal" aria-label="Close" onclick="window.location='{{ route('admin.reports') }}'">
                         <span aria-hidden="true">&times;</span>
                     </button>
             </div>
             <div class="container mt-3">
                 <div class="input-group">
-                    <select class="form-control form-control-sm" id="reportReason" name="reportReason" onchange="getEventReports('{{ $event->id }}',1)">
+                    <select class="form-control form-control-sm" id="reportReason" name="reportReason">
                         <option value="All">All</option>
                         <option value="Inappropriate content">Inappropriate content</option>
                         <option value="Incorrect Information">Incorrect Information</option>
@@ -127,9 +131,6 @@
     </div>
 </div>
     
-    <script>
-        var eventId = '{{ $event->id }}';
-    </script>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
