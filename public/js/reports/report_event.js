@@ -20,9 +20,10 @@ function getEventReports(eventId, page){
         })
         .then(data => {
             document.getElementById('tableBody').innerHTML = '';
-
+            pagination(data);
+            
             if(data.length > 0){
-                pagination(data);
+                
 
                 var curr_pag = document.getElementById('pg'+page);
                 curr_pag.classList.add('disabled');   
@@ -40,7 +41,7 @@ function getEventReports(eventId, page){
                         <td>${report.reason}</td>
                         <td>${report.description}</td>
                         <td>
-                            <button type="button" class="btn btn-primary"><i class="far fa-eye"></i></button>
+                            <button type="button" class="btn btn-success">Check</button>
                         </td>
                     `;
                     document.getElementById('tableBody').appendChild(newRow);
@@ -60,7 +61,7 @@ function pagination(data){
     var pags = Math.ceil(qt/rowsPerPag);
     var elementoHTML = '';
 
-    document.getElementById('pagination').innerHTML = '';onchange="getEventReports('{{ $event->id }}',1)"
+    document.getElementById('pagination').innerHTML = '';
     for(var i = 1; i <= pags; i++){
         elementoHTML += '<li class="page-item" id="pg' + i + '"><a class="page-link" href="javascript:void(0);" onclick="getEventReports(\'' + eventId + '\', ' + i + ')">' + i + '</a></li>';
 

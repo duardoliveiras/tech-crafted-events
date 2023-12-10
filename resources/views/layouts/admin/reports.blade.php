@@ -85,6 +85,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="reportModalLabel">Report {{ $event->name }} </h5>
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
             </div>
             <div class="container mt-3">
                 <div class="input-group">
@@ -115,7 +118,7 @@
                     </tr>
                 </tbody>
             </table>
-                <nav aria-label="...">
+                <nav aria-label="..." >
                     <ul class="pagination justify-content-center" id="pagination">
                         <!-- Insert JS -->
                     </ul>
