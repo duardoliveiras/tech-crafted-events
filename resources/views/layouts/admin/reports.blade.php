@@ -19,7 +19,7 @@
                     <tbody>
                             @forelse ($events as $event )
                                 <tr>
-                                    <td> {{ $event->name }} </td>
+                                    <td> <a href="{{ route('events.show', $event->id) }}" > {{ $event->name }} </a>  </td>
                                     <td> {{ $event->event_report_count }} </td>
                                 <td>
                                     <button type="button" class="btn btn-primary"  data-toggle="modal" data-target="#reportModal" onClick="getEventReportsView('{{ $event->id }}','{{ $event->name}}')">    
@@ -27,12 +27,12 @@
                                         View
                                     </button>
 
-                                    <button type="button" class="btn btn-success">
+                                    <button type="button" class="btn btn-success" >
                                         <svg class="bi" width="16" height="16"><use xlink:href="{{ asset('assets/svg/icons.svg#check-square-fill') }}"></use></svg>
                                         Check
                                     </button>
 
-                                    <button type="button" class="btn btn-danger">
+                                    <button type="button" class="btn btn-danger" onClick="banEvent( '{{ $event->id }}' )">
                                         <svg class="bi" width="16" height="16"><use xlink:href="{{ asset('assets/svg/icons.svg#ban-fill') }}"></use></svg>
                                         Ban
                                     </button>   
@@ -89,7 +89,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="reportModalLabel"></h5>
-                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal" aria-label="Close" onclick="window.location='{{ route('admin.reports') }}'">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal" aria-label="Close" onclick="window.location=route_reports">
                         <span aria-hidden="true">&times;</span>
                     </button>
             </div>
@@ -131,6 +131,10 @@
     </div>
 </div>
     
+
+    <script>
+        var route_reports = "{{ route('admin.reports') }}";
+    </script>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>

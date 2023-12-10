@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Event;
 use App\Models\EventReport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -32,7 +33,6 @@ class EventReportController extends Controller
     public function checkOneReport($reportId)
     {
         $report = EventReport::find($reportId);
-        
 
         if($report){
             $report->update(['analyzed' => true]);
@@ -42,5 +42,17 @@ class EventReportController extends Controller
         }
 
 
+    }
+
+    public function banEvent($eventId)
+    {
+        $event = Event::find($eventId);
+
+        if($event){
+            $event->update(['status' => 'BANNED']);
+            return response()->json(['message' => 'Event successfully banned.']);
+        }else{
+            return response()->json(['error' => 'Event not found'], 404);
+        }
     }
 }
