@@ -7,7 +7,9 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ preg_replace('/(?<!\ )[A-Z]/', ' $0', config('app.name', 'Laravel')) }}</title>
+
+    <link rel="icon" href="{{ URL::asset('/assets/img/logo-without-text.svg') }}">
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.bunny.net">

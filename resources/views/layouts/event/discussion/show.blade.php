@@ -8,11 +8,17 @@
             <div class="card-body">
                 <h5 class="card-title">Add a Comment</h5>
                 <form action="{{ route('discussion.comment', ['event' => $event->id, 'discussion' => $discussion->id]) }}"
-                      method="POST">
+                      method="POST" enctype="multipart/form-data">
                     @csrf
-                    <div class="form-group">
+                    <div class="form-group mb-3">
                         <label for="content">Your Comment:</label>
                         <textarea name="content" id="content" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="custom-label" for="attachment">Attach image to comment:</label>
+                        <input type="file" class="form-control custom-input" id="attachment" name="attachment" required>
+                        <small class="form-text text-muted">Image must be in JPEG, PNG, JPG, GIF, or SVG format and have
+                            a maximum size of 2MB.</small>
                     </div>
                     <button type="submit" class="btn btn-primary mt-2">Submit Comment</button>
                 </form>
@@ -43,6 +49,7 @@
                 </div>
             </div>
         </div>
+
 
         <script type="text/javascript" src="{{ URL::asset ('js/event/discussion.js') }}"></script>
     </div>

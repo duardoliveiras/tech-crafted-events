@@ -20,18 +20,23 @@ class CommentController extends Controller
     {
         $request->validate([
             'content' => 'required|string',
+            'attachment' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
         ]);
 
+        $filePath = null;
+        if ($request->hasFile('attachment')) {
+            $filePath = $request->file('attachment')->store('attachments', 'public');
+        }
 
         $comment = new Comment([
             'text' => $request->input('content'),
             'user_id' => auth()->id(),
             'discussion_id' => $discussion->id,
             'commented_at' => now(),
+            'attachment_path' => $filePath,
         ]);
 
         $comment->save();
-
 
         return redirect()
             ->route('discussion.show', ['event' => $event->id])
