@@ -66,6 +66,8 @@ Route::get('/events/{event}', [EventController::class, 'show'])->name('events.sh
 //Reports
 Route::post('/events/{event}/report', [EventReportController::class, 'postReport'])->name('event-report.store');
 Route::get('/admin/reports/load-reports/{event}/{reason}', [AdminController::class, 'eventReports'])->name('event-reports');
+
+Route::put('/events/{event}/check-all',[EventReportController::class, 'check_all_reports']);
 //
 Route::put('admin/reports/check/{reportId}', [EventReportController::class, 'checkOneReport'])->name('check-one-report');
 Route::put('admin/reports/check-all/{event}', [EventReportController::class, 'checkAllReport'])->name('check-all-report');
