@@ -61,3 +61,29 @@ function readNotification(notificationId) {
             console.error('Erro', error);
         });
 }
+
+function check_all_reports(eventId){
+    var url = '/events/' + eventId + '/check-all';
+    console.log(url);
+    
+    var options = {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({}),
+    };
+
+    fetch(url, options)
+        .then(response => {
+            if (!response.ok) {
+                throw Error(response.statusText);
+            }
+            window.location.href = '/admin/reports';
+        })
+    
+        .catch(error => {
+            console.error('Erro', error);
+        });
+}

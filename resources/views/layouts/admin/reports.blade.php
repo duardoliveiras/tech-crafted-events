@@ -27,7 +27,7 @@
                                         View
                                     </button>
 
-                                    <button type="button" class="btn btn-success" >
+                                    <button type="button" class="btn btn-success" onclick="check_all_reports('{{ $event->id }}' )">
                                         <svg class="bi" width="16" height="16"><use xlink:href="{{ asset('assets/svg/icons.svg#check-square-fill') }}"></use></svg>
                                         Check
                                     </button>
@@ -66,7 +66,7 @@
                             View
                         </button>
 
-                        <button type="button" class="btn btn-success">
+                        <button type="button" class="btn btn-success" onclick="check_all_reports()">
                             <svg class="bi" width="16" height="16"><use xlink:href="{{ asset('assets/svg/icons.svg#check-square-fill') }}"></use></svg>
                             Check
                         </button>

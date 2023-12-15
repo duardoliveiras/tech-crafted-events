@@ -55,4 +55,22 @@ class EventReportController extends Controller
             return response()->json(['error' => 'Event not found'], 404);
         }
     }
+
+    public function check_all_reports($eventId){
+        $reports = EventReport::where('event_id', $eventId)->get();
+
+        if($reports){
+            foreach($reports as $report){
+                $report->analyzed = true;
+                $report->save();
+            }
+            return response()->json(['message' => 'Success check all'], 200);
+                                
+        }else{
+            return response()->json(['error' => 'Event not found'], 404);
+        }
+        
+    }
 }
+
+
