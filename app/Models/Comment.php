@@ -19,7 +19,8 @@ class Comment extends BaseModel
         'commented_at',
         'user_id',
         'discussion_id',
-        'is_deleted'
+        'is_deleted',
+        'attachment_path'
     ];
 
     public static function getCommentsForDiscussion($discussionId)
