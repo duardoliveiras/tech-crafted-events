@@ -23,57 +23,24 @@ class NotificationsController extends Controller
     {   
         $user_id = Auth::id();
 
-        $notifications = UserEventNotifications::where('user_id', $user_id)
-            ->where('read', false)
-            ->get();
-
-
-        $eventNotifications = [];
-
-        $eventNotifications = [];
-
-        foreach ($notifications as $notification) {
-
-            $eventNotification = EventNotification::find($notification->notification_id);
-
-            if ($eventNotification) {
-
-                $event = Event::find($eventNotification->event_id);
-
-                if ($event) {
-                    $eventNotifications[] = [
-                        'eventNotification' => $eventNotification,
-                        'eventName' => $event->name,
-                    ];
-                }
-            }
-        }
-
-        return view('layouts.notifications.index', compact('eventNotifications'));
+        $userEventNotifications = UserEventNotifications::with('eventNotification.event')
+        ->where('user_id', $user_id)
+        ->where('read', false)
+        ->get();
+                                 
+        return response()->json($userEventNotifications);
     }
 
-    public function markRead($notificationId)
-  
-  
+    public function updateRead($notificationId)
     {
-
         $notification = UserEventNotifications::find($notificationId);
 
-        if($notification) {
-            
-            $notification->update([
-                'read' => true,
-            ]);
-            error_log($notification);
-            echo "Nome: " . $notification . "<br>";
-
-            return response()->json([
-                'success' => true,
-            ]);
+        if($notification) {     
+            $notification->update(['read' => true]);
+            return response()->json(['message' => 'Marcado como lido com sucesso.']);
+        }   
+        else{
+            return response()->json(['error' => 'Notificação não encontrada.'], 404);
         }
-            return response()->json([
-                'success' => false,
-            ]);
-            
     }
-}
+} 

@@ -9,8 +9,6 @@ class State extends BaseModel
 {
     use HasFactory;
     protected $table = 'state';
-    protected $keyType = 'string';
-    public $timestamps = false;
     protected $fillable = ['name', 'initials', 'country_id'];
 
     public function country()

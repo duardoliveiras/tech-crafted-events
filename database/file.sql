@@ -9,8 +9,9 @@ DROP TABLE IF EXISTS Discussion CASCADE;
 DROP TABLE IF EXISTS EventOrganizer CASCADE;
 DROP TABLE IF EXISTS Admin CASCADE;
 DROP TABLE IF EXISTS Notification CASCADE;
-DROP TYPE IF EXISTS NotificationType;
-DROP TYPE IF EXISTS ticket_status;
+DROP TYPE IF EXISTS NotificationType CASCADE;
+DROP TYPE IF EXISTS ticket_status CASCADE;
+DROP TYPE IF EXISTS event_status CASCADE;
 DROP TABLE IF EXISTS Users CASCADE;
 DROP TABLE IF EXISTS University CASCADE;
 DROP TABLE IF EXISTS Event CASCADE;
@@ -70,7 +71,7 @@ CREATE TABLE Users
 (
     id            UUID PRIMARY KEY,
     name          VARCHAR(255) NOT NULL,
-    phone         CHAR(15)     NOT NULL,
+    phone         CHAR(20)     NOT NULL,
     email         VARCHAR(255) NOT NULL UNIQUE,
     password      VARCHAR(255) NOT NULL,
     birthDate     DATE         NOT NULL,
@@ -83,27 +84,32 @@ CREATE TABLE Users
 
 CREATE TABLE EventOrganizer
 (
-    id       UUID PRIMARY KEY,
-    legal_id CHAR(50) NOT NULL,
-    user_id  UUID     NOT NULL,
+    id                UUID PRIMARY KEY,
+    legal_id          CHAR(50) NOT NULL,
+    stripe_account_id VARCHAR(255),
+    user_id           UUID     NOT NULL,
     FOREIGN KEY (user_id) REFERENCES Users (id)
 );
+
+CREATE TYPE event_status AS ENUM ('UPCOMING', 'ONGOING', 'FINISHED', 'CANCELLED', 'BANNED', 'DELETED');
 
 CREATE TABLE Event
 (
     id                  UUID PRIMARY KEY,
-    name                VARCHAR(255)   NOT NULL,
-    description         TEXT           NOT NULL,
-    start_date          timestamp      NOT NULL,
-    end_date            timestamp      NOT NULL,
-    start_tickets_qty   INT            NOT NULL CHECK (start_tickets_qty >= 0),
-    current_tickets_qty INT            NOT NULL CHECK (current_tickets_qty >= 0),
-    current_price       DECIMAL(10, 2) NOT NULL CHECK (current_price >= 0),
-    address             VARCHAR(255)   NOT NULL,
-    image_url           VARCHAR(255)   NOT NULL,
-    category_id         UUID           NOT NULL,
-    city_id             UUID           NOT NULL,
-    owner_id            UUID           NOT NULL,
+    name                VARCHAR(255)                                   NOT NULL,
+    description         TEXT                                           NOT NULL,
+    start_date          timestamp                                      NOT NULL,
+    end_date            timestamp                                      NOT NULL,
+    start_tickets_qty   INT                                            NOT NULL CHECK (start_tickets_qty >= 0),
+    current_tickets_qty INT                                            NOT NULL CHECK (current_tickets_qty >= 0),
+    current_price       DECIMAL(10, 2)                                 NOT NULL CHECK (current_price >= 0),
+    address             VARCHAR(255)                                   NOT NULL,
+    image_url           VARCHAR(255)                                   NOT NULL,
+    category_id         UUID                                           NOT NULL,
+    city_id             UUID                                           NOT NULL,
+    owner_id            UUID                                           NOT NULL,
+    status              event_status                DEFAULT 'UPCOMING' NOT NULL,
+    created_at          TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
     FOREIGN KEY (owner_id) REFERENCES EventOrganizer (id),
     FOREIGN KEY (category_id) REFERENCES Category (id),
     FOREIGN KEY (city_id) REFERENCES City (id)
@@ -170,11 +176,13 @@ CREATE TABLE Ticket
 
 CREATE TABLE Comment
 (
-    id            UUID PRIMARY KEY,
-    text          TEXT      NOT NULL,
-    commented_at  TIMESTAMP NOT NULL,
-    user_id       UUID      NOT NULL,
-    discussion_id UUID      NOT NULL,
+    id              UUID PRIMARY KEY,
+    text            TEXT      NOT NULL,
+    commented_at    TIMESTAMP NOT NULL,
+    user_id         UUID      NOT NULL,
+    discussion_id   UUID      NOT NULL,
+    is_deleted      boolean DEFAULT FALSE,
+    attachment_path TEXT,
     FOREIGN KEY (user_id) REFERENCES Users (id),
     FOREIGN KEY (discussion_id) REFERENCES Discussion (id)
 );
@@ -191,24 +199,69 @@ CREATE TABLE Vote
     FOREIGN KEY (comment_id) REFERENCES Comment (id)
 );
 
-create or replace function NOTIFY_EVENT_UPDATE()
-    returns trigger as
+CREATE OR REPLACE FUNCTION notify_event_update()
+    RETURNS trigger AS
 $$
 declare
-    id_notification INTEGER;
+    id_notification     INTEGER;
+    v_notification_text VARCHAR;
+    v_update            bool;
 begin
-    insert into tech_crafted.eventnotifications(id, event_id, notification_text)
-    values (DEFAULT, new.id, new.name || ' has been updated.')
-    returning id into id_notification;
 
-    insert into tech_crafted.userseventnotifications(user_id, notification_id, read)
-    select user_id, id_notification, false
-    from ticket
-    where event_id = new.id;
+    if new is distinct from old then
+        v_notification_text := new.name || ' the event underwent several changes.';
+        v_update = true;
+    end if;
+
+    if new.name <> old.name and new.description = old.description and new.start_date = old.start_date and
+       new.end_date = old.end_date
+        and new.address = old.address then
+        v_notification_text := old.name || ' name has been updated.';
+        v_update = true;
+
+    elsif new.name = old.name and new.description <> old.description and new.start_date = old.start_date and
+          new.end_date = old.end_date
+        and new.address = old.address then
+        v_notification_text := old.name || ' description has been updated.';
+        v_update = true;
+
+    elsif new.name = old.name and new.description = old.description and new.start_date <> old.start_date and
+          new.end_date = old.end_date
+        and new.address = old.address then
+        v_notification_text :=
+                old.name || ' start date has been updated to ' || to_char(new.start_date, 'mm/dd/yyyy hh:mi');
+        v_update = true;
+
+    elsif new.name = old.name and new.description = old.description and new.start_date = old.start_date and
+          new.end_date <> old.end_date
+        and new.address = old.address then
+        v_notification_text :=
+                old.name || ' end date has been updated to ' || to_char(new.end_date, 'mm/dd/yyyy hh:mi');
+        v_update = true;
+
+    elsif new.name = old.name and new.description = old.description and new.start_date = old.start_date and
+          new.end_date = old.end_date
+        and new.address <> old.address then
+        v_notification_text := old.name || ' address has been updated.';
+        v_update = true;
+    else
+        v_update = false;
+    end if;
+
+    if v_update = true then
+
+        insert into tech_crafted.eventnotifications(id, event_id, notification_text)
+        values (DEFAULT, new.id, v_notification_text)
+        returning id into id_notification;
+
+        insert into tech_crafted.userseventnotifications(user_id, notification_id, read)
+        select user_id, id_notification, false
+        from ticket
+        where event_id = new.id;
+    end if;
 
     return new;
 end;
-
 $$ language plpgsql;
 
 create trigger event_update_trigger

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('events', function (Blueprint $table) {
+        Schema::create('event', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->text('description');
@@ -25,8 +25,12 @@ return new class extends Migration
            // $table->foreignId('city_id')->constrained('city');
            // $table->foreignId('owner_id')->constrained('users');
             $table->timestamps();
+            $table->text('full_text_search')->nullable();
         });
+        DB::statement("CREATE INDEX full_text_search_events_idx ON event USING gin(to_tsvector('english', name));");
     }
+
+    
 
     /**
      * Reverse the migrations.

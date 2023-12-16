@@ -62,10 +62,14 @@
                     </div>
                 </div>
             </div>
+
+            <input type="hidden" name="sort" id="sort">
+
             <a onclick="clearForm()" id="clear-filters" class="text-decoration-none text-white ms-4"
                style="cursor: pointer;"><u>Clear filter options</u></a>
         </form>
     </div>
+
 
     <div class="container mt-5">
         <div class="row">
@@ -74,23 +78,24 @@
                 <h2 class="title-events purple"> Events</h2>
             </div>
             <div class="sort-options col justify-content-end d-flex flex-row align-items-center">
-                <div class="event-type-select">
-                    <select id="eventType" name="eventType" class="form-control">
-                        <option value="">Event Type</option>
-                        @foreach ($categories as $eventType)
-                            <option value="{{ $eventType->id }}" {{ request('eventType') == $eventType->id ? 'selected' : '' }}>{{ $eventType->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="sort-by-select">
-
-                </div>
+                    <div class="dropdown">
+                        <button id="dropdown-sort" class="btn btn-secondary dropdown-toggle" type="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                            Sort By
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdown-sort">
+                            <li><a class="dropdown-item" style="cursor:pointer" data-sort="start-date">Start Date</a></li>
+                            <li><a class="dropdown-item" style="cursor:pointer" data-sort="name">Name</a></li>
+                            <li><a class="dropdown-item" style="cursor:pointer" data-sort="price-lowest">Price (lowest first)</a></li>
+                            <li><a class="dropdown-item" style="cursor:pointer" data-sort="price-greater">Price (greater first)</a></li>
+                        </ul>
+                    </div>
             </div>
         </div>
 
+
         <div class="row mt-3">
-            @foreach($events as $event)
+            @forelse($events as $event)
                 <div class="col-md-4">
                     <div class="card mb-4 shadow card-hover-effect" style="border-width: 0;">
                         <a href="/events/{{ $event->id }}" class="text-decoration-none text-reset">
@@ -101,14 +106,17 @@
                                     € {{ number_format($event->current_price, 2) }}
                                 @endif
                             </div>
-                            <img src="{{('storage/' . $event->image_url) }}"
+                            <img src="{{ asset('storage/' . $event->image_url) }}"
                                  class="card-img-top" alt="{{ $event->name }}">
                             <div class="card-body">
                                 <h5 class="card-title">{{ $event->name }}</h5>
-                                <p class="card-text mb-1"
-                                   style="color: #7848F4;">{{ \Carbon\Carbon::parse($event->start_date)->format('l, F j, g:i A') }}</p>
-                                <p class="card-text" style="color: #7E7E7E;">{{ $event->address }}
+                                <p class="card-text mb-1" style="color: #7848F4;">
+                                    {{ \Carbon\Carbon::parse($event->start_date)->format('l, F j, Y, g:i A') }}
+                                </p>
+                                <p class="card-text mb-1" style="color: #7E7E7E;">{{ $event->address }}
                                     , {{ $event->city->name }}</p>
+                                <small style="color: #7E7E7E; font-size: .8em;"><i>Event created by user from &#174;
+                                        <u>{{ $event->owner->user->university->name }}</u></i></small>
                             </div>
                         </a>
                     </div>
@@ -117,9 +125,14 @@
         </div>
         <div class="row">
             @endif
-            @endforeach
+            @empty
+                <div class="col-12 text-center">
+                    <p class="lead">No upcoming events found.</p>
+                </div>
+            @endforelse
         </div>
     </div>
+
 
     <div class="banner mt-5">
         <img src="{{URL::asset('/assets/make-your-event.png')}}" class="image-mye"/>
@@ -127,7 +140,7 @@
             <h1>Make your own Event</h1>
             <p>Publish your own event here!</p>
             <a href="{{route('events.create')}}">
-                <button class="btn banner-button">Create Events</button>
+                <button class="btn btn-primary banner-button px-5">Create Events</button>
             </a>
         </div>
     </div>
@@ -146,7 +159,7 @@
                         <img src="{{ $imageUrl }}" class="card-img-top" alt="Imagem de {{ $university->name }}">
                         <div class="card-body">
                             <h5 class="card-title">{{ $university->name }}</h5>
-                            <p class="card-text">Localization: {{ $university->address }}</p>
+                            <p class="card-text">Location: {{ $university->address }}</p>
                         </div>
                     </div>
                 </div>

@@ -18,8 +18,12 @@ class UserEventNotifications extends Model
         'notification_id',
     ];
 
-    public static function getNotificationsByUserId($user_id)
+    public function eventNotification()
     {
-        return self::where('user_id', $user_id)->get();
+        return $this->belongsTo(EventNotification::class, 'notification_id');
+    }
+    public function event()
+    {
+        return $this->belongsTo(Event::class, 'event_id');
     }
 }

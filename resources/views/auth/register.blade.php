@@ -16,7 +16,8 @@
                 <h6 style="color: #0E4A67">Already have an account? <a href="/login" style="color: #5826D7">Login</a>
                 </h6>
 
-                <form method="POST" class="mt-3" action="{{route('register') }}" id="register-form" enctype="multipart/form-data">
+                <form method="POST" class="mt-3" action="{{route('register') }}" id="register-form"
+                      enctype="multipart/form-data">
                     @csrf
 
                     @if ($errors->any())
@@ -62,7 +63,7 @@
                             <label class="custom-label" for="birthdate">{{ __('Birthdate') }}</label>
                             <input id="birthdate" type="date"
                                    class="form-control custom-input @error('birthdate') is-invalid @enderror"
-                                   name="birthdate" value="{{ old('birthdate') }}" required>
+                                   name="birthdate" required>
                             <span class="invalid-feedback" role="alert" id="error-message-birthdate"></span>
                         </div>
 
@@ -165,12 +166,13 @@
                         </div>
 
 
-                        <img id="preview">
-
-                        <button type="button" class="btn btn-secondary prev-step">Last Step</button>
-                        <button type="submit" class="btn btn-primary">
-                            {{ __('Register') }}
+                        <div class="w-100 d-flex align-items-center justify-content-center">
+                            <img id="preview" class="w-50 rounded-circle">
+                        </div>
+                        <button type="submit"
+                                class="btn btn-primary next-step w-100 custom-button mt-3 mb-3">{{ __('Register') }}
                         </button>
+                        <button type="button" class="btn btn-secondary prev-step w-100">Last Step</button>
 
                     </div>
 
