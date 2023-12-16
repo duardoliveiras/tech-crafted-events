@@ -55,4 +55,8 @@ class Comment extends BaseModel
     {
         return $this->hasMany(Vote::class, 'comment_id');
     }
+
+    public function comment_report(){
+        return $this->hasMany(CommentReport::class, 'comment_id');
+    }
 }
