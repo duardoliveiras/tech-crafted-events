@@ -211,7 +211,7 @@ create table event_report (
 	event_id UUID not null,
 	reason report_reason not null,
 	description text,
-	created_at timestamp without default time zone default now(),
+	created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
     analyzed bool default false,
     foreign key (user_id) references Users (id),
     foreign key (event_id) references Event (id)
