@@ -62,10 +62,14 @@
                     </div>
                 </div>
             </div>
+
+            <input type="hidden" name="sort" id="sort">
+
             <a onclick="clearForm()" id="clear-filters" class="text-decoration-none text-white ms-4"
                style="cursor: pointer;"><u>Clear filter options</u></a>
         </form>
     </div>
+
 
     <div class="container mt-5">
         <div class="row">
@@ -74,20 +78,21 @@
                 <h2 class="title-events purple"> Events</h2>
             </div>
             <div class="sort-options col justify-content-end d-flex flex-row align-items-center">
-                {{--                <div class="event-type-select">--}}
-                {{--                    <select id="eventType" name="eventType" class="form-control">--}}
-                {{--                        <option value="">Event Type</option>--}}
-                {{--                        @foreach ($categories as $eventType)--}}
-                {{--                            <option value="{{ $eventType->id }}" {{ request('eventType') == $eventType->id ? 'selected' : '' }}>{{ $eventType->name }}</option>--}}
-                {{--                        @endforeach--}}
-                {{--                    </select>--}}
-                {{--                </div>--}}
-
-                {{--                <div class="sort-by-select">--}}
-
-                {{--                </div>--}}
+                    <div class="dropdown">
+                        <button id="dropdown-sort" class="btn btn-secondary dropdown-toggle" type="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                            Sort By
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdown-sort">
+                            <li><a class="dropdown-item" style="cursor:pointer" data-sort="start-date">Start Date</a></li>
+                            <li><a class="dropdown-item" style="cursor:pointer" data-sort="name">Name</a></li>
+                            <li><a class="dropdown-item" style="cursor:pointer" data-sort="price-lowest">Price (lowest first)</a></li>
+                            <li><a class="dropdown-item" style="cursor:pointer" data-sort="price-greater">Price (greater first)</a></li>
+                        </ul>
+                    </div>
             </div>
         </div>
+
 
         <div class="row mt-3">
             @forelse($events as $event)
@@ -105,9 +110,13 @@
                                  class="card-img-top" alt="{{ $event->name }}">
                             <div class="card-body">
                                 <h5 class="card-title">{{ $event->name }}</h5>
-                                <p class="card-text mb-1"
-                                   style="color: #7848F4;">{{ \Carbon\Carbon::parse($event->start_date)->format('l, F j, g:i A') }}</p>
-                                <p class="card-text" style="color: #7E7E7E;">{{ $event->address }}, {{ $event->city->name }}</p>
+                                <p class="card-text mb-1" style="color: #7848F4;">
+                                    {{ \Carbon\Carbon::parse($event->start_date)->format('l, F j, Y, g:i A') }}
+                                </p>
+                                <p class="card-text mb-1" style="color: #7E7E7E;">{{ $event->address }}
+                                    , {{ $event->city->name }}</p>
+                                <small style="color: #7E7E7E; font-size: .8em;"><i>Event created by user from &#174;
+                                        <u>{{ $event->owner->user->university->name }}</u></i></small>
                             </div>
                         </a>
                     </div>

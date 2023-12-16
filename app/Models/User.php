@@ -80,6 +80,11 @@ class User extends Authenticatable
         return $this->admin()->exists();
     }
 
+    public function university()
+    {
+        return $this->belongsTo(University::class, 'university_id');
+    }
+
     public function eventOrganizer()
     {
         return $this->hasMany(EventOrganizer::class, 'user_id');

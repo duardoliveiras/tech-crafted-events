@@ -71,6 +71,23 @@ class EventController extends Controller
             $query->whereDate('start_date', '=', date('Y-m-d', strtotime($dateFilter)));
         }
 
+        $sort = $request->query('sort');
+
+        switch ($sort) {
+            case 'name':
+                $query->orderBy('name');
+                break;
+            case 'price-lowest':
+                $query->orderBy('current_price', 'asc');
+                break;
+            case 'price-greater':
+                $query->orderBy('current_price', 'desc');
+                break;
+            default:
+                $query->orderBy('start_date');
+                break;
+        }
+
         $query->where('status', 'ONGOING')->orWhere('status', 'UPCOMING');
         $events = $query->get();
 
