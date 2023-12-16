@@ -3,6 +3,12 @@
 @section('title', 'Edit Event')
 
 @section('content')
+    @section('breadcrumbs')
+        <li> 
+            &nbsp; / <a href="{{ route('events.show', $event->id) }}">{{$event->name}}</a>
+        </li>
+        <li> &nbsp; / Edit </li>
+    @endsection
     <div class="container mt-4">
         <div class="card">
             <div class="card-header bg-primary text-white">

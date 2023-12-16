@@ -1,6 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
+       @section('breadcrumbs')
+        <li> 
+            &nbsp; / <a href="{{ route('profile.show', $user->id) }}">{{$user->name}}</a>
+        </li>
+        <li>
+            &nbsp; / Edit    
+        </li>
+        @endsection
     <div class="container mt-5">
         <div class="row">
             <div class="col-md-6 offset-md-3">
