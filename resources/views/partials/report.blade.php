@@ -12,7 +12,12 @@
                     
             </div>
             <div class="modal-body">
-                <form method="POST" enctype="multipart/form-data">
+                @if($report == "event")
+                    <form method="POST" enctype="multipart/form-data" action="{{ route('event-report.store', [$event->id]) }}">
+                @else
+                    <form method="POST" enctype="multipart/form-data">
+                @endif
+                
                 @csrf
                 <div class="form-group">
                     <label for="reportReason"> Reason </label>
