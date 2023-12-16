@@ -9,6 +9,7 @@ use App\Models\Comment;
 use App\Models\University;
 use App\Models\EventReport;
 use Illuminate\Http\Request;
+use App\Models\CommentReport;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Intervention\Image\Facades\Image;
@@ -86,15 +87,15 @@ class AdminController extends Controller
 
         $events = $events->sortByDesc('event_report_count');
 
-        $comments = Comment::where('is_deleted', '!=', false )
-            ->whereHas('comment_report', 
-                fn($query) => $query->where('analyzed', false))
+        $comments = Comment::where('is_deleted', false)
+            ->whereHas('comment_report', fn($query) => $query->where('analyzed', false))
             ->withCount([
                 'comment_report as comment_report_count' => function ($query){
                     $query->where('analyzed', false);
                 }
             ])->get();
-    
+        $comments = $comments->sortByDesc('event_report_count');
+
         return view('layouts.admin.reports', compact('events', 'comments'));
         
     }
@@ -113,9 +114,25 @@ class AdminController extends Controller
             ->with('user')
             ->get();
         }
-
-        
-        
+  
         return response()->json($eventReports);
+    }
+
+    public function commentReports($userId, $reason)
+    {
+        if($reason == "All"){
+            $commentReports = CommentReport::where('user_id', $userId)
+            ->where('analyzed', false)
+            ->with('user')
+            ->get();
+        }else{
+            $commentReports = CommentReport::where('user_id', $userId)
+            ->where('reason', $reason)
+            ->where('analyzed', false)
+            ->with('user')
+            ->get();
+        }
+        
+        return response()->json($commentReports);
     }
 }
