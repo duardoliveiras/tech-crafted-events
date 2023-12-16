@@ -11,18 +11,12 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DiscussionController;
 use App\Http\Controllers\EventReportController;
 use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\CommentController;
-use App\Http\Controllers\DiscussionController;
-use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventOrganizerController;
-use App\Http\Controllers\MyEventsController;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\StripeController;
-use App\Http\Controllers\TicketController;
-use App\Http\Controllers\UserController;
 use App\Http\Controllers\UniversityController;
-use Illuminate\Support\Facades\Route;
+
 
 // Home
 Route::redirect('/', '/home');
