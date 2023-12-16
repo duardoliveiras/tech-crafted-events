@@ -65,6 +65,7 @@ CREATE TABLE University
     id      UUID PRIMARY KEY,
     address VARCHAR(255) NOT NULL,
     name    VARCHAR(255) NOT NULL,
+    image_url  VARCHAR(255)   NOT NULL,
     city_id UUID         NOT NULL,
     FOREIGN KEY (city_id) REFERENCES City (id)
 );
@@ -73,7 +74,7 @@ CREATE TABLE Users
 (
     id            UUID PRIMARY KEY,
     name          VARCHAR(255) NOT NULL,
-    phone         CHAR(15)     NOT NULL,
+    phone         CHAR(20)     NOT NULL,
     email         VARCHAR(255) NOT NULL UNIQUE,
     password      VARCHAR(255) NOT NULL,
     birthDate     DATE         NOT NULL,
@@ -86,9 +87,10 @@ CREATE TABLE Users
 
 CREATE TABLE EventOrganizer
 (
-    id       UUID PRIMARY KEY,
-    legal_id CHAR(50) NOT NULL,
-    user_id  UUID     NOT NULL,
+    id                UUID PRIMARY KEY,
+    legal_id          CHAR(50) NOT NULL,
+    stripe_account_id VARCHAR(255),
+    user_id           UUID     NOT NULL,
     FOREIGN KEY (user_id) REFERENCES Users (id)
 );
 
@@ -97,19 +99,20 @@ CREATE TYPE event_status AS ENUM ('UPCOMING', 'ONGOING', 'FINISHED', 'CANCELLED'
 CREATE TABLE Event
 (
     id                  UUID PRIMARY KEY,
-    name                VARCHAR(255)   NOT NULL,
-    description         TEXT           NOT NULL,
-    start_date          timestamp      NOT NULL,
-    end_date            timestamp      NOT NULL,
-    start_tickets_qty   INT            NOT NULL CHECK (start_tickets_qty >= 0),
-    current_tickets_qty INT            NOT NULL CHECK (current_tickets_qty >= 0),
-    current_price       DECIMAL(10, 2) NOT NULL CHECK (current_price >= 0),
-    address             VARCHAR(255)   NOT NULL,
-    image_url           VARCHAR(255)   NOT NULL,
-    category_id         UUID           NOT NULL,
-    city_id             UUID           NOT NULL,
-    owner_id            UUID           NOT NULL,
-    status event_status DEFAULT 'UPCOMING' NOT NULL,
+    name                VARCHAR(255)                                   NOT NULL,
+    description         TEXT                                           NOT NULL,
+    start_date          timestamp                                      NOT NULL,
+    end_date            timestamp                                      NOT NULL,
+    start_tickets_qty   INT                                            NOT NULL CHECK (start_tickets_qty >= 0),
+    current_tickets_qty INT                                            NOT NULL CHECK (current_tickets_qty >= 0),
+    current_price       DECIMAL(10, 2)                                 NOT NULL CHECK (current_price >= 0),
+    address             VARCHAR(255)                                   NOT NULL,
+    image_url           VARCHAR(255)                                   NOT NULL,
+    category_id         UUID                                           NOT NULL,
+    city_id             UUID                                           NOT NULL,
+    owner_id            UUID                                           NOT NULL,
+    status              event_status                DEFAULT 'UPCOMING' NOT NULL,
+    created_at          TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
     FOREIGN KEY (owner_id) REFERENCES EventOrganizer (id),
     FOREIGN KEY (category_id) REFERENCES Category (id),
     FOREIGN KEY (city_id) REFERENCES City (id)
@@ -176,11 +179,13 @@ CREATE TABLE Ticket
 
 CREATE TABLE Comment
 (
-    id            UUID PRIMARY KEY,
-    text          TEXT      NOT NULL,
-    commented_at  TIMESTAMP NOT NULL,
-    user_id       UUID      NOT NULL,
-    discussion_id UUID      NOT NULL,
+    id              UUID PRIMARY KEY,
+    text            TEXT      NOT NULL,
+    commented_at    TIMESTAMP NOT NULL,
+    user_id         UUID      NOT NULL,
+    discussion_id   UUID      NOT NULL,
+    is_deleted      boolean DEFAULT FALSE,
+    attachment_path TEXT,
     FOREIGN KEY (user_id) REFERENCES Users (id),
     FOREIGN KEY (discussion_id) REFERENCES Discussion (id)
 );
@@ -206,67 +211,74 @@ create table event_report (
 	event_id UUID not null,
 	reason report_reason not null,
 	description text,
-	created_at timestamp without default time zone default now(),
+	created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
     analyzed bool default false,
     foreign key (user_id) references Users (id),
     foreign key (event_id) references Event (id)
 );
 
 CREATE OR REPLACE FUNCTION notify_event_update()
-    RETURNS trigger AS 
+    RETURNS trigger AS
 $$
 declare
-    id_notification INTEGER;
-   	v_notification_text VARCHAR;
-   	v_update bool;
+    id_notification     INTEGER;
+    v_notification_text VARCHAR;
+    v_update            bool;
 begin
-	
-	if new is distinct from old then
-		v_notification_text := new.name || ' the event underwent several changes.';
-		v_update = true;
-	end if;
-	
-	if new.name <> old.name and new.description = old.description and new.start_date = old.start_date and new.end_date = old.end_date
-		and new.address = old.address then
-		v_notification_text := old.name || ' name has been updated.';
-		v_update = true;
-	
-	elsif new.name = old.name and new.description <> old.description and new.start_date = old.start_date and new.end_date = old.end_date
-		and new.address = old.address then
-		v_notification_text := old.name || ' description has been updated.';
-		v_update = true;
-	
-	elsif new.name = old.name and new.description = old.description and new.start_date <> old.start_date and new.end_date = old.end_date
-		and new.address = old.address then
-		v_notification_text := old.name || ' start date has been updated to ' || to_char(new.start_date, 'mm/dd/yyyy hh:mi');
-		v_update = true;
-	
-	elsif new.name = old.name and new.description = old.description and new.start_date = old.start_date and new.end_date <> old.end_date
-		and new.address = old.address then
-		v_notification_text := old.name || ' end date has been updated to ' || to_char(new.end_date, 'mm/dd/yyyy hh:mi');
-		v_update = true;
-	
-	elsif new.name = old.name and new.description = old.description and new.start_date = old.start_date and new.end_date = old.end_date
-		and new.address <> old.address then
-		v_notification_text := old.name || ' address has been updated.';
-		v_update = true;
-	else
-		v_update = false;
-	end if;
 
-	if v_update = true then
-	
-	    insert into tech_crafted.eventnotifications(id, event_id, notification_text)
-	    values (DEFAULT, new.id, v_notification_text)
-	    returning id into id_notification;
-	
-	    insert into tech_crafted.userseventnotifications(user_id, notification_id, read)
-	    select user_id, id_notification, false
-	    from ticket
-	    where event_id = new.id;
-	 end if;
-	
-	return new;
+    if new is distinct from old then
+        v_notification_text := new.name || ' the event underwent several changes.';
+        v_update = true;
+    end if;
+
+    if new.name <> old.name and new.description = old.description and new.start_date = old.start_date and
+       new.end_date = old.end_date
+        and new.address = old.address then
+        v_notification_text := old.name || ' name has been updated.';
+        v_update = true;
+
+    elsif new.name = old.name and new.description <> old.description and new.start_date = old.start_date and
+          new.end_date = old.end_date
+        and new.address = old.address then
+        v_notification_text := old.name || ' description has been updated.';
+        v_update = true;
+
+    elsif new.name = old.name and new.description = old.description and new.start_date <> old.start_date and
+          new.end_date = old.end_date
+        and new.address = old.address then
+        v_notification_text :=
+                old.name || ' start date has been updated to ' || to_char(new.start_date, 'mm/dd/yyyy hh:mi');
+        v_update = true;
+
+    elsif new.name = old.name and new.description = old.description and new.start_date = old.start_date and
+          new.end_date <> old.end_date
+        and new.address = old.address then
+        v_notification_text :=
+                old.name || ' end date has been updated to ' || to_char(new.end_date, 'mm/dd/yyyy hh:mi');
+        v_update = true;
+
+    elsif new.name = old.name and new.description = old.description and new.start_date = old.start_date and
+          new.end_date = old.end_date
+        and new.address <> old.address then
+        v_notification_text := old.name || ' address has been updated.';
+        v_update = true;
+    else
+        v_update = false;
+    end if;
+
+    if v_update = true then
+
+        insert into tech_crafted.eventnotifications(id, event_id, notification_text)
+        values (DEFAULT, new.id, v_notification_text)
+        returning id into id_notification;
+
+        insert into tech_crafted.userseventnotifications(user_id, notification_id, read)
+        select user_id, id_notification, false
+        from ticket
+        where event_id = new.id;
+    end if;
+
+    return new;
 end;
 $$ language plpgsql;
 
@@ -304,15 +316,13 @@ VALUES ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'Los Angeles', '77777777-7777-77
        ('ffffffff-ffff-ffff-ffff-ffffffffffff', 'São Paulo', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
        ('11111111-1111-1111-1111-111111111111', 'Porto', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb');
 
-INSERT INTO University (id, name, address, city_id)
-VALUES ('22222222-2222-2222-2222-222222222222', 'University of California, Los Angeles', '405 Hilgard Ave',
-        'cccccccc-cccc-cccc-cccc-cccccccccccc'),
-       ('33333333-3333-3333-3333-333333333333', 'Columbia University', '116th St & Broadway',
-        'dddddddd-dddd-dddd-dddd-dddddddddddd'),
-       ('44444444-4444-4444-4444-444444444444', 'Universidade de São Paulo',
-        'R. da Reitoria, R. Cidade Universitária, 374', 'ffffffff-ffff-ffff-ffff-ffffffffffff'),
-       ('55555555-5555-5555-5555-555555555555', 'Universidade do Porto', 'Praça de Gomes Teixeira',
-        '11111111-1111-1111-1111-111111111111');
+INSERT INTO University (id, name, address, city_id, image_url)
+VALUES
+    ('22222222-2222-2222-2222-222222222222', 'University of California, Los Angeles', '405 Hilgard Ave', 'cccccccc-cccc-cccc-cccc-cccccccccccc', '/path/to/uc-la-image.jpg'),
+    ('33333333-3333-3333-3333-333333333333', 'Columbia University', '116th St & Broadway', 'dddddddd-dddd-dddd-dddd-dddddddddddd', '/path/to/columbia-university-image.jpg'),
+    ('44444444-4444-4444-4444-444444444444', 'Universidade de São Paulo', 'R. da Reitoria, R. Cidade Universitária, 374', 'ffffffff-ffff-ffff-ffff-ffffffffffff', '/path/to/univ-sao-paulo-image.jpg'),
+    ('55555555-5555-5555-5555-555555555555', 'Universidade do Porto', 'Praça de Gomes Teixeira', '11111111-1111-1111-1111-111111111111', '/path/to/univ-porto-image.jpg');
+
 
 INSERT INTO Users (id, name, phone, email, password, birthDate, university_id, is_banned, is_deleted, image_url)
 VALUES ('66666666-6666-6666-6666-666666666666', 'Tiririca', '+55 77997890', 'tiririca@gmail.com',

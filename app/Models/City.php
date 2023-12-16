@@ -8,10 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class City extends BaseModel
 {
     use HasFactory;
-    protected $table = 'city';
-    protected $keyType = 'string';
-    public $timestamps = false;
 
+    protected $table = 'city';
     protected $fillable = [
         'name',
         'state_id'

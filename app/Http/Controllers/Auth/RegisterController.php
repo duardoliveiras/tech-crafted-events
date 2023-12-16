@@ -7,16 +7,13 @@ use App\Models\University;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Contracts\View\View;
-use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Intervention\Image\Facades\Image;
-use Illuminate\Http\Request;
 
 class RegisterController extends Controller
 {
@@ -62,8 +59,8 @@ class RegisterController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'phone' => ['string', 'max:15'],
-            'birthdate' => ['date'],
+            'phone' => ['string', 'max:20'],
+            'birthdate' => ['date', 'before:' . now()->subYears(12)->format('Y-m-d')],
             'university_id' => 'required|exists:university,id',
         ]);
     }

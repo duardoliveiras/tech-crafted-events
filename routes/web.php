@@ -11,8 +11,12 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DiscussionController;
 use App\Http\Controllers\EventReportController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\EventOrganizerController;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\StripeController;
+use App\Http\Controllers\UniversityController;
+
 
 // Home
 Route::redirect('/', '/home');
@@ -37,8 +41,8 @@ Route::view('/help', 'help')->name('help');
 Route::view('/about', 'about')->name('about');
 
 // User
-Route::resource('profile', UserController::class);
 
+Route::resource('profile', UserController::class);
 Route::get('/my-events', [MyEventsController::class, 'index'])->name('my_events.index');
 
 //Notifications
@@ -50,17 +54,19 @@ Route::post('/password/email', [ForgotPasswordController::class, 'forgetPassword
 Route::get('/password/reset/{token}', [ForgotPasswordController::class, 'resetPassword'])->name('password.update.get');
 Route::post('/password/reset', [ForgotPasswordController::class, 'resetPasswordPost'])->name('password.update');
 
-Route::get('/password/reset', function(){
+Route::get('/password/reset', function () {
     return view('auth.passwords.email');
 })->name('password.request');
 
 //Admin
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+    Route::get('/admin/create', [AdminController::class, 'create'])->name('admin.create');
+    Route::post('/admin/store', [AdminController::class, 'store'])->name('admin.store');
     Route::get('/admin/reports', [AdminController::class, 'reports'])->name('admin.reports');
 });
 
-//Events
+// Events
 Route::resource('events', EventController::class);
 Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
 //Reports
@@ -72,6 +78,14 @@ Route::put('/events/{event}/check-all',[EventReportController::class, 'check_all
 Route::put('admin/reports/check/{reportId}', [EventReportController::class, 'checkOneReport'])->name('check-one-report');
 Route::put('admin/reports/check-all/{event}', [EventReportController::class, 'checkAllReport'])->name('check-all-report');
 Route::put('admin/reports/ban/{event}', [EventReportController::class, 'banEvent'])->name('ban-event');
+Route::post('/events/leave/{event_id}/{ticket_id}', [EventController::class, 'leave'])->name('events.leave');
+Route::get('/events/byPass/{event_id}/{ticket_id}', [EventController::class, 'byPassTicketShow'])->name('events.byPassTicketShow');
+
+//Universities
+Route::resource('universities', UniversityController::class);
+
+//Universities
+Route::resource('universities', UniversityController::class);
 
 //Ticket
 Route::get('/events/{event}/ticket/buy', [TicketController::class, 'showBuyTicketForm'])->name('ticket.buy');
@@ -81,6 +95,8 @@ Route::get('/events/{event}/ticket/{ticket}', [TicketController::class, 'showTic
     ->name('ticket.show')
     ->middleware(['auth', 'acess.ticket']);
 Route::post('/events/{event}/ticket/authenticate', [TicketController::class, 'authenticateTicket'])->name('ticket.authenticate');
+Route::get('/download-ticket/{eventId}/{ticketId}', [TicketController::class, 'downloadTicket'])->name('ticket.download');
+
 
 
 //Discussion
@@ -95,21 +111,33 @@ Route::post('/events/{event}/discussion/{discussion}/comment', [CommentControlle
 
 // add vote to comment
 Route::middleware(['auth'])->group(function () {
-    Route::post('/comments/{comment}/toggle-vote/{voteType}', [CommentController::class, 'toggleVote'])
-        ->name('comment.toggleVote');
+    Route::post('/comments/{comment}/toggle-vote/{voteType}', [CommentController::class, 'toggleVote'])->name('comment.toggleVote');
 });
+
+Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comment.update')->middleware(['auth']);
+Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comment.destroy')->middleware(['auth']);
 
 // Payment Routes
 Route::prefix('payment')->group(function () {
-    Route::get('/checkout', [\App\Http\Controllers\StripeController::class, 'checkout'])
-        ->name('payment.checkout');
-    Route::post('/session', [\App\Http\Controllers\StripeController::class, 'session'])
+    Route::post('/session', [StripeController::class, 'session'])
         ->name('payment.session');
-    Route::get('/success', [\App\Http\Controllers\StripeController::class, 'success'])
+    Route::get('/success', [StripeController::class, 'success'])
         ->name('payment.success');
-    Route::get('/connect', [\App\Http\Controllers\StripeController::class, 'connect'])
+    Route::get('/connect', [StripeController::class, 'connect'])
         ->name('payment.connect');
-    Route::get('/callback', [\App\Http\Controllers\StripeController::class, 'callback'])
+    Route::get('/callback', [StripeController::class, 'callback'])
         ->name('payment.stripe.connect.callback');
+    Route::get('/transfer', [StripeController::class, 'transfer'])
+        ->name('payment.transfer');
+    Route::get('/refund/{payment_intent_id}', [StripeController::class, 'refundPayment'])
+        ->name('payment.refund');
 });
 
+// event organizer routes
+Route::get('/event-organizer', [EventOrganizerController::class, 'show'])
+    ->name('event-organizer.show')
+    ->middleware(['auth']);
+
+Route::post('/event-organizer/{legal_id}/{stripe_account_id}', [EventOrganizerController::class, 'create'])
+    ->name('event-organizer.create')
+    ->middleware(['auth']);

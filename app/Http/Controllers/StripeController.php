@@ -2,84 +2,191 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Services\TicketService;
 use App\Models\Event;
-use App\Models\Ticket;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Stripe\Exception\ApiErrorException;
+use Stripe\Checkout\Session;
+use Stripe\StripeClient;
 
 class StripeController extends Controller
 {
-    public function checkout()
+    protected TicketService $ticketService;
+    protected EventOrganizerController $eventOrganizerController;
+    protected StripeClient $stripe;
+
+    public function __construct(TicketService $ticketService, EventOrganizerController $eventOrganizerController)
     {
-        return view('checkout');
+        $this->middleware('auth');
+        $this->ticketService = $ticketService;
+        $this->eventOrganizerController = $eventOrganizerController;
+        $this->stripe = new StripeClient(config('stripe.sk'));
     }
 
-    /**
-     * @throws ApiErrorException
-     */
-    public function session(Request $request)
+    public function session(Request $request): RedirectResponse
     {
         $eventId = $request->query('eventId');
         $amount = $request->query('amount');
         $eventName = $request->query('eventName');
 
-        $event = Event::findOrFail($eventId);
+        $ticket = $this->ticketService->createTicket($eventId, $amount);
+        $session = $this->createStripeCheckoutSession($amount, $eventName, $eventId, $ticket->id);
 
-        $ticket = new Ticket([
-            'user_id' => Auth::id(),
-            'event_id' => $eventId,
-            'price_paid' => $amount
-        ]);
+        return redirect()->away($session->url);
+    }
 
-        $event->decrement('current_tickets_qty');
-        $ticket->save();
-
-        $ticket->markTicketAsPending();
-
-        \Stripe\Stripe::setApiKey(config('stripe.sk'));
-
-        $session = \Stripe\Checkout\Session::create([
+    private function createStripeCheckoutSession(int $amount, string $eventName, string $eventId, string $ticketId): Session
+    {
+        return $this->stripe->checkout->sessions->create([
             'line_items' => [
                 [
                     'price_data' => [
                         'currency' => 'eur',
                         'product_data' => [
-                            'name' => 'Ticket for event ' . $eventName,
+                            'name' => "Ticket for event $eventName",
                         ],
-                        'unit_amount' => $amount * 10,
+                        'unit_amount' => $amount * 100,
                     ],
                     'quantity' => 1,
                 ],
             ],
             'mode' => 'payment',
-            'success_url' => route('events.show', ['event' => $eventId]),
-            'cancel_url' => route('ticket.buy', ['event' => $eventId])
+            'success_url' => route('events.byPassTicketShow', ['event_id' => $eventId, 'ticket_id' => $ticketId]),
+            'cancel_url' => route('ticket.buy', ['event' => $eventId]),
+            'metadata' => [
+                'event_id' => $eventId,
+                'user_id' => Auth::id()
+            ],
+        ]);
+    }
+
+    public function connect(Request $request): RedirectResponse
+    {
+        $legalId = $request->query('legal_id');
+
+        if ($legalId) {
+            session([Auth::id() . ":legal-id" => $legalId]);
+
+            $connectUrl = $this->stripe->oauth->authorizeUrl([
+                'scope' => 'read_write',
+                'response_type' => 'code',
+                'redirect_uri' => route('payment.stripe.connect.callback'),
+                'client_id' => config('stripe.client_id')
+            ]);
+
+            return redirect()->away($connectUrl);
+        }
+
+        return redirect()->back()->with('error', 'Legal Id is required.');
+    }
+
+    public function callback(Request $request): RedirectResponse
+    {
+        $legalId = session(Auth::id() . ":legal-id");
+
+        if (!$legalId) {
+            return redirect()->back()->with('error', 'Legal Id is missing.');
+        }
+
+        $code = $request->input('code');
+
+        $response = $this->stripe->oauth->token([
+            'grant_type' => 'authorization_code',
+            'code' => $code,
         ]);
 
-        $ticket->markTIcketAsPaid();
+        $this->eventOrganizerController->create($legalId, $response->stripe_user_id);
 
-        return redirect()->away($session->url);
+        session()->forget(Auth::id() . ":legal-id");
+
+        return redirect()->away(route('events.create'));
     }
 
-    public function checkPaymentStatus($sessionId)
+    public function transfer($amount, $accountId): void
     {
-        \Stripe\Stripe::setApiKey(config('stripe.sk'));
+        $this->stripe->transfers->create([
+            'amount' => $amount * 100,
+            'currency' => 'eur',
+            'destination' => $accountId,
+        ]);
+    }
 
-        try {
-            $session = \Stripe\Checkout\Session::retrieve($sessionId);
+    public function listPaymentsForEvent(Event $event, $paymentStatus = null, $userId = null): array
+    {
+        // Fetch all sessions created after the event
+        $sessions = $this->stripe->checkout->sessions->all([
+            'limit' => 100,
+            'created' => ['gte' => strtotime($event->created_at)]
+        ]);
 
-            // Check the payment status
-            $paymentStatus = $session->payment_status;
+        $eventPayments = [];
 
-            if ($paymentStatus === 'paid') {
-                return "Payment was successful!";
-            } else {
-                return "Payment failed or not yet completed.";
+        // Iterate over each payment session
+        foreach ($sessions->autoPagingIterator() as $payment) {
+            // Check if the payment is for the specified event and meets the filter criteria
+            if ($this->isPaymentForEvent($payment, $event) && $this->meetsFilterCriteria($payment, $paymentStatus, $userId)) {
+                // Format and add the payment to the result array
+                $eventPayments[] = $this->formatPayment($payment, $event);
             }
+        }
 
-        } catch (\Stripe\Exception\ApiErrorException $e) {
-            return "Error retrieving session: " . $e->getMessage();
+        return $eventPayments;
+    }
+
+    public function refundPayment($paymentIntent): void
+    {
+        $refund = $this->stripe->refunds->create(['payment_intent' => $paymentIntent]);
+    }
+
+    // fazer reembolso de vários pagamentos, assim que um evento for cancelado -> listar todos pagamentos de um EVENT_ID e então, para cada um, fazer o reembolso
+    public function refundAllPaymentsFromEvent(Event $event)
+    {
+        // listar todos pagamentos de um EVENT_ID
+        $allPayments = $this->listPaymentsForEvent($event);
+
+        // para cada um, fazer o reembolso
+        foreach ($allPayments as $payment) {
+            $this->refundPayment($payment['payment_intent']);
         }
     }
+
+    // fazer reembolso de um pagamento, quando um usuário quiser sair do evento que pertence -> encontrar pagamento que o usuário XXX fez no evento YYY
+    public function refundPaymentFromUser(Event $event, string $userId)
+    {
+        // encontrar pagamento que o usuário XXX fez
+        $payment = $this->listPaymentsForEvent(event: $event, userId: $userId);
+
+        if ($payment) {
+            // fazer reembolso de um pagamento
+            $this->refundPayment($payment[0]['payment_intent']);
+        }
+    }
+
+    private function isPaymentForEvent($payment, $event): bool
+    {
+        // Check if the payment is associated with the given event
+        return isset($payment->metadata['event_id']) && $payment->metadata['event_id'] == $event->id;
+    }
+
+    private function meetsFilterCriteria($payment, $paymentStatus, $userId): bool
+    {
+        // Check if the payment meets the status and user ID filter criteria
+        return ($paymentStatus === null || $payment->payment_status === $paymentStatus) &&
+            ($userId === null || (isset($payment->metadata['user_id']) && $payment->metadata['user_id'] == $userId));
+    }
+
+    private function formatPayment($payment, $event): array
+    {
+        // Format the payment information
+        return [
+            'session_id' => $payment->id,
+            'payment_status' => $payment->payment_status, // paid, unpaid or no_payment_required
+            'amount_paid' => $payment->amount_total / 100,
+            'created_at' => date('Y-m-d H:i:s', $payment->created),
+            'payment_intent' => $payment->payment_intent,
+            'event_id' => $event->id
+        ];
+    }
+
 }

@@ -11,8 +11,6 @@ class Discussion extends BaseModel
 {
     use HasFactory;
 
-    protected $keyType = 'string';
-    public $timestamps = false;
     protected $table = 'discussion';
     protected $fillable = ['event_id'];
 
@@ -29,6 +27,7 @@ class Discussion extends BaseModel
     public function commentsOrderedByVotes()
     {
         return $this->hasMany(Comment::class)
+            ->where('is_deleted', false) // Exclude deleted comments
             ->get()
             ->sortByDesc(function ($comment) {
                 return $comment->votes()->sum('vote_type');

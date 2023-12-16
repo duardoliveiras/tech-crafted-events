@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Comment;
 use App\Models\Event;
 
 class DiscussionController extends Controller
@@ -15,30 +15,7 @@ class DiscussionController extends Controller
         $this->middleware('auth');
         $this->middleware('acess.ticket')->only('show');
     }
-    public function index()
-    {
-        //
-    }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
     public function show($eventId)
     {
         $event = Event::with('discussion', 'ticket')->findOrFail($eventId);
@@ -55,34 +32,9 @@ class DiscussionController extends Controller
             abort(403, 'You do not have access to this discussion.');
         }
 
-        $comments = $discussion->comments ?? collect();
+        $comments = Comment::getCommentsForDiscussion($discussion->id) ?? collect();
         $userVotes = $user->votesForDiscussion($discussion);
 
         return view('layouts.event.discussion.show', compact('discussion', 'comments', 'event', 'userVotes'));
-    }
-
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }
