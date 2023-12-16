@@ -13,6 +13,7 @@ use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UniversityController;
 use Illuminate\Support\Facades\Route;
 
 // Home
@@ -38,8 +39,8 @@ Route::view('/help', 'help')->name('help');
 Route::view('/about', 'about')->name('about');
 
 // User
-Route::resource('profile', UserController::class);
 
+Route::resource('profile', UserController::class);
 Route::get('/my-events', [MyEventsController::class, 'index'])->name('my_events.index');
 
 Route::get('/load-notifications', [NotificationsController::class, 'index'])->name('notifications.index');
@@ -64,6 +65,9 @@ Route::resource('events', EventController::class);
 Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
 Route::post('/events/leave/{event_id}/{ticket_id}', [EventController::class, 'leave'])->name('events.leave');
 Route::get('/events/byPass/{event_id}/{ticket_id}', [EventController::class, 'byPassTicketShow'])->name('events.byPassTicketShow');
+
+//Universities
+Route::resource('universities', UniversityController::class);
 
 //Ticket
 Route::get('/events/{event}/ticket/buy', [TicketController::class, 'showBuyTicketForm'])->name('ticket.buy');

@@ -4,6 +4,9 @@
     <div class="container mt-4">
         <h2 class="mb-4">Admin Dashboard</h2>
 
+        <div class="mb-3">
+            <a href="{{ route('universities.create') }}" class="btn btn-primary">Add New University</a>
+        </div>
         <div class="row">
             <!-- Users Section -->
             <div class="col-lg-6 mb-4">

@@ -63,6 +63,7 @@ CREATE TABLE University
     id      UUID PRIMARY KEY,
     address VARCHAR(255) NOT NULL,
     name    VARCHAR(255) NOT NULL,
+    image_url  VARCHAR(255)   NOT NULL,
     city_id UUID         NOT NULL,
     FOREIGN KEY (city_id) REFERENCES City (id)
 );
@@ -298,15 +299,13 @@ VALUES ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'Los Angeles', '77777777-7777-77
        ('ffffffff-ffff-ffff-ffff-ffffffffffff', 'São Paulo', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
        ('11111111-1111-1111-1111-111111111111', 'Porto', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb');
 
-INSERT INTO University (id, name, address, city_id)
-VALUES ('22222222-2222-2222-2222-222222222222', 'University of California, Los Angeles', '405 Hilgard Ave',
-        'cccccccc-cccc-cccc-cccc-cccccccccccc'),
-       ('33333333-3333-3333-3333-333333333333', 'Columbia University', '116th St & Broadway',
-        'dddddddd-dddd-dddd-dddd-dddddddddddd'),
-       ('44444444-4444-4444-4444-444444444444', 'Universidade de São Paulo',
-        'R. da Reitoria, R. Cidade Universitária, 374', 'ffffffff-ffff-ffff-ffff-ffffffffffff'),
-       ('55555555-5555-5555-5555-555555555555', 'Universidade do Porto', 'Praça de Gomes Teixeira',
-        '11111111-1111-1111-1111-111111111111');
+INSERT INTO University (id, name, address, city_id, image_url)
+VALUES
+    ('22222222-2222-2222-2222-222222222222', 'University of California, Los Angeles', '405 Hilgard Ave', 'cccccccc-cccc-cccc-cccc-cccccccccccc', '/path/to/uc-la-image.jpg'),
+    ('33333333-3333-3333-3333-333333333333', 'Columbia University', '116th St & Broadway', 'dddddddd-dddd-dddd-dddd-dddddddddddd', '/path/to/columbia-university-image.jpg'),
+    ('44444444-4444-4444-4444-444444444444', 'Universidade de São Paulo', 'R. da Reitoria, R. Cidade Universitária, 374', 'ffffffff-ffff-ffff-ffff-ffffffffffff', '/path/to/univ-sao-paulo-image.jpg'),
+    ('55555555-5555-5555-5555-555555555555', 'Universidade do Porto', 'Praça de Gomes Teixeira', '11111111-1111-1111-1111-111111111111', '/path/to/univ-porto-image.jpg');
+
 
 INSERT INTO Users (id, name, phone, email, password, birthDate, university_id, is_banned, is_deleted, image_url)
 VALUES ('66666666-6666-6666-6666-666666666666', 'Tiririca', '+55 77997890', 'tiririca@gmail.com',
