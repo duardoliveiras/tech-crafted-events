@@ -43,7 +43,7 @@ class EventController extends Controller
         $this->stripeController = $stripeController;
     }
 
-    public function index(Request $request): View
+    public function index(Request $request)
     {
         $categories = Category::all();
         $locations = City::all();
@@ -89,7 +89,13 @@ class EventController extends Controller
         }
 
         $query->where('status', 'ONGOING')->orWhere('status', 'UPCOMING');
-        $events = $query->get();
+
+        $events = $query->paginate(6);
+
+        if ($request->ajax()) {
+            $view = view('partials.event', compact('events'))->render();
+            return response()->json(['html' => $view]);
+        }
 
         return view('layouts.event.list', compact('events', 'universities', 'categories', 'locations'));
     }

@@ -78,61 +78,32 @@
                 <h2 class="title-events purple"> Events</h2>
             </div>
             <div class="sort-options col justify-content-end d-flex flex-row align-items-center">
-                    <div class="dropdown">
-                        <button id="dropdown-sort" class="btn btn-secondary dropdown-toggle" type="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                            Sort By
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="dropdown-sort">
-                            <li><a class="dropdown-item" style="cursor:pointer" data-sort="start-date">Start Date</a></li>
-                            <li><a class="dropdown-item" style="cursor:pointer" data-sort="name">Name</a></li>
-                            <li><a class="dropdown-item" style="cursor:pointer" data-sort="price-lowest">Price (lowest first)</a></li>
-                            <li><a class="dropdown-item" style="cursor:pointer" data-sort="price-greater">Price (greater first)</a></li>
-                        </ul>
-                    </div>
+                <div class="dropdown">
+                    <button id="dropdown-sort" class="btn btn-secondary dropdown-toggle" type="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                        Sort By
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdown-sort">
+                        <li><a class="dropdown-item" style="cursor:pointer" data-sort="start-date">Start Date</a></li>
+                        <li><a class="dropdown-item" style="cursor:pointer" data-sort="name">Name</a></li>
+                        <li><a class="dropdown-item" style="cursor:pointer" data-sort="price-lowest">Price (lowest
+                                first)</a></li>
+                        <li><a class="dropdown-item" style="cursor:pointer" data-sort="price-greater">Price (greater
+                                first)</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
 
 
         <div class="row mt-3">
-            @forelse($events as $event)
-                <div class="col-md-4">
-                    <div class="card mb-4 shadow card-hover-effect" style="border-width: 0;">
-                        <a href="/events/{{ $event->id }}" class="text-decoration-none text-reset">
-                            <div style="position: absolute; top: 10px; left: 20px; background: white; color: #7848F4; padding: 8px; border-radius: 10px;">
-                                @if ($event->current_price == 0)
-                                    FREE
-                                @else
-                                    € {{ number_format($event->current_price, 2) }}
-                                @endif
-                            </div>
-                            <img src="{{ asset('storage/' . $event->image_url) }}"
-                                 class="card-img-top" alt="{{ $event->name }}">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ $event->name }}</h5>
-                                <p class="card-text mb-1" style="color: #7848F4;">
-                                    {{ \Carbon\Carbon::parse($event->start_date)->format('l, F j, Y, g:i A') }}
-                                </p>
-                                <p class="card-text mb-1" style="color: #7E7E7E;">{{ $event->address }}
-                                    , {{ $event->city->name }}</p>
-                                <small style="color: #7E7E7E; font-size: .8em;"><i>Event created by user from &#174;
-                                        <u>{{ $event->owner->user->university->name }}</u></i></small>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                @if ($loop->iteration % 3 == 0)
-        </div>
-        <div class="row">
+            @include('partials.event', ['events' => $events])
+            <div id="anchor"></div>
+            @if($events->hasMorePages())
+                <button id="loadMore" class="btn btn-primary custom-button mt-3 mb-3">Load More</button>
             @endif
-            @empty
-                <div class="col-12 text-center">
-                    <p class="lead">No upcoming events found.</p>
-                </div>
-            @endforelse
         </div>
     </div>
-
 
     <div class="banner mt-5">
         <img src="{{URL::asset('/assets/make-your-event.png')}}" class="image-mye"/>
@@ -148,12 +119,13 @@
     <div class="container mt-5">
         <h2 class="title-events black">Trending</h2>
         <h2 class="title-events purple">Colleges</h2>
-        <div class="row mt-3">
+        <div class="row mt-3" id="container-events">
             @foreach($universities as $university)
                 <div class="col-md-4">
                     <a href="{{ route('universities.show', $university->id) }}" class="text-decoration-none">
                         <div class="card mb-4 card-hover-effect">
-                            <img src="{{ Storage::url($university->image_url) }}" class="card-img-top" alt="Image of {{ $university->name }}">
+                            <img src="{{ Storage::url($university->image_url) }}" class="card-img-top"
+                                 alt="Image of {{ $university->name }}">
                             <div class="card-body">
                                 <h5 class="card-title">{{ $university->name }}</h5>
                                 <p class="card-text">Localization: {{ $university->address }}</p>
@@ -162,15 +134,64 @@
                     </a>
                 </div>
                 @if ($loop->iteration % 3 == 0)
-        </div><div class="row">
+        </div>
+        <div class="row">
             @endif
             @endforeach
         </div>
     </div>
 
-
-
     <script type="text/javascript" src="{{ URL::asset ('js/event/list-event.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            let page = 1; // Track the current page
+
+            function getUrlParameter(name) {
+                name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+                let regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+                let results = regex.exec(location.search);
+                return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+            }
+
+            // Function to load more data with filters
+            function loadMoreData(page, sortType, eventType, location, dateFilter, nameFilter) {
+                $.ajax({
+                    url: `?page=${page}&sort=${sortType}&eventType=${eventType}&location=${location}&date-filter=${dateFilter}&full-text-search=${nameFilter}`,
+                    type: "get",
+                    beforeSend: function () {
+                        $('#loadMore').text('Loading...');
+                    }
+                })
+                    .done(function (data) {
+                        if (data.html === "") {
+                            $('#loadMore').text('No more records').prop('disabled', true);
+                            return;
+                        }
+                        $('#loadMore').text('Load More');
+                        $("#anchor").before(data.html); // Insert the new data before the anchor
+                    })
+                    .fail(function (jqXHR, ajaxOptions, thrownError) {
+                        alert('server not responding...');
+                    });
+            }
+
+            // Load more button click event
+            $('#loadMore').click(function () {
+                page++; // Increase the page number
+                let sortType = getUrlParameter('sort');
+                // Get filter values from URL
+                let eventType = getUrlParameter('eventType');
+                let location = getUrlParameter('location');
+                let dateFilter = getUrlParameter('date-filter');
+                let nameFilter = getUrlParameter('full-text-search');
+
+                loadMoreData(page, sortType, eventType, location, dateFilter, nameFilter); // Load data with filters
+            });
+
+        });
+    </script>
 
 @endsection
 
