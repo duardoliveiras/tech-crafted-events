@@ -1,6 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
+    @section('breadcrumbs')
+        <li>
+             &nbsp; / {{ $user->name }}
+        </li>
+    @endsection
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-lg-8 col-md-10">

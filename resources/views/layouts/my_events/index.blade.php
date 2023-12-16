@@ -3,6 +3,11 @@
 @section('title', 'My Events')
 
 @section('content')
+    @section('breadcrumbs')
+        <li>
+             &nbsp; / My Events
+        </li>
+    @endsection
     <div class="container py-5">
         <h1 class="text-center mb-5 display-4">My Events</h1>
 

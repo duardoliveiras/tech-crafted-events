@@ -3,7 +3,11 @@
 <link rel="stylesheet" type="text/css" href="{{URL::asset('/assets/css/create-event.css')}}">
 
 @section('content')
-
+    @section('breadcrumbs')
+        <li>
+            &nbsp; / Create Event
+        </li>
+    @endsection
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-8">
