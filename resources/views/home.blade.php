@@ -27,7 +27,7 @@
                     </div>
                 </div>
 
-                <!-- Carrossel começa aqui -->
+                <!-- Carrossel start here -->
                 <div id="carouselExampleCaptions" class="carousel slide mt-5" data-bs-ride="carousel">
                     <div class="carousel-indicators">
                         @foreach($events as $index => $event)

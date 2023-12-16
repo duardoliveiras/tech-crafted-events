@@ -28,15 +28,28 @@
             integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 </head>
 <body class="">
+
 <div id="app" class="d-flex flex-column min-vh-100">
     @if(optional(\Illuminate\Support\Facades\Route::getCurrentRoute())->uri != 'register')
         @include('partials.navbar')
     @endif
 
+            <nav aria-label="breadcrumb" class="mt-2 ms-5">
+                <ol class="breadcrumb">
+                    <li>
+                        <i class="fa fa-home"></i>
+                        <a href="{{route('home')}}">Home</a>
+                    </li>
+                    @yield('breadcrumbs')
+                </ol>
+            </nav>
+
+
+
     <main class="flex-fill py-4">
         @yield('content')
     </main>
-
+    
     <footer class="text-white text-center text-lg-start"
             style="background-color: #10107B !important;">
         <div class="container pt-5 mt-auto">
@@ -101,5 +114,6 @@
         </div>
     </footer>
 </div>
+
 </body>
 </html>

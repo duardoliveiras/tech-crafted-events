@@ -1,6 +1,16 @@
 @extends('layouts.app')
 
 @section('content')
+    @section('breadcrumbs')
+        <li>
+            <a href="{{ route('events.show', $event->id) }} "> &nbsp; / {{ $event->name }} </a>
+        </li>
+        
+        <li>
+            &nbsp; / Discussion
+        </li>
+    @endsection
+
     <div class="container mt-4">
         <h2 class="mb-4">Discussion for "{{ $event->name }}"</h2>
 
@@ -34,6 +44,7 @@
                             <p class="fw-light mb-4 pb-2">Comments section by users registered in the event</p>
 
                             @forelse($discussion->commentsOrderedByVotes() as $comment)
+
                                 @include('partials.comment', ['comment' => $comment, 'userVotes' => optional($userVotes)[$comment->id]])
                                 @if(!$loop->last)
                                     <hr class="my-3"/>

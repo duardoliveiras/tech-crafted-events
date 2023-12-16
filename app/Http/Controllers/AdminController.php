@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Admin;
 use App\Models\University;
+use App\Models\EventReport;
 use App\Models\User;
 use App\Models\Event;
 use Illuminate\Support\Facades\Auth;
@@ -70,5 +71,41 @@ class AdminController extends Controller
         $user->admin()->save($admin);
 
         return redirect()->route('admin.dashboard')->with('success', 'Admin created successfully!');
+    }
+
+    public function reports()
+    {
+        $events = Event::where('status', '!=', 'BANNED')
+        ->whereHas('event_report', fn($query) => $query->where('analyzed', false))
+        ->withCount([
+            'event_report as event_report_count' => function ($query) {
+                $query->where('analyzed', false);
+            }
+        ])->get();
+
+        $events = $events->sortByDesc('event_report_count');
+    
+        return view('layouts.admin.reports', compact('events'));
+        
+    }
+
+    public function eventReports($eventId, $reason)
+    {
+        if($reason == "All"){
+            $eventReports = EventReport::where('event_id', $eventId)
+            ->where('analyzed', false)
+            ->with('user')
+            ->get();
+        }else{
+            $eventReports = EventReport::where('event_id', $eventId)
+            ->where('reason', $reason)
+            ->where('analyzed', false)
+            ->with('user')
+            ->get();
+        }
+
+        
+        
+        return response()->json($eventReports);
     }
 }
