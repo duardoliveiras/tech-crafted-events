@@ -31,10 +31,7 @@
                                         Available: {{ $event->current_tickets_qty }}</small></p>
                                 <p class="card-text"><small class="text-muted">Price:
                                         ${{ number_format($event->current_price, 2) }}</small></p>
-                                @if(auth()->check() && $event->current_tickets_qty > 0 && !$event->ticket->contains('user_id', auth()->id()))
-                                    <a href="{{ route('ticket.buy', ['event' => $event->id]) }}"
-                                       class="btn btn-success">Buy Ticket</a>
-                                @endif
+
                                 @if(auth()->check())
                                     @php
                                         $userTicket = $event->ticket->firstWhere('user_id', auth()->id());
@@ -43,10 +40,15 @@
                                         $isAdmin = $user->isAdmin();
                                         $isOwnerOrAdmin = $isOwner || $isAdmin;
                                     @endphp
+                                
+                                    @if(auth()->check() && $event->current_tickets_qty > 0 && !$event->ticket->contains('user_id', auth()->id())&& !$isOwnerOrAdmin)
+                                        <a href="{{ route('ticket.buy', ['event' => $event->id]) }}"
+                                           class="btn btn-success">Buy Ticket</a>
+                                    @endif
                                     @if($userTicket || $isOwnerOrAdmin)
                                         <a href="{{ route('discussion.show', ['event' => $event->id]) }}"
                                            class="btn btn-primary m-1">Access Discussion</a>
-                                        @if($userTicket)
+                                        @if($userTicket && !$isOwnerOrAdmin)
                                             <a href="{{ route('ticket.show', ['event' => $event->id, 'ticket' => $userTicket->id]) }}"
                                                class="btn btn-info m-1">Access Ticket</a>
 

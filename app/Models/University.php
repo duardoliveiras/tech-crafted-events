@@ -11,7 +11,7 @@ class University extends BaseModel
     protected $table = 'university';
     public $timestamps = false;
 
-    protected $fillable = ['name', 'address', 'city_id', 'image_url'];
+    protected $fillable = ['name', 'address', 'city_id'];
 
     public function city(): BelongsTo
     {
