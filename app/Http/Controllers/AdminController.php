@@ -71,4 +71,50 @@ class AdminController extends Controller
 
         return redirect()->route('admin.dashboard')->with('success', 'Admin created successfully!');
     }
+    public function create() {
+        $universities = University::all();
+        return view('layouts.admin.create', compact('universities'));
+    }
+
+    public function store(Request $request) {
+        // Validate the incoming request data
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|max:255',
+            'birthdate' => 'required|date',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:6',
+            'phone' => 'required|unique:users',
+            'university_id' => 'required|exists:university,id',
+            'image_url' => 'sometimes|image|max:2048', // Validate if the file is an image and its size
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        $imageUrl = '';
+        if ($request->hasFile('image_url') && $request->file('image_url')->isValid()) {
+            $imageFile = $request->file('image_url');
+            $image = Image::make($imageFile);
+            $imagePath = 'users/' . $imageFile->hashName();
+            Storage::disk('public')->put($imagePath, (string)$image->encode());
+            $imageUrl = $imagePath;
+        }
+
+        $user = User::create([
+            'name' => $request->name,
+            'birthdate' => $request->birthdate,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'phone' => $request->phone,
+            'university_id' => $request->university_id,
+            'image_url' => $imageUrl,
+        ]);
+
+        // Now create the Admin record and associate it with the User
+        $admin = new Admin;
+        $user->admin()->save($admin);
+
+        return redirect()->route('admin.dashboard')->with('success', 'Admin created successfully!');
+    }
 }
