@@ -147,29 +147,28 @@
 
     <div class="container mt-5">
         <h2 class="title-events black">Trending</h2>
-        <h2 class="title-events purple"> Colleges</h2>
+        <h2 class="title-events purple">Colleges</h2>
         <div class="row mt-3">
-            @foreach($universities as $index => $university)
+            @foreach($universities as $university)
                 <div class="col-md-4">
-                    <div class="card mb-4 card-hover-effect">
-                        @php
-                            $imageName = 'university' . ($index + 1) . '.jpeg';
-                            $imageUrl = asset("assets/universities/{$imageName}");
-                        @endphp
-                        <img src="{{ $imageUrl }}" class="card-img-top" alt="Imagem de {{ $university->name }}">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ $university->name }}</h5>
-                            <p class="card-text">Location: {{ $university->address }}</p>
+                    <a href="{{ route('universities.show', $university->id) }}" class="text-decoration-none">
+                        <div class="card mb-4 card-hover-effect">
+                            <img src="{{ Storage::url($university->image_url) }}" class="card-img-top" alt="Image of {{ $university->name }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ $university->name }}</h5>
+                                <p class="card-text">Localization: {{ $university->address }}</p>
+                            </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
                 @if ($loop->iteration % 3 == 0)
-        </div>
-        <div class="row">
+        </div><div class="row">
             @endif
             @endforeach
         </div>
     </div>
+
+
 
     <script type="text/javascript" src="{{ URL::asset ('js/event/list-event.js') }}"></script>
 
