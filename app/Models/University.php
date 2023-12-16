@@ -9,9 +9,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class University extends BaseModel
 {
     protected $table = 'university';
+    protected $keyType = 'string';
     public $timestamps = false;
 
-    protected $fillable = ['name', 'address', 'city_id'];
+    protected $fillable = ['name', 'address', 'city_id', 'image_url'];
 
     public function city(): BelongsTo
     {

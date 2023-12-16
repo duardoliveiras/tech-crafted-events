@@ -82,6 +82,8 @@ Route::get('/events/{event}/ticket/{ticket}', [TicketController::class, 'showTic
     ->name('ticket.show')
     ->middleware(['auth', 'acess.ticket']);
 Route::post('/events/{event}/ticket/authenticate', [TicketController::class, 'authenticateTicket'])->name('ticket.authenticate');
+Route::get('/download-ticket/{eventId}/{ticketId}', [TicketController::class, 'downloadTicket'])->name('ticket.download');
+
 
 
 //Discussion
