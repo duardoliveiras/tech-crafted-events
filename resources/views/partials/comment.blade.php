@@ -1,4 +1,5 @@
 <div class="d-flex flex-start mt-3">
+    
     <img class="rounded-circle shadow-1-strong me-3"
          src="{{ $comment->user->image_url ? asset('storage/' . $comment->user->image_url) : 'https://static-00.iconduck.com/assets.00/user-icon-2048x2048-ihoxz4vq.png' }}"
          alt="avatar" width="60" height="60"/>
@@ -16,6 +17,7 @@
             <p class="mb-0" style="color: #7E7E7E;">
                 {{ $comment->commented_at->format('d M Y, H:i') }}
             </p>
+            
             <div class="d-flex align-items-center ms-auto">
                 <a href="javascript:void(0);"
                    class="link-muted text-decoration-none text-reset upvote-btn"
