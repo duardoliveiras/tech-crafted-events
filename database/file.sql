@@ -12,6 +12,8 @@ DROP TABLE IF EXISTS Notification CASCADE;
 DROP TYPE IF EXISTS NotificationType CASCADE;
 DROP TYPE IF EXISTS ticket_status CASCADE;
 DROP TYPE IF EXISTS event_status CASCADE;
+DROP TYPE IF EXISTS report_reason CASCADE;
+DROP TABLE IF EXISTS event_report CASCADE;
 DROP TABLE IF EXISTS Users CASCADE;
 DROP TABLE IF EXISTS University CASCADE;
 DROP TABLE IF EXISTS Event CASCADE;
@@ -198,6 +200,21 @@ CREATE TABLE Vote
     comment_id UUID     NOT NULL,
     FOREIGN KEY (user_id) REFERENCES Users (id),
     FOREIGN KEY (comment_id) REFERENCES Comment (id)
+);
+
+create type report_reason as ENUM ('Inappropriate content', 'Incorrect Information', 'Inappropriate Behavior at the Event', 'Safety Conditions',
+'Fraud or Suspicious Activity', 'Spam or Repetitive Content', 'Others'); 
+
+create table event_report (
+	id UUID primary key,
+	user_id UUID not null,
+	event_id UUID not null,
+	reason report_reason not null,
+	description text,
+	created_at timestamp without default time zone default now(),
+    analyzed bool default false,
+    foreign key (user_id) references Users (id),
+    foreign key (event_id) references Event (id)
 );
 
 CREATE OR REPLACE FUNCTION notify_event_update()

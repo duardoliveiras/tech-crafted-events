@@ -1,8 +1,15 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\EventController;
+use App\Http\Controllers\TicketController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\MyEventsController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\DiscussionController;
+use App\Http\Controllers\EventReportController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\DiscussionController;
@@ -10,6 +17,7 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventOrganizerController;
 use App\Http\Controllers\MyEventsController;
 use App\Http\Controllers\NotificationsController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UserController;
@@ -43,6 +51,7 @@ Route::view('/about', 'about')->name('about');
 Route::resource('profile', UserController::class);
 Route::get('/my-events', [MyEventsController::class, 'index'])->name('my_events.index');
 
+//Notifications
 Route::get('/load-notifications', [NotificationsController::class, 'index'])->name('notifications.index');
 Route::put('/update-read/{id}', [NotificationsController::class, 'updateRead'])->name('read-notification');
 
@@ -60,11 +69,21 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
     Route::get('/admin/create', [AdminController::class, 'create'])->name('admin.create');
     Route::post('/admin/store', [AdminController::class, 'store'])->name('admin.store');
+    Route::get('/admin/reports', [AdminController::class, 'reports'])->name('admin.reports');
 });
 
 // Events
 Route::resource('events', EventController::class);
 Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
+//Reports
+Route::post('/events/{event}/report', [EventReportController::class, 'postReport'])->name('event-report.store');
+Route::get('/admin/reports/load-reports/{event}/{reason}', [AdminController::class, 'eventReports'])->name('event-reports');
+
+Route::put('/events/{event}/check-all',[EventReportController::class, 'check_all_reports']);
+//
+Route::put('admin/reports/check/{reportId}', [EventReportController::class, 'checkOneReport'])->name('check-one-report');
+Route::put('admin/reports/check-all/{event}', [EventReportController::class, 'checkAllReport'])->name('check-all-report');
+Route::put('admin/reports/ban/{event}', [EventReportController::class, 'banEvent'])->name('ban-event');
 Route::post('/events/leave/{event_id}/{ticket_id}', [EventController::class, 'leave'])->name('events.leave');
 Route::get('/events/byPass/{event_id}/{ticket_id}', [EventController::class, 'byPassTicketShow'])->name('events.byPassTicketShow');
 
