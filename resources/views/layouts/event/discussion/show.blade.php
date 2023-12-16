@@ -38,6 +38,7 @@
                             <p class="fw-light mb-4 pb-2">Comments section by users registered in the event</p>
 
                             @forelse($discussion->commentsOrderedByVotes() as $comment)
+
                                 @include('partials.comment', ['comment' => $comment, 'userVotes' => optional($userVotes)[$comment->id]])
                                 @if(!$loop->last)
                                     <hr class="my-3"/>
