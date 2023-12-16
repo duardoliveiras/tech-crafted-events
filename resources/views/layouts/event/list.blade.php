@@ -35,11 +35,11 @@
                         <div class="accordion-body pt-0">
                             <div class="form-row d-flex flex-row justify-content-around mx-2">
                                 <div class="col mx-2">
-                                    <label for="eventType" class="text-white label-filter">Looking for</label>
-                                    <select id="eventType" name="eventType" class="form-control">
+                                    <label for="event-type" class="text-white label-filter">Looking for</label>
+                                    <select id="event-type" name="event-type" class="form-control">
                                         <option value="">Choose event type</option>
                                         @foreach ($categories as $eventType)
-                                            <option value="{{ $eventType->id }}" {{ request('eventType') == $eventType->id ? 'selected' : '' }}>{{ $eventType->name }}</option>
+                                            <option value="{{ $eventType->id }}" {{ request('event-type') == $eventType->id ? 'selected' : '' }}>{{ $eventType->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -158,7 +158,7 @@
             // Function to load more data with filters
             function loadMoreData(page, sortType, eventType, location, dateFilter, nameFilter) {
                 $.ajax({
-                    url: `?page=${page}&sort=${sortType}&eventType=${eventType}&location=${location}&date-filter=${dateFilter}&full-text-search=${nameFilter}`,
+                    url: `?page=${page}&sort=${sortType}&event-type=${eventType}&location=${location}&date-filter=${dateFilter}&full-text-search=${nameFilter}`,
                     type: "get",
                     beforeSend: function () {
                         $('#loadMore').text('Loading...');
@@ -182,7 +182,7 @@
                 page++; // Increase the page number
                 let sortType = getUrlParameter('sort');
                 // Get filter values from URL
-                let eventType = getUrlParameter('eventType');
+                let eventType = getUrlParameter('event-type');
                 let location = getUrlParameter('location');
                 let dateFilter = getUrlParameter('date-filter');
                 let nameFilter = getUrlParameter('full-text-search');
