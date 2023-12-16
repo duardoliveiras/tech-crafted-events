@@ -73,13 +73,21 @@ Route::get('/events/{event}', [EventController::class, 'show'])->name('events.sh
 
 //Reports
 Route::post('/events/{event}/report', [EventReportController::class, 'postReport'])->name('event-report.store');
-Route::get('/admin/reports/load-reports/{event}/{reason}', [AdminController::class, 'eventReports'])->name('event-reports');
-Route::put('/events/{event}/check-all',[EventReportController::class, 'check_all_reports']);
+
+Route::get('/admin/reports/reports-events/{event}/{reason}', [AdminController::class, 'eventReports'])->name('event-reports');
+Route::get('/admin/reports/reports-comments/{user}/{reason}', [AdminController::class, 'commentReports'])->name('comment-reports');
+
+Route::put('/events/{event}/check-all-event',[EventReportController::class, 'check_all_event']);
+Route::put('/events/{user}/check-all-comment',[CommentReportController::class, 'check_all_comment']);
 Route::post('events/{event}/discussion/{comment}/report', [CommentReportController::class, 'postReport'])->name('comment-report.store');
 //Dashboard
-Route::put('admin/reports/check/{reportId}', [EventReportController::class, 'checkOneReport'])->name('check-one-report');
+Route::put('admin/reports/check-event/{reportId}', [EventReportController::class, 'checkOneReportEvent']);
+Route::put('admin/reports/check-comment/{reportId}', [CommentReportController::class, 'checkOneReportComment']);
 Route::put('admin/reports/check-all/{event}', [EventReportController::class, 'checkAllReport'])->name('check-all-report');
-Route::put('admin/reports/ban/{event}', [EventReportController::class, 'banEvent'])->name('ban-event');
+  
+Route::put('admin/reports/ban/event/{event}', [EventReportController::class, 'banEvent'])->name('ban-event');
+Route::put('admin/reports/ban/comment/{comment}', [CommentReportController::class, 'banComment']);
+
 Route::post('/events/leave/{event_id}/{ticket_id}', [EventController::class, 'leave'])->name('events.leave');
 Route::get('/events/byPass/{event_id}/{ticket_id}', [EventController::class, 'byPassTicketShow'])->name('events.byPassTicketShow');
 

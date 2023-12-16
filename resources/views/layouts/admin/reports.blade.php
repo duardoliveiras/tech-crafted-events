@@ -22,12 +22,12 @@
                                     <td> <a href="{{ route('events.show', $event->id) }}" > {{ $event->name }} </a>  </td>
                                     <td> {{ $event->event_report_count }} </td>
                                 <td>
-                                    <button type="button" class="btn btn-primary"  data-toggle="modal" data-target="#reportModal" onClick="getEventReportsView('{{ $event->id }}','{{ $event->name}}')">    
+                                    <button type="button" class="btn btn-primary"  data-toggle="modal" data-target="#reportModal" onClick="getEventReportsView('{{ $event->id }}','{{ $event->name}}', 'event')">    
                                         <svg class="bi" width="16" height="16"><use xlink:href="{{ asset('assets/svg/icons.svg#eye-fill') }}"></use></svg>
                                         View
                                     </button>
 
-                                    <button type="button" class="btn btn-success" onclick="check_all_reports('{{ $event->id }}' )">
+                                    <button type="button" class="btn btn-success" onclick="check_all_event('{{ $event->id }}' )">
                                         <svg class="bi" width="16" height="16"><use xlink:href="{{ asset('assets/svg/icons.svg#check-square-fill') }}"></use></svg>
                                         Check
                                     </button>
@@ -51,32 +51,38 @@
                  <table class="table table-bordered">
                     <thead>
                     <tr>
-                        <th scope="col">Comment</th>
+                        <th scope="col">User</th>
                         <th scope="col">Reports</th>
                         <th scope="col">Actions</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr>
-                        <td>Mulher tem mesmo é que lavar louça</td>
-                        <td>5.000</td>
-                        <td>
-                        <button type="button" class="btn btn-primary">    
-                            <svg class="bi" width="16" height="16"><use xlink:href="{{ asset('assets/svg/icons.svg#eye-fill') }}"></use></svg>
-                            View
-                        </button>
 
-                        <button type="button" class="btn btn-success" onclick="check_all_reports()">
-                            <svg class="bi" width="16" height="16"><use xlink:href="{{ asset('assets/svg/icons.svg#check-square-fill') }}"></use></svg>
-                            Check
-                        </button>
+                    @forelse ($comments as $comment )
+                        <tr>
+                            <td> <a href="{{ route('profile.show', $comment->user->id) }}" > {{ $comment->user->name }} </a> </td>
+                            <td> {{ $comment->comment_report_count }} </td>
+                            <td>
+                            <button type="button" class="btn btn-primary"  data-toggle="modal" data-target="#reportModal" onClick="getEventReportsView('{{ $comment->user->id }}','{{ $comment->user->name }}', 'comment')">    
+                                <svg class="bi" width="16" height="16"><use xlink:href="{{ asset('assets/svg/icons.svg#eye-fill') }}"></use></svg>
+                                View
+                            </button>
 
-                        <button type="button" class="btn btn-danger">
-                            <svg class="bi" width="16" height="16"><use xlink:href="{{ asset('assets/svg/icons.svg#ban-fill') }}"></use></svg>
-                            Ban
-                        </button>                       
-                        </td>
-                    </tr>
+                            <button type="button" class="btn btn-success" onclick="check_all_comment('{{ $comment->user->id }}' )">
+                                <svg class="bi" width="16" height="16"><use xlink:href="{{ asset('assets/svg/icons.svg#check-square-fill') }}"></use></svg>
+                                Check
+                            </button>
+
+                            <button type="button" class="btn btn-danger" onClick="banComment( '{{ $comment->id }}' )">
+                                <svg class="bi" width="16" height="16"><use xlink:href="{{ asset('assets/svg/icons.svg#ban-fill') }}"></use></svg>
+                                Ban
+                            </button>   
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                        </tr>
+                    @endforelse
                     </tbody>
                  </table>
                 </div>

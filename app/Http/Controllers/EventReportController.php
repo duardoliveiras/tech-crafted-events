@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Models\EventReport;
 use Illuminate\Http\Request;
+use App\Models\CommentReport;
 use Illuminate\Support\Facades\Auth;
 
 class EventReportController extends Controller
@@ -30,7 +31,7 @@ class EventReportController extends Controller
         );
     }
 
-    public function checkOneReport($reportId)
+    public function checkOneReportEvent($reportId)
     {
         $report = EventReport::find($reportId);
 
@@ -56,7 +57,7 @@ class EventReportController extends Controller
         }
     }
 
-    public function check_all_reports($eventId){
+    public function check_all_event($eventId){
         $reports = EventReport::where('event_id', $eventId)->get();
 
         if($reports){
