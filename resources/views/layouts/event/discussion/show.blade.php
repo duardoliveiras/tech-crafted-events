@@ -25,9 +25,10 @@
                         <textarea name="content" id="content" class="form-control" rows="3"></textarea>
                     </div>
                     <div class="form-group mb-3">
-                        <label class="custom-label" for="attachment">Attach image to comment:</label>
-                        <input type="file" class="form-control custom-input" id="attachment" name="attachment" required>
-                        <small class="form-text text-muted">Image must be in JPEG, PNG, JPG, GIF, or SVG format and have
+                        <label class="custom-label" for="attachment">Attach file to comment:</label>
+                        <input type="file" class="form-control custom-input" id="attachment" name="attachment"
+                               accept="image/jpeg, image/png, image/jpg, image/gif, image/svg+xml, application/pdf, .txt">
+                        <small class="form-text text-muted">File must be in JPEG, PNG, JPG, GIF, SVG, PDF or TXT format and have
                             a maximum size of 2MB.</small>
                     </div>
                     <button type="submit" class="btn btn-primary mt-2">Submit Comment</button>
