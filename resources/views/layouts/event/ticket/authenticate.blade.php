@@ -32,11 +32,11 @@
                             @csrf
                             <div class="mb-3">
                                 <label for="ticket_id" class="form-label">Ticket ID</label>
-                                <input type="text" class="form-control" id="ticket_id" name="ticket_id" readonly>
+                                <input type="text" class="form-control" id="ticket_id" name="ticket_id">
                             </div>
                             <div class="mb-3">
                                 <label for="user_id" class="form-label">User ID</label>
-                                <input type="text" class="form-control" id="user_id" name="user_id" readonly>
+                                <input type="text" class="form-control" id="user_id" name="user_id">
                             </div>
                             <div class="mb-3">
                                 <button type="submit" class="btn btn-primary" id="submitForm">Send</button>
