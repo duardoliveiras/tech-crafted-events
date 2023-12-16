@@ -7,10 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Vote extends BaseModel
 {
-    protected $table = 'vote';
-    public $timestamps = false;
-
     use HasFactory;
+
+    protected $table = 'vote';
     protected $fillable = [
         'vote_type',
         'voted_at',

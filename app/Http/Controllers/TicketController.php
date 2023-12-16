@@ -2,18 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Services\TicketService;
 use App\Models\Event;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use PDF;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class TicketController extends Controller
 {
-    public function __construct()
+    protected TicketService $ticketService;
+
+    public function __construct(TicketService $ticketService)
     {
         $this->middleware('auth');
+        $this->ticketService = $ticketService;
     }
 
     public function store(Request $request)
@@ -29,7 +34,6 @@ class TicketController extends Controller
     public function acquireTicket(Request $request, $eventId)
     {
         $event = Event::findOrFail($eventId);
-        $pricePaid = $event->current_price > 0 ? $event->current_price : 0.0;
 
         if ($event->current_tickets_qty <= 0) {
             return back()->withError('Sorry, there are no more tickets available for this event.');
@@ -39,30 +43,12 @@ class TicketController extends Controller
             return back()->withError('You already have a ticket for this event.');
         }
 
-        // Cast current_price to float and use strict comparison
         if ((float)$event->current_price === 0.0) {
-            $ticket = new Ticket([
-                'user_id' => Auth::id(),
-                'event_id' => $eventId,
-                'price_paid' => 0.0,
-            ]);
-            $ticket->markTicketAsPaid();
-            $event->decrement('current_tickets_qty');
-            $ticket->save();
+            $this->ticketService->createFreeTicket($eventId);
 
             return redirect()->route('events.show', $eventId)->with('success', 'Your free ticket has been acquired!');
         } else {
-            $ticket = new Ticket([
-                'user_id' => Auth::id(),
-                'event_id' => $eventId,
-                'price_paid' => $pricePaid
-            ]);
-
-            $event->decrement('current_tickets_qty');
-            $ticket->save();
-
-            // Add the ticket ID to the redirect if you need to reference it later
-            return redirect()->route('payment.session', ['ticketId' => $event->id, 'eventId' => $event->id, 'amount' => $event->current_price, 'eventName' => $event->name]);
+            return route('payment.session', ['eventId' => $event->id, 'amount' => $event->current_price, 'eventName' => $event->name]);
         }
     }
 
@@ -130,5 +116,36 @@ class TicketController extends Controller
         $ticket->save();
 
         return redirect()->route('events.show', ['event' => $eventId])->with('success', 'Ticket authenticated successfully!');
+    }
+
+    public function downloadTicket($eventId, $ticketId)
+    {
+        // Fetch the event and the specific ticket
+        $event = Event::findOrFail($eventId);
+        $ticket = Ticket::where('event_id', $eventId)->findOrFail($ticketId);
+
+        // Verify if the ticket belongs to the event and the user
+        if ($ticket->event_id != $event->id || $ticket->user_id != Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Optionally, you can include additional data or format it
+        // For example, generating a QR code for the ticket
+        $qrContent = "{$eventId},{$ticket->id},{$ticket->user_id}";
+
+        $qrImagePath = 'storage/temp_qrcodes/ticket-' . $ticket->id . '.svg';
+        QrCode::format('svg')->size(200)->generate($qrContent, public_path($qrImagePath));
+
+        // Prepare the data to be passed to the view
+        $data = [
+            'ticket' => $ticket,
+            'event' => $event,
+            'qrCodePath' => 'storage/temp_qrcodes/ticket-' . $ticket->id . '.svg'
+        ];
+        // Load the view and pass in the ticket data
+        $pdf = PDF::loadView('layouts.event.ticket.pdf', $data);
+
+        // Download the PDF with a dynamic filename
+        return $pdf->download('invoice-' . $ticket->id . '.pdf');
     }
 }

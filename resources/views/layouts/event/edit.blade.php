@@ -77,6 +77,11 @@
                     </div>
 
                     <div class="mb-3">
+                        <label for="current_tickets_qty" class="form-label">Current ticket's amount</label>
+                        <input type="text" class="form-control" id="current_tickets_qty" name="current_tickets_qty" value="{{ old('current_tickets_qty', $event->current_tickets_qty) }}" required>
+                    </div>
+
+                    <div class="mb-3">
                         <label for="address" class="form-label">Address</label>
                         <input type="text" class="form-control" id="address" name="address" value="{{ old('address', $event->address) }}" required>
                     </div>

@@ -63,7 +63,7 @@
                             <label class="custom-label" for="birthdate">{{ __('Birthdate') }}</label>
                             <input id="birthdate" type="date"
                                    class="form-control custom-input @error('birthdate') is-invalid @enderror"
-                                   name="birthdate" value="{{ old('birthdate') }}" required>
+                                   name="birthdate" required>
                             <span class="invalid-feedback" role="alert" id="error-message-birthdate"></span>
                         </div>
 

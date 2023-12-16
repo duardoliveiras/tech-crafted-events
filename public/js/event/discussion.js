@@ -39,3 +39,69 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
+function toggleEdit(commentId) {
+    let commentText = document.getElementById('commentText-' + commentId);
+    let editCommentInput = document.getElementById('editCommentInput-' + commentId);
+    let buttonSave = document.getElementById('button-save-' + commentId);
+
+    commentText.style.display = commentText.style.display === 'none' ? 'block' : 'none';
+    editCommentInput.style.display = editCommentInput.style.display === 'none' ? 'block' : 'none';
+    buttonSave.style.display = buttonSave.style.display === 'none' ? 'block' : 'none';
+}
+
+// Function to save changes
+function saveChanges(commentId) {
+    let editedText = document.getElementById('editCommentInput-' + commentId).value;
+
+    // Send a request to update the comment
+    fetch(`/comments/${commentId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+        },
+        body: JSON.stringify({
+            text: editedText,
+        }),
+    })
+        .then(response => {
+            if (response.ok) {
+                // Update the comment text and toggle back to display mode
+                document.getElementById('commentText-' + commentId).textContent = editedText;
+                toggleEdit(commentId);
+                // Reload the page
+                location.reload();
+            } else {
+                console.error('Failed to update comment');
+            }
+        })
+        .catch(error => {
+            console.error('Error during the request:', error);
+        });
+}
+
+function confirmDelete(commentId) {
+    let confirmation = window.confirm('Are you sure you want to delete this comment?');
+
+    if (confirmation) {
+        // Send a request to "delete" the comment (perform logical deletion)
+        fetch(`/comments/${commentId}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            },
+        })
+            .then(response => {
+                if (response.ok) {
+                    // Reload the page after deletion
+                    location.reload();
+                } else {
+                    console.error('Failed to delete comment');
+                }
+            })
+            .catch(error => {
+                console.error('Error during the request:', error);
+            });
+    }
+}
