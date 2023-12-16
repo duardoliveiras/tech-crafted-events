@@ -20,14 +20,17 @@ class AdminController extends Controller
         $users = User::where('id', '!=', Auth::id())->get();
 
         $events = Event::all();
-        return view('layouts.admin.dashboard',compact('users', 'events'));
+        return view('layouts.admin.dashboard', compact('users', 'events'));
     }
-    public function create() {
+
+    public function create()
+    {
         $universities = University::all();
         return view('layouts.admin.create', compact('universities'));
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         // Validate the incoming request data
         $validator = Validator::make($request->all(), [
             'name' => 'required|max:255',
@@ -52,7 +55,6 @@ class AdminController extends Controller
             $imageUrl = $imagePath;
         }
 
-        // Create the User record
         $user = User::create([
             'name' => $request->name,
             'birthdate' => $request->birthdate,
@@ -61,12 +63,10 @@ class AdminController extends Controller
             'phone' => $request->phone,
             'university_id' => $request->university_id,
             'image_url' => $imageUrl,
-            // Other fields can be added as necessary
         ]);
 
         // Now create the Admin record and associate it with the User
         $admin = new Admin;
-        // You can set additional properties for the Admin here if necessary
         $user->admin()->save($admin);
 
         return redirect()->route('admin.dashboard')->with('success', 'Admin created successfully!');
