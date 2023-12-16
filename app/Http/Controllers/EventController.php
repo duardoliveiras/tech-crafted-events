@@ -49,7 +49,7 @@ class EventController extends Controller
         $locations = City::all();
         $universities = University::all();
 
-        $eventType = $request->query('eventType');
+        $eventType = $request->query('event-type');
         $location = $request->query('location');
         $dateFilter = $request->query('date-filter');
         $nameFilter = $request->query('full-text-search');
@@ -59,6 +59,7 @@ class EventController extends Controller
         if ($nameFilter) {
             $query->whereRaw("to_tsvector('english', name) @@ to_tsquery('english', ?)", [$nameFilter])->get();
         }
+
         if ($eventType) {
             $query->where('category_id', $eventType);
         }
@@ -88,7 +89,7 @@ class EventController extends Controller
                 break;
         }
 
-        $query->where('status', 'ONGOING')->orWhere('status', 'UPCOMING');
+        $query->whereIn('status', ['ONGOING', 'UPCOMING']);
 
         $events = $query->paginate(6);
 
