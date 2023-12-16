@@ -24,7 +24,9 @@
                         <p class="text-muted">Scan at the entrance</p>
                     </div>
                 </div>
+                <a href="{{ route('ticket.download', ['eventId' => $event->id, 'ticketId' => $ticket->id]) }}" class="btn btn-primary">Download Ticket</a>
             </div>
         </div>
+
     </div>
 @endsection
