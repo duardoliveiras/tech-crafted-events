@@ -1,3 +1,12 @@
+let today = new Date();
+
+// Calculate the maximum date allowed (12 years ago)
+let maxDate = new Date();
+maxDate.setFullYear(today.getFullYear() - 12);
+
+// Set the maximum date for the birthdate input
+document.getElementById('birthdate').max = maxDate.toISOString().split('T')[0];
+
 document.addEventListener('DOMContentLoaded', function () {
     const phoneInput = document.querySelector("#phone");
     window.intlTelInput(phoneInput, {

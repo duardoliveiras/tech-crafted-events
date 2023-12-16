@@ -3,15 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 
 class Event extends BaseModel
 {
     use HasFactory;
 
     protected $table = 'event';
-    protected $keyType = 'string';
-    public $timestamps = false;
     protected $fillable = [
         'name',
         'description',
@@ -24,12 +21,15 @@ class Event extends BaseModel
         'category_id',
         'city_id',
         'owner_id',
-        'image_url'
+        'image_url',
+        'status',
+        'created_at'
     ];
     protected $casts = [
         'current_price' => 'float',
         'start_date' => 'datetime',
         'end_date' => 'datetime',
+        'created_at' => 'datetime',
     ];
 
     public function category()
@@ -51,6 +51,7 @@ class Event extends BaseModel
     {
         return $this->hasMany(Ticket::class);
     }
+
     public function discussion()
     {
         return $this->hasOne(Discussion::class);
@@ -63,5 +64,15 @@ class Event extends BaseModel
                 'event_id' => $event->id
             ]);
         });
+    }
+
+    public function isFinished(): bool
+    {
+        return $this['status'] === EventStatus::Finished->value;
+    }
+
+    public function eventNotifications()
+    {
+        return $this->hasMany(EventNotification::class, 'event_id');
     }
 }

@@ -1,13 +1,16 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\DiscussionController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\EventOrganizerController;
 use App\Http\Controllers\MyEventsController;
 use App\Http\Controllers\NotificationsController;
+use App\Http\Controllers\StripeController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -39,15 +42,28 @@ Route::resource('profile', UserController::class);
 
 Route::get('/my-events', [MyEventsController::class, 'index'])->name('my_events.index');
 
-Route::get('/notifications', [NotificationsController::class, 'index'])->name('notifications.index');
-Route::match(['post', 'put'], '/notifications/mark-read/{notification}', [NotificationsController::class, 'markRead'])->name('notificationscontroller.markRead');
+Route::get('/load-notifications', [NotificationsController::class, 'index'])->name('notifications.index');
+Route::put('/update-read/{id}', [NotificationsController::class, 'updateRead'])->name('read-notification');
+
+// Forget Password
+Route::post('/password/email', [ForgotPasswordController::class, 'forgetPasswordPost'])->name('password.email');
+Route::get('/password/reset/{token}', [ForgotPasswordController::class, 'resetPassword'])->name('password.update.get');
+Route::post('/password/reset', [ForgotPasswordController::class, 'resetPasswordPost'])->name('password.update');
+
+Route::get('/password/reset', function () {
+    return view('auth.passwords.email');
+})->name('password.request');
 
 //Admin
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
 });
-//Events
+
+// Events
 Route::resource('events', EventController::class);
+Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
+Route::post('/events/leave/{event_id}/{ticket_id}', [EventController::class, 'leave'])->name('events.leave');
+Route::get('/events/byPass/{event_id}/{ticket_id}', [EventController::class, 'byPassTicketShow'])->name('events.byPassTicketShow');
 
 //Ticket
 Route::get('/events/{event}/ticket/buy', [TicketController::class, 'showBuyTicketForm'])->name('ticket.buy');
@@ -71,7 +87,33 @@ Route::post('/events/{event}/discussion/{discussion}/comment', [CommentControlle
 
 // add vote to comment
 Route::middleware(['auth'])->group(function () {
-    Route::post('/comments/{comment}/toggle-vote/{voteType}', [CommentController::class, 'toggleVote'])
-        ->name('comment.toggleVote');
-});;
+    Route::post('/comments/{comment}/toggle-vote/{voteType}', [CommentController::class, 'toggleVote'])->name('comment.toggleVote');
+});
 
+Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comment.update')->middleware(['auth']);
+Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comment.destroy')->middleware(['auth']);
+
+// Payment Routes
+Route::prefix('payment')->group(function () {
+    Route::post('/session', [StripeController::class, 'session'])
+        ->name('payment.session');
+    Route::get('/success', [StripeController::class, 'success'])
+        ->name('payment.success');
+    Route::get('/connect', [StripeController::class, 'connect'])
+        ->name('payment.connect');
+    Route::get('/callback', [StripeController::class, 'callback'])
+        ->name('payment.stripe.connect.callback');
+    Route::get('/transfer', [StripeController::class, 'transfer'])
+        ->name('payment.transfer');
+    Route::get('/refund/{payment_intent_id}', [StripeController::class, 'refundPayment'])
+        ->name('payment.refund');
+});
+
+// event organizer routes
+Route::get('/event-organizer', [EventOrganizerController::class, 'show'])
+    ->name('event-organizer.show')
+    ->middleware(['auth']);
+
+Route::post('/event-organizer/{legal_id}/{stripe_account_id}', [EventOrganizerController::class, 'create'])
+    ->name('event-organizer.create')
+    ->middleware(['auth']);

@@ -10,8 +10,6 @@ class Ticket extends BaseModel
     use HasFactory;
 
     protected $table = 'ticket';
-    protected $keyType = 'string';
-    public $timestamps = false;
     protected $fillable = [
         'event_id',
         'user_id',
