@@ -4,18 +4,19 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\StripeController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\MyEventsController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DiscussionController;
+use App\Http\Controllers\UniversityController;
 use App\Http\Controllers\EventReportController;
 use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\EventOrganizerController;
+use App\Http\Controllers\CommentReportController;
 use App\Http\Controllers\NotificationsController;
+use App\Http\Controllers\EventOrganizerController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
-use App\Http\Controllers\StripeController;
-use App\Http\Controllers\UniversityController;
 
 
 // Home
@@ -69,12 +70,13 @@ Route::middleware(['auth', 'admin'])->group(function () {
 // Events
 Route::resource('events', EventController::class);
 Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
+
 //Reports
 Route::post('/events/{event}/report', [EventReportController::class, 'postReport'])->name('event-report.store');
 Route::get('/admin/reports/load-reports/{event}/{reason}', [AdminController::class, 'eventReports'])->name('event-reports');
-
 Route::put('/events/{event}/check-all',[EventReportController::class, 'check_all_reports']);
-//
+Route::post('events/{event}/discussion/{comment}/report', [CommentReportController::class, 'postReport'])->name('comment-report.store');
+//Dashboard
 Route::put('admin/reports/check/{reportId}', [EventReportController::class, 'checkOneReport'])->name('check-one-report');
 Route::put('admin/reports/check-all/{event}', [EventReportController::class, 'checkAllReport'])->name('check-all-report');
 Route::put('admin/reports/ban/{event}', [EventReportController::class, 'banEvent'])->name('ban-event');

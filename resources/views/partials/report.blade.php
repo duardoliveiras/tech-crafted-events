@@ -15,7 +15,7 @@
                 @if($report == "event")
                     <form method="POST" enctype="multipart/form-data" action="{{ route('event-report.store', [$event->id]) }}">
                 @else
-                    <form method="POST" enctype="multipart/form-data">
+                    <form method="POST" enctype="multipart/form-data" action="{{ route('comment-report.store', [$event->id, $comment->id])}}">
                 @endif
                 
                 @csrf
