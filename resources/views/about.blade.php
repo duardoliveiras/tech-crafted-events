@@ -27,7 +27,7 @@
                 $developers = [
                     ['name' => 'Bernardo', 'image' => 'bernardo.jpg', 'github' => 'https://github.com/brito-bernardo'],
                     ['name' => 'Eduardo', 'image' => 'eduardo.jpeg', 'github' => 'https://github.com/duardoliveiras'],
-                    ['name' => 'Tomás', 'image' => 'tomas.jpeg', 'github' => 'https://github.com/TWEgit'],
+//                    ['name' => 'Tomás', 'image' => 'tomas.jpeg', 'github' => 'https://github.com/TWEgit'],
                     ['name' => 'Vicente', 'image' => 'vicente.jpeg', 'github' => 'https://github.com/vicente-md']
                 ];
             @endphp

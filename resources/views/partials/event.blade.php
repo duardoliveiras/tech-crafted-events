@@ -16,8 +16,7 @@
                     <p class="card-text mb-1" style="color: #7848F4;">
                         {{ \Carbon\Carbon::parse($event->start_date)->format('l, F j, Y, g:i A') }}
                     </p>
-                    <p class="card-text mb-1" style="color: #7E7E7E;">{{ $event->address }}
-                        , {{ $event->city->name }}</p>
+                    <p class="card-text mb-1" style="color: #7E7E7E;">{{ $event->address }}, {{ $event->city->name }}</p>
                     <small style="color: #7E7E7E; font-size: .8em;"><i>Event created by user from &#174;
                             <u>{{ $event->owner->user->university->name }}</u></i></small>
                 </div>
