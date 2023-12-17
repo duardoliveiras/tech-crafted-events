@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\ProviderController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
@@ -46,6 +47,10 @@ Route::view('/about', 'about')->name('about');
 Route::resource('profile', UserController::class);
 Route::get('/my-events', [MyEventsController::class, 'index'])->name('my_events.index');
 
+// Socialite
+Route::get('/auth/{provider}/redirect', [ProviderController::class, 'redirect']);
+Route::get('/auth/{provider}/callback', [ProviderController::class, 'callback']);
+
 //Notifications
 Route::get('/load-notifications', [NotificationsController::class, 'index'])->name('notifications.index');
 Route::put('/update-read/{id}', [NotificationsController::class, 'updateRead'])->name('read-notification');
@@ -77,14 +82,14 @@ Route::post('/events/{event}/report', [EventReportController::class, 'postReport
 Route::get('/admin/reports/reports-events/{event}/{reason}', [AdminController::class, 'eventReports'])->name('event-reports');
 Route::get('/admin/reports/reports-comments/{user}/{reason}', [AdminController::class, 'commentReports'])->name('comment-reports');
 
-Route::put('/events/{event}/check-all-event',[EventReportController::class, 'check_all_event']);
-Route::put('/events/{user}/check-all-comment',[CommentReportController::class, 'check_all_comment']);
+Route::put('/events/{event}/check-all-event', [EventReportController::class, 'check_all_event']);
+Route::put('/events/{user}/check-all-comment', [CommentReportController::class, 'check_all_comment']);
 Route::post('events/{event}/discussion/{comment}/report', [CommentReportController::class, 'postReport'])->name('comment-report.store');
 //Dashboard
 Route::put('admin/reports/check-event/{reportId}', [EventReportController::class, 'checkOneReportEvent']);
 Route::put('admin/reports/check-comment/{reportId}', [CommentReportController::class, 'checkOneReportComment']);
 Route::put('admin/reports/check-all/{event}', [EventReportController::class, 'checkAllReport'])->name('check-all-report');
-  
+
 Route::put('admin/reports/ban/event/{event}', [EventReportController::class, 'banEvent'])->name('ban-event');
 Route::put('admin/reports/ban/comment/{comment}', [CommentReportController::class, 'banComment']);
 

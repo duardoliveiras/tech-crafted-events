@@ -73,17 +73,19 @@ CREATE TABLE University
 
 CREATE TABLE Users
 (
-    id            UUID PRIMARY KEY,
-    name          VARCHAR(255) NOT NULL,
-    phone         CHAR(20)     NOT NULL,
-    email         VARCHAR(255) NOT NULL UNIQUE,
-    password      VARCHAR(255) NOT NULL,
-    birthDate     DATE         NOT NULL,
-    university_id UUID         NOT NULL,
+    id             UUID PRIMARY KEY,
+    name           VARCHAR(255) NOT NULL,
+    phone          CHAR(20)     NOT NULL,
+    email          VARCHAR(255) NOT NULL UNIQUE,
+    password       VARCHAR(255),
+    provider       VARCHAR(255),
+    provider_token VARCHAR(255),
+    birthDate      DATE         NOT NULL,
+    university_id  UUID         NOT NULL,
     FOREIGN KEY (university_id) REFERENCES University (id),
-    is_banned     BOOLEAN DEFAULT FALSE,
-    is_deleted    BOOLEAN DEFAULT FALSE,
-    image_url     VARCHAR(255) NOT NULL
+    is_banned      BOOLEAN DEFAULT FALSE,
+    is_deleted     BOOLEAN DEFAULT FALSE,
+    image_url      VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE EventOrganizer
