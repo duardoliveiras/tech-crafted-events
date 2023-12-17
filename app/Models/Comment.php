@@ -26,7 +26,6 @@ class Comment extends BaseModel
     public static function getCommentsForDiscussion($discussionId)
     {
         return static::where('discussion_id', $discussionId)
-            ->where('is_deleted', false)
             ->get();
     }
 

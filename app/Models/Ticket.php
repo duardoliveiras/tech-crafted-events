@@ -59,9 +59,9 @@ class Ticket extends BaseModel
         $this->save();
     }
 
-    public function isValidTicket(): bool
+    public function isValidTicket(): Ticket|null
     {
-        return $this->status === 'PAID' || $this->status === 'READ';
+        return $this->status === 'PAID' || $this->status === 'READ' ? $this : null;
     }
 
     public function canBuyTicket(): bool

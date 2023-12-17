@@ -72,8 +72,14 @@
 
                                 @if(auth()->check())
                                     @php
-                                        $userTicket = $event->ticket->firstWhere('user_id', auth()->id());
-                                        if($userTicket) $userTicket = $userTicket->isValidTicket();
+                                        $userTickets = $event->ticket->where('user_id', auth()->id());
+                                        $userTicket = null; // Initialize $userTicket as null
+                                        foreach ($userTickets as $ticket) {
+                                            if ($ticket && $ticket->isValidTicket()) {
+                                                $userTicket = $ticket;
+                                                break;
+                                            }
+                                        }
                                         $user = auth()->user();
                                         $isOwner = $user->id == $event->owner->user_id;
                                         $isAdmin = $user->isAdmin();

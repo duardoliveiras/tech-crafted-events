@@ -80,6 +80,23 @@ class User extends Authenticatable
         return $this->admin()->exists();
     }
 
+    public function delete()
+    {
+        // Mark the user as deleted
+        $this->is_deleted = true;
+
+        // Anonymize personal information
+        $this->name = '[User Deleted]';
+        $this->email = '';
+        $this->password = bcrypt(Str::random(10)); // Reset password with a random hash
+        $this->phone = '';
+        $this->birthdate = now();
+        $this->image_url = '';
+
+        $this->save();
+    }
+
+
     public function university()
     {
         return $this->belongsTo(University::class, 'university_id');
