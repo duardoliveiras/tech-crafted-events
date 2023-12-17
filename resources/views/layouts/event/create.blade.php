@@ -41,7 +41,7 @@
                                       title="Enter the name of the event as you want it to appear on promotional materials and event listings.">
         <img src="{{ asset('assets/img/info.svg') }}" alt="Info">
     </span>
-                                <input type="text" class="form-control custom-input" id="name" name="name" required>
+                                <input type="text" class="form-control custom-input" id="name" name="name" value="{{ old('name') }}" required>
                             </div>
 
                             <div class="form-group mb-3">
@@ -50,7 +50,7 @@
                                       title="Upload an eye-catching image for your event. This will be displayed on the event's preview card.">
         <img src="{{ asset('assets/img/info.svg') }}" alt="Info">
     </span>
-                                <input type="file" class="form-control custom-input" id="image_url" name="image_url"
+                                <input type="file" class="form-control custom-input" id="image_url" value="{{ old('image_url') }}" name="image_url"
                                        accept="image/jpeg, image/png, image/jpg, image/gif, image/svg+xml" required>
                                 <small class="form-text text-muted">Image must be in JPEG, PNG, JPG, GIF, or SVG format
                                     and have a maximum size of 2MB.</small>
@@ -77,7 +77,7 @@
         <img src="{{ asset('assets/img/info.svg') }}" alt="Info">
     </span>
                                 <textarea class="form-control custom-input" id="description" name="description"
-                                          required></textarea>
+                                          required>{{old('description')}}</textarea>
                             </div>
 
                             <div class="form-row d-flex justify-content-around mb-3">
@@ -88,7 +88,7 @@
         <img src="{{ asset('assets/img/info.svg') }}" alt="Info">
     </span>
                                     <input type="datetime-local" class="form-control custom-input" id="start_date"
-                                           name="start_date"
+                                           name="start_date" value="{{old('start_date')}}"
                                            required>
                                 </div>
                                 <div class="form-group col-md-5 ms-1">
@@ -97,7 +97,7 @@
                                           title="Specify the date and time when your event will conclude. Note: Events should last no more than 5 days.">
         <img src="{{ asset('assets/img/info.svg') }}" alt="Info">
     </span>
-                                    <input type="datetime-local" class="form-control custom-input" id="end_date"
+                                    <input type="datetime-local" class="form-control custom-input" id="end_date" value="{{old('end_date')}}"
                                            name="end_date"
                                            required>
                                 </div>
@@ -110,7 +110,7 @@
         <img src="{{ asset('assets/img/info.svg') }}" alt="Info">
     </span>
                                 <input type="number" class="form-control custom-input" id="start_tickets_qty"
-                                       name="start_tickets_qty"
+                                       name="start_tickets_qty" value="{{old('start_tickets_qty')}}"
                                        required>
                             </div>
 
@@ -121,7 +121,7 @@
                                       title="Enter the price for each ticket. Set the price as 0 for free events. Ensure the price reflects the value of the event experience.">
         <img src="{{ asset('assets/img/info.svg') }}" alt="Info">
     </span>
-                                <input type="number" step="0.01" class="form-control custom-input" id="current_price"
+                                <input type="number" step="0.01" class="form-control custom-input" id="current_price" value="{{old('current_price')}}"
                                        name="current_price" required>
                             </div>
 
