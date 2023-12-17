@@ -75,7 +75,7 @@ class Event extends BaseModel
     {
         return $this->hasMany(EventNotification::class, 'event_id');
     }
-    
+
     public function event_report()
     {
         return $this->hasMany(EventReport::class, 'event_id');
