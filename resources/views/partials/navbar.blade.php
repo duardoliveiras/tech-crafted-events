@@ -104,7 +104,5 @@
 </script>
 
 <script>
-    var assetUrl = '{{ asset('
-    storage / ') }}';
-
+    var assetUrl = '{{ asset('storage/') }}';
 </script>
