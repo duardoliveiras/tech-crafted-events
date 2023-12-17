@@ -90,3 +90,11 @@
     font-weight: bold !important;
     border-color: rgba(104, 124, 148, 0.27) !important;
 }
+
+.custom-button {
+    background: linear-gradient(to left, #7848F4, #5827D8);
+    font-size: 1.4rem !important;
+    font-weight: bolder !important;
+    border: none !important;
+    width: 40% !important;
+}

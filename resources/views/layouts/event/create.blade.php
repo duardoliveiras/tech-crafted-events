@@ -36,13 +36,21 @@
                             @csrf
 
                             <div class="form-group mb-3">
-                                <label class="custom-label" for="name">Event Name:</label>
-                                <input type="text" class="form-control custom-input" id="name" name="name" required>
+                                <label class="custom-label" for="name">Event Name</label>
+                                <span class="ms-1 custom-label" data-toggle="tooltip" data-placement="top"
+                                      title="Enter the name of the event as you want it to appear on promotional materials and event listings.">
+        <img src="{{ asset('assets/img/info.svg') }}" alt="Info">
+    </span>
+                                <input type="text" class="form-control custom-input" id="name" name="name" value="{{ old('name') }}" required>
                             </div>
 
                             <div class="form-group mb-3">
-                                <label class="custom-label" for="image_url">Event Image:</label>
-                                <input type="file" class="form-control custom-input" id="image_url" name="image_url"
+                                <label class="custom-label" for="image_url">Event Image</label>
+                                <span class="ms-1 custom-label" data-toggle="tooltip" data-placement="top"
+                                      title="Upload an eye-catching image for your event. This will be displayed on the event's preview card.">
+        <img src="{{ asset('assets/img/info.svg') }}" alt="Info">
+    </span>
+                                <input type="file" class="form-control custom-input" id="image_url" value="{{ old('image_url') }}" name="image_url"
                                        accept="image/jpeg, image/png, image/jpg, image/gif, image/svg+xml" required>
                                 <small class="form-text text-muted">Image must be in JPEG, PNG, JPG, GIF, or SVG format
                                     and have a maximum size of 2MB.</small>
@@ -50,6 +58,10 @@
 
                             <div class="form-group mb-3">
                                 <label class="custom-label" for="category_id">Category</label>
+                                <span class="ms-1 custom-label" data-toggle="tooltip" data-placement="top"
+                                      title="Choose the category that best describes your event, helping attendees find it more easily.">
+        <img src="{{ asset('assets/img/info.svg') }}" alt="Info">
+    </span>
                                 <select class="form-control custom-input" id="category_id" name="category_id">
                                     <option value="">Select a Category</option>
                                     @foreach ($categories as $category)
@@ -59,42 +71,67 @@
                             </div>
 
                             <div class="form-group mb-3">
-                                <label class="custom-label" for="description">Description:</label>
+                                <label class="custom-label" for="description">Description</label>
+                                <span class="ms-1 custom-label" data-toggle="tooltip" data-placement="top"
+                                      title="Provide a detailed description of what attendees can expect at your event. Be clear and engaging!">
+        <img src="{{ asset('assets/img/info.svg') }}" alt="Info">
+    </span>
                                 <textarea class="form-control custom-input" id="description" name="description"
-                                          required></textarea>
+                                          required>{{old('description')}}</textarea>
                             </div>
 
                             <div class="form-row d-flex justify-content-around mb-3">
                                 <div class="form-group col-md-5 me-1">
-                                    <label class="custom-label" for="start_date">Start Date:</label>
+                                    <label class="custom-label" for="start_date">Start Date</label>
+                                    <span class="ms-1 custom-label" data-toggle="tooltip" data-placement="top"
+                                          title="Set the date and time when your event will begin.">
+        <img src="{{ asset('assets/img/info.svg') }}" alt="Info">
+    </span>
                                     <input type="datetime-local" class="form-control custom-input" id="start_date"
-                                           name="start_date"
+                                           name="start_date" value="{{old('start_date')}}"
                                            required>
                                 </div>
                                 <div class="form-group col-md-5 ms-1">
-                                    <label class="custom-label" for="end_date">End Date:</label>
-                                    <input type="datetime-local" class="form-control custom-input" id="end_date"
+                                    <label class="custom-label" for="end_date">End Date</label>
+                                    <span class="ms-1 custom-label" data-toggle="tooltip" data-placement="top"
+                                          title="Specify the date and time when your event will conclude. Note: Events should last no more than 5 days.">
+        <img src="{{ asset('assets/img/info.svg') }}" alt="Info">
+    </span>
+                                    <input type="datetime-local" class="form-control custom-input" id="end_date" value="{{old('end_date')}}"
                                            name="end_date"
                                            required>
                                 </div>
                             </div>
 
                             <div class="form-group mb-3">
-                                <label class="custom-label" for="start_tickets_qty">Start Tickets Quantity:</label>
+                                <label class="custom-label" for="start_tickets_qty">Start Tickets Quantity</label>
+                                <span class="ms-1 custom-label" data-toggle="tooltip" data-placement="top"
+                                      title="Specify the initial quantity of tickets available for your event. Adjustments can be made later if needed.">
+        <img src="{{ asset('assets/img/info.svg') }}" alt="Info">
+    </span>
                                 <input type="number" class="form-control custom-input" id="start_tickets_qty"
-                                       name="start_tickets_qty"
+                                       name="start_tickets_qty" value="{{old('start_tickets_qty')}}"
                                        required>
                             </div>
 
+
                             <div class="form-group mb-3">
-                                <label class="custom-label" for="current_price">Ticket Price:</label>
-                                <input type="number" step="0.01" class="form-control custom-input" id="current_price"
+                                <label class="custom-label" for="current_price">Ticket Price</label>
+                                <span class="ms-1 custom-label" data-toggle="tooltip" data-placement="top"
+                                      title="Enter the price for each ticket. Set the price as 0 for free events. Ensure the price reflects the value of the event experience.">
+        <img src="{{ asset('assets/img/info.svg') }}" alt="Info">
+    </span>
+                                <input type="number" step="0.01" class="form-control custom-input" id="current_price" value="{{old('current_price')}}"
                                        name="current_price" required>
                             </div>
 
                             <div class="form-group mb-3">
                                 <label class="custom-label" for="address_search">Search Address (City, State,
-                                    Country): </label>
+                                    Country)</label>
+                                <span class="ms-1 custom-label" data-toggle="tooltip" data-placement="top"
+                                      title="Type the event's location details such as city, state or province, and country to ensure accurate mapping and easy location by attendees.">
+        <img src="{{ asset('assets/img/info.svg') }}" alt="Info">
+    </span>
                                 <div class="input-group mb-3">
                                     <input type="text" class="form-control custom-input" id="address_search"
                                            name="address_search"
@@ -118,7 +155,11 @@
 
                             <div class="form-group mb-3">
                                 <label class="custom-label" for="address">Address Description (Number, Neighborhood,
-                                    Reference):</label>
+                                    Reference)</label>
+                                <span class="ms-1 custom-label" data-toggle="tooltip" data-placement="top"
+                                      title="Type more information about event's address.">
+        <img src="{{ asset('assets/img/info.svg') }}" alt="Info">
+    </span>
                                 <input type="text" class="form-control custom-input" id="address" name="address"
                                        placeholder="Type address's number, neighborhood, reference..." required>
                             </div>

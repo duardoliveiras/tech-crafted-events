@@ -81,4 +81,16 @@ class Event extends BaseModel
         return $this->hasMany(EventReport::class, 'event_id');
     }
 
+    public function userCanBuyTicket(): bool
+    {
+        foreach ($this->ticket as $ticket) {
+            // Check if the ticket belongs to the current user
+            if ($ticket->user_id === auth()->id() && !$ticket->canBuyTicket()) {
+                // If the user has a ticket and they cannot buy a new one, return false
+                return false;
+            }
+        }
+        return true;
+    }
+
 }
