@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Admin;
+use App\Models\Event;
+use App\Models\Comment;
 use App\Models\University;
 use App\Models\EventReport;
-use App\Models\User;
-use App\Models\Event;
+use Illuminate\Http\Request;
+use App\Models\CommentReport;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class AdminController extends Controller
 {
@@ -84,8 +86,17 @@ class AdminController extends Controller
         ])->get();
 
         $events = $events->sortByDesc('event_report_count');
-    
-        return view('layouts.admin.reports', compact('events'));
+
+        $comments = Comment::where('is_deleted', false)
+            ->whereHas('comment_report', fn($query) => $query->where('analyzed', false))
+            ->withCount([
+                'comment_report as comment_report_count' => function ($query){
+                    $query->where('analyzed', false);
+                }
+            ])->get();
+        $comments = $comments->sortByDesc('event_report_count');
+  
+        return view('layouts.admin.reports', compact('events', 'comments'));
         
     }
 
@@ -103,9 +114,25 @@ class AdminController extends Controller
             ->with('user')
             ->get();
         }
-
-        
-        
+  
         return response()->json($eventReports);
+    }
+
+    public function commentReports($userId, $reason)
+    {
+        if($reason == "All"){
+            $commentReports = CommentReport::where('user_id', $userId)
+            ->where('analyzed', false)
+            ->with('user')
+            ->get();
+        }else{
+            $commentReports = CommentReport::where('user_id', $userId)
+            ->where('reason', $reason)
+            ->where('analyzed', false)
+            ->with('user')
+            ->get();
+        }
+        
+        return response()->json($commentReports);
     }
 }
