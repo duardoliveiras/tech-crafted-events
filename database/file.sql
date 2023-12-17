@@ -13,7 +13,8 @@ DROP TYPE IF EXISTS NotificationType CASCADE;
 DROP TYPE IF EXISTS ticket_status CASCADE;
 DROP TYPE IF EXISTS event_status CASCADE;
 DROP TYPE IF EXISTS report_reason CASCADE;
-DROP TABLE IF EXISTS event_report CASCADE;
+DROP TABLE IF EXISTS event_report;
+drop table if exists comment_report; 
 DROP TABLE IF EXISTS Users CASCADE;
 DROP TABLE IF EXISTS University CASCADE;
 DROP TABLE IF EXISTS Event CASCADE;
@@ -72,17 +73,19 @@ CREATE TABLE University
 
 CREATE TABLE Users
 (
-    id            UUID PRIMARY KEY,
-    name          VARCHAR(255) NOT NULL,
-    phone         CHAR(20)     NOT NULL,
-    email         VARCHAR(255) NOT NULL UNIQUE,
-    password      VARCHAR(255) NOT NULL,
-    birthDate     DATE         NOT NULL,
-    university_id UUID         NOT NULL,
+    id             UUID PRIMARY KEY,
+    name           VARCHAR(255) NOT NULL,
+    phone          CHAR(20)     NOT NULL,
+    email          VARCHAR(255) NOT NULL UNIQUE,
+    password       VARCHAR(255),
+    provider       VARCHAR(255),
+    provider_token VARCHAR(255),
+    birthDate      DATE         NOT NULL,
+    university_id  UUID         NOT NULL,
     FOREIGN KEY (university_id) REFERENCES University (id),
-    is_banned     BOOLEAN DEFAULT FALSE,
-    is_deleted    BOOLEAN DEFAULT FALSE,
-    image_url     VARCHAR(255) NOT NULL
+    is_banned      BOOLEAN DEFAULT FALSE,
+    is_deleted     BOOLEAN DEFAULT FALSE,
+    image_url      VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE EventOrganizer
@@ -215,6 +218,18 @@ create table event_report (
     analyzed bool default false,
     foreign key (user_id) references Users (id),
     foreign key (event_id) references Event (id)
+);
+
+create table comment_report (
+	id UUID primary key,
+	user_id UUID not null,
+	comment_id UUID not null,
+	reason report_reason not null,
+	description text,
+	created_at timestamp not null default now(),
+	analyzed bool default false,
+	foreign key (user_id) references Users (id),
+	foreign key (comment_id) references comment (id)
 );
 
 CREATE OR REPLACE FUNCTION notify_event_update()

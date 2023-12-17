@@ -2,38 +2,37 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Event;
-use App\Models\EventReport;
+use App\Models\Comment;
 use Illuminate\Http\Request;
 use App\Models\CommentReport;
 use Illuminate\Support\Facades\Auth;
 
-class EventReportController extends Controller
+class CommentReportController extends Controller
 {
-    public function postReport(Request $request, $eventId)
-    {   
+    public function postReport(Request $request, $eventId, $commentId){
         $request->validate([
-            'reportReason' => 'required'
+            'description' => 'reportRequired'
         ]);
 
-        $report = new EventReport([
-            'event_id' => $eventId,
+        $report = new CommentReport([
+            'comment_id' => $commentId,
             'user_id' => Auth::id(),
             'reason' => $request->reportReason,
             'description' => $request->reportDescription
-            
         ]);
 
         $report->save();
 
-        return redirect()->to(route('events.show', $eventId))->with(
+        return redirect()->to(route('discussion.show', $eventId))->with(
             "success", "Your report will be analyzed by the team"
         );
     }
 
-    public function checkOneReportEvent($reportId)
+    public function checkOneReportComment($reportId)
     {
-        $report = EventReport::find($reportId);
+        $report = CommentReport::find($reportId);
 
         if($report){
             $report->update(['analyzed' => true]);
@@ -44,21 +43,8 @@ class EventReportController extends Controller
 
 
     }
-
-    public function banEvent($eventId)
-    {
-        $event = Event::find($eventId);
-
-        if($event){
-            $event->update(['status' => 'BANNED']);
-            return response()->json(['message' => 'Event successfully banned.']);
-        }else{
-            return response()->json(['error' => 'Event not found'], 404);
-        }
-    }
-
-    public function check_all_event($eventId){
-        $reports = EventReport::where('event_id', $eventId)->get();
+    public function check_all_comment($userId){
+        $reports = CommentReport::where('user_id', $userId)->get();
 
         if($reports){
             foreach($reports as $report){
@@ -72,6 +58,21 @@ class EventReportController extends Controller
         }
         
     }
+
+    public function banComment($commentId){
+        $comment = Comment::find($commentId);
+        $user = User::find($comment->user_id);
+
+        if($user && $comment){
+            $user->update([
+                'is_banned' => true
+            ]);
+            $comment->update([
+                'is_deleted' => true
+            ]);
+            return response()->json(['message' => 'Banned with success.']);
+        }else{
+            return response()->json(['error' => 'User not found.'], 404);
+        }
+    }
 }
-
-

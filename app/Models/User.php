@@ -36,7 +36,9 @@ class User extends Authenticatable
         'is_deleted',
         'is_banned',
         'university_id',
-        'image_url'
+        'image_url',
+        'provider',
+        'provider_token'
     ];
 
 
@@ -119,7 +121,8 @@ class User extends Authenticatable
             ->pluck('vote_type', 'comment_id');
     }
 
-    public function event_report(){
+    public function event_report()
+    {
         return $this->hasMany(EventReport::class, 'user_id');
     }
 
@@ -128,7 +131,7 @@ class User extends Authenticatable
         parent::boot();
 
         static::creating(function ($model) {
-            $model->{$model->getKeyName()} = (string)Str::uuid();
+            $model->{$model->getKeyName()} = (string) Str::uuid();
         });
     }
 

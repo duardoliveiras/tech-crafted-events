@@ -1,21 +1,23 @@
 <?php
 
+use App\Http\Controllers\Auth\ProviderController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\StripeController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\MyEventsController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DiscussionController;
+use App\Http\Controllers\UniversityController;
 use App\Http\Controllers\EventReportController;
 use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\EventOrganizerController;
+use App\Http\Controllers\CommentReportController;
 use App\Http\Controllers\NotificationsController;
+use App\Http\Controllers\EventOrganizerController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
-use App\Http\Controllers\StripeController;
-use App\Http\Controllers\UniversityController;
 
 
 // Home
@@ -31,6 +33,7 @@ Route::controller(LoginController::class)->group(function () {
 Route::controller(RegisterController::class)->group(function () {
     Route::get('/register', 'showRegistrationForm')->name('register');
     Route::post('/register', 'register');
+    Route::post('/register-complete', 'registerComplete')->name('register-complete');
 });
 
 \Illuminate\Support\Facades\Auth::routes();
@@ -44,6 +47,10 @@ Route::view('/about', 'about')->name('about');
 
 Route::resource('profile', UserController::class);
 Route::get('/my-events', [MyEventsController::class, 'index'])->name('my_events.index');
+
+// Socialite
+Route::get('/auth/{provider}/redirect', [ProviderController::class, 'redirect']);
+Route::get('/auth/{provider}/callback', [ProviderController::class, 'callback']);
 
 //Notifications
 Route::get('/load-notifications', [NotificationsController::class, 'index'])->name('notifications.index');
@@ -69,15 +76,24 @@ Route::middleware(['auth', 'admin'])->group(function () {
 // Events
 Route::resource('events', EventController::class);
 Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
+
 //Reports
 Route::post('/events/{event}/report', [EventReportController::class, 'postReport'])->name('event-report.store');
-Route::get('/admin/reports/load-reports/{event}/{reason}', [AdminController::class, 'eventReports'])->name('event-reports');
 
-Route::put('/events/{event}/check-all',[EventReportController::class, 'check_all_reports']);
-//
-Route::put('admin/reports/check/{reportId}', [EventReportController::class, 'checkOneReport'])->name('check-one-report');
+Route::get('/admin/reports/reports-events/{event}/{reason}', [AdminController::class, 'eventReports'])->name('event-reports');
+Route::get('/admin/reports/reports-comments/{user}/{reason}', [AdminController::class, 'commentReports'])->name('comment-reports');
+
+Route::put('/events/{event}/check-all-event', [EventReportController::class, 'check_all_event']);
+Route::put('/events/{user}/check-all-comment', [CommentReportController::class, 'check_all_comment']);
+Route::post('events/{event}/discussion/{comment}/report', [CommentReportController::class, 'postReport'])->name('comment-report.store');
+//Dashboard
+Route::put('admin/reports/check-event/{reportId}', [EventReportController::class, 'checkOneReportEvent']);
+Route::put('admin/reports/check-comment/{reportId}', [CommentReportController::class, 'checkOneReportComment']);
 Route::put('admin/reports/check-all/{event}', [EventReportController::class, 'checkAllReport'])->name('check-all-report');
-Route::put('admin/reports/ban/{event}', [EventReportController::class, 'banEvent'])->name('ban-event');
+
+Route::put('admin/reports/ban/event/{event}', [EventReportController::class, 'banEvent'])->name('ban-event');
+Route::put('admin/reports/ban/comment/{comment}', [CommentReportController::class, 'banComment']);
+
 Route::post('/events/leave/{event_id}/{ticket_id}', [EventController::class, 'leave'])->name('events.leave');
 Route::get('/events/byPass/{event_id}/{ticket_id}', [EventController::class, 'byPassTicketShow'])->name('events.byPassTicketShow');
 

@@ -16,6 +16,9 @@ class DatabaseSeeder extends Seeder
         $path = base_path('database/file.sql');
         $sql = file_get_contents($path);
         DB::unprepared($sql);
+
+        $this->call(EventSeeder::class);
+
         $this->command->info('Database tech crafted seeded!');
     }
 }
