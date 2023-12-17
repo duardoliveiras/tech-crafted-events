@@ -22,7 +22,7 @@
         <p class="text-center mb-5">TechCrafted is dedicated to enhancing the faculty event management experience at
             FEUP, engineered by students for students.</p>
 
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-5">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-5 d-flex justify-content-center">
             @php
                 $developers = [
                     ['name' => 'Bernardo', 'image' => 'bernardo.jpg', 'github' => 'https://github.com/brito-bernardo'],
