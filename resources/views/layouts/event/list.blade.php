@@ -5,7 +5,6 @@
 @section('content')
     <!-- Success Message -->
     @if(session('success'))
-        @php echo "deu bom" @endphp
         <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
             <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header" style="background-color: #308329;color: white;">
