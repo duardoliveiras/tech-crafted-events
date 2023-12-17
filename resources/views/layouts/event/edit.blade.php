@@ -40,12 +40,12 @@
 
                     <div class="mb-3">
                         <label for="start_date" class="form-label">Start Date</label>
-                        <input type="datetime-local" class="form-control" id="start_date" name="start_date" value="{{ old('start_date', $event->start_date) }}" required>
+                        <input type="datetime-local" class="form-control" id="start_date" name="start_date" value="{{ old('start_date', isset($event->start_date) ? $event->start_date->format('Y-m-d\TH:i') : '') }}" required>
                     </div>
 
                     <div class="mb-3">
                         <label for="end_date" class="form-label">End Date</label>
-                        <input type="datetime-local" class="form-control" id="end_date" name="end_date" value="{{ old('end_date', $event->end_date) }}" required>
+                        <input type="datetime-local" class="form-control" id="end_date" name="end_date" value="{{ old('end_date', isset($event->end_date) ? $event->end_date->format('Y-m-d\TH:i') : '') }}" required>
                     </div>
 
                     <div class="mb-3">
