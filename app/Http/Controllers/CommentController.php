@@ -20,7 +20,7 @@ class CommentController extends Controller
     {
         $request->validate([
             'content' => 'required|string',
-            'attachment' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+            'attachment' => 'file|mimes:jpeg,png,jpg,gif,svg,pdf,txt|max:2048'
         ]);
 
         $filePath = null;
