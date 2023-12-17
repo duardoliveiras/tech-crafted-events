@@ -3,6 +3,37 @@
 <link rel="stylesheet" type="text/css" href="{{URL::asset('/assets/css/list-event.css')}}">
 
 @section('content')
+    <!-- Success Message -->
+    @if(session('success'))
+        @php echo "deu bom" @endphp
+        <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+            <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header" style="background-color: #308329;color: white;">
+                    <strong class="me-auto" style="font-size: 1.2rem;font-weight: bolder;">Success</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body" style="font-size: 1rem;font-weight: bolder;">
+                    {{ session('success') }}
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Error Message -->
+    @if(session('error'))
+        <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+            <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header" style="background-color: #f06f6f;color: white;">
+                    <strong class="me-auto" style="font-size: 1.2rem;font-weight: bolder;">Error</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body" style="font-size: 1rem;font-weight: bolder;">
+                    {{ session('error') }}
+                </div>
+            </div>
+        </div>
+    @endif
+
     <div class="container my-3 filters-container">
         <form class="mb-0" id="filter-form">
             <div class="form-row d-flex flex-row justify-content-around mx-4">
