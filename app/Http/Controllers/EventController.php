@@ -387,7 +387,7 @@ class EventController extends Controller
         return Event::findOrFail($id);
     }
 
-    private function findTicketById($id)
+    private function findTicketById($id): Ticket
     {
         return Ticket::findOrFail($id);
     }
@@ -418,9 +418,13 @@ class EventController extends Controller
 
             $this->stripeController->refundPaymentFromUser($event, Auth::id());
 
-            return redirect()->route('events.index')->with('success', 'Event deleted successfully.');
+            $ticket = $this->findTicketById($ticketId);
+
+            $ticket->markTicketAsCanceled();
+
+            return redirect()->route('events.index')->with('success', 'Leaved from event "' . $event->name . '" successfully.');
         } catch (\Exception $e) {
-            return redirect()->route('events.index')->with('error', 'Error deleting event');
+            return redirect()->route('events.index')->with('error', 'Error deleting event. Cause: ' . $e->getMessage());
         }
     }
 }
