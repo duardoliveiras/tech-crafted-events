@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Models\User;
 use App\Models\University;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 
 class ProviderController extends Controller
@@ -18,8 +20,15 @@ class ProviderController extends Controller
     {
         $user = Socialite::driver($provider)->user();
         $universities = University::get();
+        $login = User::where('email', $user->email)->first();
 
-        return view('register-provider', ['universities' => $universities, 'user' => $user, 'provider' => $provider]);
+        if ($login) {
+            Auth::login($login);
+            return redirect('/home');
+        } else {
+            return view('register-provider', ['universities' => $universities, 'user' => $user, 'provider' => $provider]);
+        }
+
     }
 
 

@@ -16,7 +16,7 @@
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col-md-4 text-center mb-3 mb-md-0">
-                            @if($user->provider == 'google')
+                            @if($user->provider !== null)
                             <img src="{{ $user->image_url ? $user->image_url : 'https://static-00.iconduck.com/assets.00/user-icon-2048x2048-ihoxz4vq.png' }}" alt="avatar" class="img-fluid rounded" style="max-width: 150px; height: auto;" />
                             @else
                             <img src="{{ $user->image_url ? asset('storage/' . $user->image_url) : 'https://static-00.iconduck.com/assets.00/user-icon-2048x2048-ihoxz4vq.png' }}" alt="avatar" class="img-fluid rounded" style="max-width: 150px; height: auto;" />

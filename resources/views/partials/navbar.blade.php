@@ -58,7 +58,7 @@
                 </li>
                 <li class="nav-item dropdown">
                     <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                        @if(Auth::user()->provider == 'google')
+                        @if(Auth::user()->provider !== null)
                         <img class="rounded-circle shadow-1-strong me-2" src="{{ Auth::user()->image_url ? Auth::user()->image_url : 'https://static-00.iconduck.com/assets.00/user-icon-2048x2048-ihoxz4vq.png' }}" alt="avatar" width="50" height="50" />
                         @else
                         <img class="rounded-circle shadow-1-strong me-2" src="{{ Auth::user()->image_url ? asset('storage/' . Auth::user()->image_url) : 'https://static-00.iconduck.com/assets.00/user-icon-2048x2048-ihoxz4vq.png' }}" alt="avatar" width="50" height="50" />
