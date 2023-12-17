@@ -101,8 +101,7 @@ class UserController extends Controller
 
         if ($authUser->isAdmin() || $authUser->id == $user->id) {
 
-            $user->is_deleted = true;
-            $user->save();
+            $user->delete();
 
             if (!$authUser->isAdmin() || $authUser->id == $user->id) {
                 Auth::logout();
