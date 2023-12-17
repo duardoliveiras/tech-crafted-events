@@ -5,11 +5,16 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">{{ __('Login') }}</div>
-
+                <div class="card-header">Seja bem vindo, {{ $user->name }}</div>
                 <div class="card-body">
-                    <form method=" POST" action="{{ route('login') }}">
+                    <form method="POST" action="{{ route('register-complete') }}">
                         @csrf
+                        <input type="hidden" name="provider" value="{{ $provider }}">
+                        <input type="hidden" name="name" value="{{ $user->name }}">
+                        <input type="hidden" name="email" value="{{ $user->email }}">
+                        <input type="hidden" name="provider_token" value="{{ $user->token }}">
+                        <input type="hidden" name="image_url" value="{{ $user->avatar }}">
+
                         <div class="row mb-3">
                             <label class="col-md-4 col-form-label text-md-end" for="university_id">Your university</label>
                             <div class="col-md-6">
@@ -21,7 +26,6 @@
                                 </select>
                             </div>
                         </div>
-
 
                         <div class="row mb-3">
                             <label class="col-md-4 col-form-label text-md-end" for="phone">{{ __('Phone') }}</label>

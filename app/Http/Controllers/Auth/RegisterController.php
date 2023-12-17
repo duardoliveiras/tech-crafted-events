@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
-use App\Models\University;
 use App\Models\User;
-use App\Providers\RouteServiceProvider;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Foundation\Auth\RegistersUsers;
-use Illuminate\Http\JsonResponse;
+use App\Models\University;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Intervention\Image\Facades\Image;
+use Illuminate\Auth\Events\Registered;
+use App\Providers\RouteServiceProvider;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Intervention\Image\Facades\Image;
+use Illuminate\Foundation\Auth\RegistersUsers;
 
 class RegisterController extends Controller
 {
@@ -83,7 +84,7 @@ class RegisterController extends Controller
                 $image = Image::make($imageFile);
 
                 $imagePath = 'users/' . $imageFile->hashName();
-                Storage::disk('public')->put($imagePath, (string)$image->encode());
+                Storage::disk('public')->put($imagePath, (string) $image->encode());
 
                 $imageUrl = $imagePath;
             }
@@ -119,6 +120,27 @@ class RegisterController extends Controller
         return $request->wantsJson()
             ? new JsonResponse([], 201)
             : redirect($this->redirectPath());
+    }
+
+    public function registerComplete(Request $request)
+    {
+        $user =
+            User::updateOrCreate([
+                'email' => $request['email']]
+                , [
+                    'name' => $request['name'],
+                    'email' => $request['email'],
+                    'phone' => $request['phone'],
+                    'birthdate' => $request['birthdate'],
+                    'university_id' => $request['university_id'],
+                    'image_url' => $request['image_url'],
+                    'provider' => $request['provider'],
+                    'provider_token' => $request['provider_token']
+                ]);
+
+        Auth::login($user);
+        return redirect('/home');
+
     }
 
 

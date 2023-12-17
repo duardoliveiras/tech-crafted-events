@@ -33,6 +33,7 @@ Route::controller(LoginController::class)->group(function () {
 Route::controller(RegisterController::class)->group(function () {
     Route::get('/register', 'showRegistrationForm')->name('register');
     Route::post('/register', 'register');
+    Route::post('/register-complete', 'registerComplete')->name('register-complete');
 });
 
 \Illuminate\Support\Facades\Auth::routes();

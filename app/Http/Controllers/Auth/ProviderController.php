@@ -18,6 +18,9 @@ class ProviderController extends Controller
     {
         $user = Socialite::driver($provider)->user();
         $universities = University::get();
-        return view('register-provider', compact('universities'));
+
+        return view('register-provider', ['universities' => $universities, 'user' => $user, 'provider' => $provider]);
     }
+
+
 }
