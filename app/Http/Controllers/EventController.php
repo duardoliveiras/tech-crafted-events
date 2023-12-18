@@ -314,7 +314,7 @@ class EventController extends Controller
             $event->image_url = $this->uploadImage($request->file('image_url'));
         }
 
-        $event->update($validatedData);
+        $event->update(array_merge($validatedData, ['current_tickets_qty' => $request->input('current_tickets_qty')]));
 
         return $event;
     }
