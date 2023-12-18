@@ -29,7 +29,7 @@
                                 <h5><i class="fas fa-user"></i> <strong>Name:</strong> {{ $user->name }}</h5>
                                 <p><i class="fas fa-envelope"></i> <strong>E-mail:</strong> {{ $user->email }}</p>
                                 <p><i class="fas fa-birthday-cake"></i> <strong>Birthdate:</strong> {{ $user->birthdate }}</p>
-                                <p><i class="fas fa-phone"></i> <strong>Phone number:</strong> {{ $user->phone }}</p>
+                                <p><i class="fas fa-phone_number"></i> <strong>Phone Number</strong> {{ $user->phone_number }}</p>
                             </div>
                             <!-- Fim da Estilização dos Dados do Usuário -->
 

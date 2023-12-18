@@ -60,7 +60,7 @@ class RegisterController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'phone' => ['string', 'max:20'],
+            'phone_number' => ['string', 'max:20'],
             'birthdate' => ['date', 'before:' . now()->subYears(12)->format('Y-m-d')],
             'university_id' => 'required|exists:university,id',
         ]);
@@ -94,7 +94,7 @@ class RegisterController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'phone' => $data['phone'],
+            'phone_number' => $data['phone_number'],
             'birthdate' => $data['birthdate'],
             'university_id' => $data['university_id'],
             'image_url' => $imageUrl
@@ -130,7 +130,7 @@ class RegisterController extends Controller
                 , [
                     'name' => $request['name'],
                     'email' => $request['email'],
-                    'phone' => $request['phone'],
+                    'phone_number' => $request['phone_number'],
                     'birthdate' => $request['birthdate'],
                     'university_id' => $request['university_id'],
                     'image_url' => $request['image_url'],
