@@ -98,7 +98,7 @@ class AdminController extends Controller
                     $query->where('analyzed', false);
                 }
             ])->get();
-        $comments = $comments->sortByDesc('event_report_count');
+        $comments = $comments->sortByDesc('comment_report_count');
 
         return view('layouts.admin.reports', compact('events', 'comments'));
 
