@@ -5,7 +5,7 @@
         <li> &nbsp; / {{ $event->name }} </li>
     @endsection
 
-    <div class="container mt-5">
+    <div class="container">
         @if(session('success'))
             <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 999">
                 <div id="liveToast" class="toast show" role="alert" aria-live="assertive"
@@ -41,108 +41,253 @@
             </div>
         @endif
         <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card mb-4 shadow-sm" style="transition: transform .2s;">
-                    <div class="row no-gutters">
-                        <div class="col-md-4">
-                            @if($event->image_url)
-                                <img src="{{asset('storage/' . $event->image_url) }}" class="card-img" alt="Event Image"
-                                     style="height: 100%; object-fit: cover;">
-                            @endif
-                        </div>
-                        <div class="col-md-8">
-
-                            <div class="card-body">
-                                <button type="button" class="btn btn-outline-danger position-absolute top-0 end-0 m-1"
-                                        data-toggle="modal" data-target="#reportModal">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                         class="bi bi-flag-fill" viewBox="0 0 16 16">
-                                        <path d="M14.778.085A.5.5 0 0 1 15 .5V8a.5.5 0 0 1-.314.464L14.5 8l.186.464-.003.001-.006.003-.023.009a12.435 12.435 0 0 1-.397.15c-.264.095-.631.223-1.047.35-.816.252-1.879.523-2.71.523-.847 0-1.548-.28-2.158-.525l-.028-.01C7.68 8.71 7.14 8.5 6.5 8.5c-.7 0-1.638.23-2.437.477A19.626 19.626 0 0 0 3 9.342V15.5a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 1 0v.282c.226-.079.496-.17.79-.26C4.606.272 5.67 0 6.5 0c.84 0 1.524.277 2.121.519l.043.018C9.286.788 9.828 1 10.5 1c.7 0 1.638-.23 2.437-.477a19.587 19.587 0 0 0 1.349-.476l.019-.007.004-.002h.001"/>
-                                    </svg>
-                                    Report
-                                </button>
-                                <h5 class="card-title">{{ $event->name }}</h5>
-                                <p class="card-text">{{ $event->description }}</p>
-                                <p class="card-text"><small class="text-muted">Tickets
-                                        Available: {{ $event->current_tickets_qty }}</small></p>
-                                <p class="card-text"><small class="text-muted">Price:
-                                        ${{ number_format($event->current_price, 2) }}</small></p>
-
-                                @if(auth()->check())
-                                    @php
-                                        $userTickets = $event->ticket->where('user_id', auth()->id());
-                                        $userTicket = null; // Initialize $userTicket as null
-                                        foreach ($userTickets as $ticket) {
-                                            if ($ticket && $ticket->isValidTicket()) {
-                                                $userTicket = $ticket;
-                                                break;
-                                            }
-                                        }
-                                        $user = auth()->user();
-                                        $isOwner = $user->id == $event->owner->user_id;
-                                        $isAdmin = $user->isAdmin();
-                                        $isOwnerOrAdmin = $isOwner || $isAdmin;
-
-                                        $canBuyTicket = auth()->check() && $event->current_tickets_qty > 0 && $event->userCanBuyTicket() && !$isOwnerOrAdmin;
-                                        $isTicketPending = $event->ticket->where('user_id', auth()->id())->where('status', 'PENDING')->count() > 0;
-                                    @endphp
-
-                                    @if($canBuyTicket)
-                                        @if($isTicketPending)
-                                            <button class="btn btn-secondary disabled">Ticket Purchase Pending</button>
-                                        @else
-                                            <a href="{{ route('ticket.buy', ['event' => $event->id]) }}"
-                                               class="btn btn-success">Buy Ticket</a>
-                                        @endif
-                                    @endif
-                                    @if($userTicket || $isOwnerOrAdmin)
-                                        <a href="{{ route('discussion.show', ['event' => $event->id]) }}"
-                                           class="btn btn-primary m-1">Access Discussion</a>
-                                        @if($userTicket && !$isOwnerOrAdmin)
-                                            <a href="{{ route('ticket.show', ['event' => $event->id, 'ticket' => $userTicket->id]) }}"
-                                               class="btn btn-info m-1">Access Ticket</a>
-
-                                            <form action="{{ route('events.leave', ['event_id' => $event->id, 'ticket_id' => $userTicket->id]) }}"
-                                                  method="POST" style="display:inline-block;">
-                                                @csrf
-                                                <button type="submit" class="btn btn-info m-1">Leave Event</button>
-                                            </form>
-
-                                        @endif
-                                    @endif
-                                    @if($isOwnerOrAdmin)
-                                        <a href="{{ route('ticket.authorize', $event->id) }}"
-                                           class="btn btn-warning m-1">Authenticate Ticket</a>
-                                        <a href="{{ route('events.edit', $event->id) }}" class="btn btn-secondary m-1">Edit
-                                            Event</a>
-                                        <a href="{{ route('events.attendees', ['event' => $event->id]) }}"
-                                           class="btn btn-outline-secondary m-1">View attendees</a>
-                                        <form action="{{ route('events.destroy', $event->id) }}" method="POST"
-                                              class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger m-1"
-                                                    onclick="return confirm('Are you sure you want to cancel this event? This action cannot be undone.')">
-                                                Cancel Event
-                                            </button>
-                                        </form>
-                                    @endif
-                                @endif
-                            </div>
-                        </div>
-                    </div>
+            <div class="col-md-8 w-100">
+                <div class="d-flex justify-content-center w-100 image-container">
+                    @if($event->image_url)
+                        <div class="blurred-background"></div>
+                        <img src="{{asset('storage/' . $event->image_url) }}" alt="Event Image">
+                    @endif
                 </div>
             </div>
         </div>
+        <div class="row mt-5">
+            <div class="col-8 box-left">
+                <h1 class="event-name">{{ $event->name }}</h1>
+                <p class="event-description ms-2 mb-2">{{ $event->description }}</p>
+                <h3 class="mt-5">When?</h3>
+                <p class="ms-1"><i class="far fa-calendar-check me-2"></i> Event takes place
+                    between <b>{{\Carbon\Carbon::parse($event->start_date)->format('l, F j, Y, g:i A')}}</b>
+                    and <b>{{\Carbon\Carbon::parse($event->end_date)->format('l, F j, Y, g:i A')}}</b>!</p>
+                <h3>Where?</h3>
+                <p class="ms-1">
+                    <i class="fas fa-map-marker-alt me-2"></i> It will be hosted at
+                    <a class="link-muted text-decoration-none text-reset"
+                       href="https://www.google.com/maps/search/?api=1&query={{ urlencode($event->address . ', ' . $event->city->name) }}">
+                        <b>{{ $event->address }}, {{ $event->city->name }}</b>
+                    </a>
+                </p>
+            </div>
+            <div class="col-1" style="width: 30px;">
+                <div class="vl"></div>
+            </div>
+            <div class="col-3 box-right ms-2 me-0 pe-0">
+                @if(auth()->check())
+                    @php
+                        $userTickets = $event->ticket->where('user_id', auth()->id());
+                        $userTicket = null; // Initialize $userTicket as null
+                        foreach ($userTickets as $ticket) {
+                            if ($ticket && $ticket->isValidTicket()) {
+                                $userTicket = $ticket;
+                                break;
+                            }
+                        }
+                        $user = auth()->user();
+                        $isOwner = $user->id == $event->owner->user_id;
+                        $isAdmin = $user->isAdmin();
+                        $isOwnerOrAdmin = $isOwner || $isAdmin;
+
+                        $canBuyTicket = auth()->check() && $event->current_tickets_qty > 0 && $event->userCanBuyTicket() && !$isOwnerOrAdmin;
+                        $isTicketPending = $event->ticket->where('user_id', auth()->id())->where('status', 'PENDING')->count() > 0;
+                    @endphp
+                    <div class="box-actions ms-5 px-4 py-4 d-flex justify-content-center align-items-center flex-column w-100">
+                        @if($canBuyTicket)
+                            @if($isTicketPending)
+                                <span class="mb-2">You have a ticket pending for payment. If already paid, wait until we detect.</span>
+                                <button class="btn btn-secondary custom-button disabled">Ticket Purchase Pending
+                                </button>
+                            @else
+                                <span class="mb-2">Tickets for € {{ number_format($event->current_price, 2) }}</span>
+                                <a href="{{ route('ticket.buy', ['event' => $event->id]) }}"
+                                   class="btn btn-primary w-100 custom-button"><i class="fas fa-money-bill-wave"></i> Buy now!</a>
+                            @endif
+                        @endif
+
+                        @if($userTicket || $isOwnerOrAdmin)
+                            <h3 style="font-family: 'Raleway', sans-serif;font-weight: bold">Actions</h3>
+                            <a href="{{ route('discussion.show', ['event' => $event->id]) }}"
+                               class="btn btn-primary my-2 custom-button discussion"><i class="far fa-comment-dots"></i>
+                                Access Discussion</a>
+                            @if($userTicket && !$isOwnerOrAdmin)
+                                <a href="{{ route('ticket.show', ['event' => $event->id, 'ticket' => $userTicket->id]) }}"
+                                   class="btn btn-primary my-2 custom-button access-ticket"><i class="fas fa-ticket-alt"></i> Access Ticket</a>
+
+                                <form action="{{ route('events.leave', ['event_id' => $event->id, 'ticket_id' => $userTicket->id]) }}"
+                                      method="POST" class="d-inline-block w-100">
+                                    @csrf
+                                    <button type="submit" class="btn btn-danger my-2 custom-button leave-event"><i class="fas fa-times-circle"></i> Leave
+                                        Event
+                                    </button>
+                                </form>
+
+                            @endif
+                        @endif
+
+                        @if($isOwnerOrAdmin)
+                            <a href="{{ route('ticket.authorize', $event->id) }}"
+                               class="btn btn-primary m-1 custom-button authenticate-ticket"><i class="fas fa-key"></i>
+                                Authenticate Ticket</a>
+                            <a href="{{ route('events.edit', $event->id) }}"
+                               class="btn btn-primary my-2 custom-button edit-event"><i class="far fa-edit"></i> Edit
+                                Event</a>
+                            <form action="{{ route('events.destroy', $event->id) }}" method="POST"
+                                  class="d-inline w-100 m-0 p-0">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger custom-button cancel-event my-2"
+                                        onclick="return confirm('Are you sure you want to cancel this event? This action cannot be undone.')">
+                                    <i class="fas fa-power-off"></i> Cancel Event
+                                </button>
+                            </form>
+                        @endif
+                    </div>
+                @else
+                    <div class="box-actions ms-5 px-4 py-4 d-flex justify-content-center align-items-center flex-column w-100">
+                        <span class="mb-2">Tickets for € {{ number_format($event->current_price, 2) }}</span>
+                        <a href="{{ route('login') }}"
+                           class="btn btn-primary mt-3 custom-button">Login to purchase</a>
+                    </div>
+                @endif
+            </div>
+        </div>
+        @if(auth()->check())
+            <div class="row mt-5">
+                <p class="report-paragraph">
+                    <em>Something wrong with "{{ $event->name }}" event?
+                        <a
+                                role="button"
+                                class="link-muted text-decoration-none text-reset"
+                                data-toggle="modal"
+                                data-target="#reportModal"
+                                aria-label="Report this event for moderation"
+                        >
+                            <u><strong>Report this event</strong></u>
+                        </a>
+                    </em>
+                </p>
+            </div>
+        @endif
+
     </div>
 
     <!-- Report Modal -->
     @include('partials.report', ['event' => $event, 'report' => "event"])
 
-    <script type="text/javascript" src="{{ URL::asset ('js/event/details-event.js') }}"></script>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="{{ URL::asset ('js/event/details-event.js') }}"></script>
 
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@200;300;400;500;600;800&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
+        .event-name {
+            color: #1e0a3c;
+            font-weight: 800;
+            font-size: 2.8rem;
+            font-family: 'Raleway', sans-serif !important;
+        }
+
+        .box-left, .box-right, .box-actions, .report-paragraph {
+            font-family: 'Raleway', sans-serif !important;
+        }
+
+        .report-paragraph {
+            color: #7E7E7E;
+        }
+
+        .report-paragraph a {
+            cursor: pointer;
+            color: #1e0a3c !important;
+        }
+
+        .box-actions {
+            border-radius: 16px;
+            border-color: #d5d4d7;
+            border-width: 1px;
+            border-style: solid;
+        }
+
+        .box-actions span {
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .image-container {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .blurred-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url({{asset('storage/' . $event->image_url) }}); /* Mesma imagem de fundo */
+            background-size: cover;
+            filter: blur(10px);
+            z-index: -1;
+        }
+
+        .image-container img {
+            display: block;
+            width: 100%; /* Define a largura da imagem para 100% do contêiner */
+            max-height: 600px;
+            object-fit: contain; /* Garante que a imagem inteira seja visível */
+            position: relative; /* Isso garante que a imagem fique acima do fundo desfocado */
+        }
+
+
+        .image-container::before, .image-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 20%;
+            z-index: 2;
+        }
+
+        .image-container::before {
+            left: 0;
+            background: linear-gradient(to right, #f8fafc, rgba(248, 250, 252, 0));
+        }
+
+        .image-container::after {
+            right: 0;
+            background: linear-gradient(to left, #f8fafc, rgba(248, 250, 252, 0));
+        }
+
+        .vl {
+            border-left: 2px solid #d5d4d7;
+            height: 300px;
+        }
+
+        .custom-button {
+            background: linear-gradient(to left, #7848F4, #5827D8);
+            font-size: 1.4rem !important;
+            font-weight: bolder !important;
+            border: none !important;
+            width: 100% !important;
+
+            &.discussion {
+                background: linear-gradient(to left, #ffa200, #ff7300);
+            }
+
+            &.access-ticket {
+                background: linear-gradient(to left, #7848F4, #5827D8);
+            }
+
+            &.edit-event {
+                background: linear-gradient(to left, #20a2f0, #1c6999);
+            }
+
+            &.authenticate-ticket {
+                background: linear-gradient(to left, #7848F4, #5827D8);
+            }
+
+            &.leave-event, &.cancel-event {
+                background: linear-gradient(to left, #ff6666, #ff0d0d);
+            }
+        }
+    </style>
 @endsection
