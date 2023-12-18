@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
-       @section('breadcrumbs')
-        <li> 
+    @section('breadcrumbs')
+        <li>
             &nbsp; / <a href="{{ route('profile.show', $user->id) }}">{{$user->name}}</a>
         </li>
         <li>
-            &nbsp; / Edit    
+            &nbsp; / Edit
         </li>
-        @endsection
+    @endsection
     <div class="container mt-5">
         <div class="row">
             <div class="col-md-6 offset-md-3">
@@ -66,7 +66,8 @@
                                          src="{{ $user->image_url ? asset('storage/' . $user->image_url) : 'https://static-00.iconduck.com/assets.00/user-icon-2048x2048-ihoxz4vq.png' }}"
                                          alt="avatar"/>
                                 </div>
-                                <input type="file" class="form-control custom-input image-input" id="image_url"
+                                <input type="file" accept="image/jpeg, image/png, image/jpg, image/gif, image/svg+xml"
+                                       class="form-control custom-input image-input" id="image_url"
                                        name="image_url"
                                        required>
                             </div>

@@ -131,7 +131,7 @@
                 <div id="step-3" class="form-step">
                     <div class="form-row mb-3">
                         <label class="custom-label" for="image_url">User Image:</label>
-                        <input type="file" class="form-control custom-input image-input" id="image_url" name="image_url" required>
+                        <input type="file" accept="image/jpeg, image/png, image/jpg, image/gif, image/svg+xml" class="form-control custom-input image-input" id="image_url" name="image_url" required>
                     </div>
 
                     <div class="modal fade" id="cropImageModal" tabindex="-1" role="dialog" aria-labelledby="cropImageModalLabel" aria-hidden="true">
