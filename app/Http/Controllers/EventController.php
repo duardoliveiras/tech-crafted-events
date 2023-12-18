@@ -188,6 +188,7 @@ class EventController extends Controller
 
     public function create()
     {
+        $this->authorize('create', Event::class);
         $categories = Category::all();
         $eventOrganizer = EventOrganizer::where('user_id', Auth::id())->first();
         $hasLegalId = $eventOrganizer && !is_null($eventOrganizer->legal_id);
@@ -224,6 +225,10 @@ class EventController extends Controller
 
     private function validateEventData(Request $request): array
     {
+        $tomorrow = Carbon::tomorrow()->format('Y-m-d');
+
+        $this->validationRules['start_date'] = 'required|date|after:' . $tomorrow;
+
         $validatedData = $request->validate($this->validationRules);
 
         $startDate = Carbon::parse($validatedData['start_date']);
@@ -321,6 +326,7 @@ class EventController extends Controller
 
     private function validateUpdateData(Request $request): array
     {
+
         $updateValidationRules = array_merge($this->validationRules, [
             'image_url' => 'sometimes|image|max:2048',
         ]);
@@ -348,6 +354,10 @@ class EventController extends Controller
 
             $this->authorizeDeletion($event);
 
+            if ($event->image_url && Storage::disk('public')->exists($event->image_url)) {
+                Storage::disk('public')->delete($event->image_url);
+            }
+
             $this->deleteEventWithDiscussion($event);
 
             return redirect()->route('events.index')->with('success', 'Event deleted successfully.');
@@ -366,6 +376,7 @@ class EventController extends Controller
             $event = $this->findEventById($id);
 
             $this->authorizeDeletion($event);
+
 
             $this->deleteEventWithDiscussion($event);
 
@@ -427,4 +438,11 @@ class EventController extends Controller
             return redirect()->route('events.index')->with('error', 'Error deleting event. Cause: ' . $e->getMessage());
         }
     }
+    public function showAttendees($eventId)
+    {
+        $event = Event::with('ticket.user')->findOrFail($eventId);
+        $this->authorize('showList', $event);
+        return view('layouts.event.attendee', compact('event'));
+    }
+
 }

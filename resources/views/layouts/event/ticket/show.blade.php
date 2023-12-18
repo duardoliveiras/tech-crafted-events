@@ -18,7 +18,7 @@
                         <p>{{ $event->description }}</p>
                         <hr>
                         <p><strong>Start Time:</strong> {{ $event->start_date->format('d M Y, H:i') }}</p>
-                        <p><strong>End Time:</strong> {{ $event->start_date->format('d M Y, H:i') }}</p>
+                        <p><strong>End Time:</strong> {{ $event->end_date->format('d M Y, H:i') }}</p>
                         <p><strong>Location:</strong> {{ $event->address }}</p>
                     </div>
                     <div class="col-lg-4 text-center">
