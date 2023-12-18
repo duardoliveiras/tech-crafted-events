@@ -55,6 +55,7 @@ Route::get('/auth/{provider}/callback', [ProviderController::class, 'callback'])
 //Notifications
 Route::get('/load-notifications', [NotificationsController::class, 'index'])->name('notifications.index');
 Route::put('/update-read/{id}', [NotificationsController::class, 'updateRead'])->name('read-notification');
+Route::post('/update-notification', [NotificationsController::class, 'received'])->name('update-notification');
 
 // Forget Password
 Route::post('/password/email', [ForgotPasswordController::class, 'forgetPasswordPost'])->name('password.email');
@@ -157,3 +158,4 @@ Route::get('/event-organizer', [EventOrganizerController::class, 'show'])
 Route::post('/event-organizer/{legal_id}/{stripe_account_id}', [EventOrganizerController::class, 'create'])
     ->name('event-organizer.create')
     ->middleware(['auth']);
+

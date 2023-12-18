@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NotificationReceived;
 use App\Models\Category;
 use App\Models\City;
 use App\Models\Country;
@@ -71,7 +72,7 @@ class EventController extends Controller
         }
 
         if ($universityFilter) {
-            $query->whereHas('owner.user.university', function($q) use ($universityFilter) {
+            $query->whereHas('owner.user.university', function ($q) use ($universityFilter) {
                 $q->where('university_id', $universityFilter);
             });
         }
@@ -275,7 +276,7 @@ class EventController extends Controller
         $image = Image::make($imageFile);
 
         $imagePath = 'events/' . $imageFile->hashName();
-        Storage::disk('public')->put($imagePath, (string)$image->encode());
+        Storage::disk('public')->put($imagePath, (string) $image->encode());
 
         return $imagePath;
     }
@@ -296,6 +297,7 @@ class EventController extends Controller
     {
         try {
             $event = $this->updateEventData($request, $id);
+            event(new NotificationReceived($id));
             return redirect()->route('events.show', $event->id)->with('success', 'Event updated successfully!');
         } catch (\Exception $e) {
             return redirect()->back()->withInput()->withErrors(['msg' => $e->getMessage()]);
@@ -306,6 +308,7 @@ class EventController extends Controller
     {
         try {
             $event = $this->updateEventData($request, $id);
+            event(new NotificationReceived($id));
             return response()->json(['success' => 'Event updated successfully!', 'event' => $event]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 422);
@@ -388,7 +391,7 @@ class EventController extends Controller
     {
         $pattern = '/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i';
 
-        return (bool)preg_match($pattern, $uuid);
+        return (bool) preg_match($pattern, $uuid);
     }
 
     private function findEventById($id): Event
