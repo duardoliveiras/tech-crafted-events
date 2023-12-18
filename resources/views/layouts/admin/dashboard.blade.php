@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container mt-4">
-        <h2 class="mb-4">Admin Dashboard</h2>
+<div class="container mt-4">
+    <h2 class="mb-4">Admin Dashboard</h2>
 
-        <div class="mb-3">
-            <a href="{{ route('universities.create') }}" class="btn btn-primary">Add New University</a>
-            <a href="{{ route('admin.create') }}" class="btn btn-danger">Create a new admin account</a>
+    <div class="mb-3">
+        <a href="{{ route('universities.create') }}" class="btn btn-primary">Add New University</a>
+        <a href="{{ route('admin.create') }}" class="btn btn-secondary">Create a new admin account</a>
 
         </div>
         <div class="row">
