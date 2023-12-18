@@ -98,7 +98,8 @@
                             @else
                                 <span class="mb-2">Tickets for € {{ number_format($event->current_price, 2) }}</span>
                                 <a href="{{ route('ticket.buy', ['event' => $event->id]) }}"
-                                   class="btn btn-primary w-100 custom-button"><i class="fas fa-money-bill-wave"></i> Buy now!</a>
+                                   class="btn btn-primary w-100 custom-button"><i class="fas fa-money-bill-wave"></i>
+                                    Buy now!</a>
                             @endif
                         @endif
 
@@ -109,12 +110,14 @@
                                 Access Discussion</a>
                             @if($userTicket && !$isOwnerOrAdmin)
                                 <a href="{{ route('ticket.show', ['event' => $event->id, 'ticket' => $userTicket->id]) }}"
-                                   class="btn btn-primary my-2 custom-button access-ticket"><i class="fas fa-ticket-alt"></i> Access Ticket</a>
+                                   class="btn btn-primary my-2 custom-button access-ticket"><i
+                                            class="fas fa-ticket-alt"></i> Access Ticket</a>
 
                                 <form action="{{ route('events.leave', ['event_id' => $event->id, 'ticket_id' => $userTicket->id]) }}"
                                       method="POST" class="d-inline-block w-100">
                                     @csrf
-                                    <button type="submit" class="btn btn-danger my-2 custom-button leave-event"><i class="fas fa-times-circle"></i> Leave
+                                    <button type="submit" class="btn btn-danger my-2 custom-button leave-event"><i
+                                                class="fas fa-times-circle"></i> Leave
                                         Event
                                     </button>
                                 </form>
@@ -129,6 +132,9 @@
                             <a href="{{ route('events.edit', $event->id) }}"
                                class="btn btn-primary my-2 custom-button edit-event"><i class="far fa-edit"></i> Edit
                                 Event</a>
+                            <a href="{{ route('events.attendees', ['event' => $event->id]) }}"
+                               class="btn btn-outline-secondary my-2 custom-button"><i class="fas fa-users"></i> View attendees</a>
+
                             <form action="{{ route('events.destroy', $event->id) }}" method="POST"
                                   class="d-inline w-100 m-0 p-0">
                                 @csrf

@@ -44,7 +44,7 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        // Verificar se é o próprio usuário ou se é administrador
+        // Verify if it's the user themselves or admin
         if (!(Auth::user()->id === $user->id || Auth::user()->isAdmin)) {
             return redirect()->route('home')->with('error', 'You do not have permission to edit this profile.');
         }
@@ -69,6 +69,7 @@ class UserController extends Controller
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'phone_number' => 'required|max:20'
         ]);
+
 
         $user->update(array_merge($validatedData, ['image_url' => $this->uploadImage($request->file('image_url'))]));
 
@@ -100,7 +101,9 @@ class UserController extends Controller
         $authUser = Auth::user();
 
         if ($authUser->isAdmin() || $authUser->id == $user->id) {
-
+            if ($user->image_url && Storage::disk('public')->exists($user->image_url)) {
+                Storage::disk('public')->delete($user->image_url);
+            }
             $user->delete();
 
             if (!$authUser->isAdmin() || $authUser->id == $user->id) {
