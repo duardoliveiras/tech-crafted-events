@@ -1,11 +1,15 @@
 <div class="d-flex flex-start mt-3">
 
+    @if($comment->user->provider == null)
     <img class="rounded-circle shadow-1-strong me-3" src="{{ $comment->user->image_url ? asset('storage/' . $comment->user->image_url) : 'https://static-00.iconduck.com/assets.00/user-icon-2048x2048-ihoxz4vq.png' }}" alt="avatar" width="60" height="60" />
+    @else
+    <img class="rounded-circle shadow-1-strong me-3" src="{{ asset($comment->user->image_url)}}" alt="avatar" width="60" height="60" />
+    @endif
     <div class="w-100">
         <h6 class="fw-bold mb-0" style="font-size: 1.05rem;">
             {{ $comment->user->name }}
             @if($comment->isOwner())
-            <span class="badge rounded-pill bg-success ms-2"><strong>Event Organizer</strong></span>
+            <span class=" badge rounded-pill bg-success ms-2"><strong>Event Organizer</strong></span>
             @endif
             @if($comment->isAdmin())
             <span class="badge rounded-pill bg-secondary ms-2"><strong>Admin</strong></span>
