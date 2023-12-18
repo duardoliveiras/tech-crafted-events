@@ -20,11 +20,15 @@ class AdminController extends Controller
 {
     public function index()
     {
-        $users = User::where('id', '!=', Auth::id())->get();
+        $usersPage = request('usersPage', 1);
+        $eventsPage = request('eventsPage', 1);
 
-        $events = Event::all();
+        $users = User::where('id', '!=', Auth::id())->paginate(10, ['*'], 'usersPage')->withPath('?eventsPage=' . $eventsPage);
+        $events = Event::paginate(10, ['*'], 'eventsPage')->withPath('?usersPage=' . $usersPage);
+
         return view('layouts.admin.dashboard', compact('users', 'events'));
     }
+
 
     public function create()
     {

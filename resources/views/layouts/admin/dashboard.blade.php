@@ -22,6 +22,9 @@
                                 <a href="{{ route('profile.show', $user->id) }}">{{ $user->name }}</a>
                             </li>
                         @endforeach
+                        <div>
+                            {{$users->links()}}
+                        </div>
                     </ul>
                 </div>
             </div>
@@ -38,6 +41,9 @@
                                 <a href="{{ route('events.show', $event->id) }}">{{ $event->name }}</a>
                             </li>
                         @endforeach
+                            <div>
+                                {{$events->links()}}
+                            </div>
                     </ul>
                 </div>
             </div>

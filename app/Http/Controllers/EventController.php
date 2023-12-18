@@ -54,6 +54,7 @@ class EventController extends Controller
         $location = $request->query('location');
         $dateFilter = $request->query('date-filter');
         $nameFilter = $request->query('full-text-search');
+        $universityFilter = $request->query('university');
 
         $query = Event::query();
 
@@ -67,6 +68,12 @@ class EventController extends Controller
 
         if ($location) {
             $query->where('city_id', $location);
+        }
+
+        if ($universityFilter) {
+            $query->whereHas('owner.user.university', function($q) use ($universityFilter) {
+                $q->where('university_id', $universityFilter);
+            });
         }
 
         if ($dateFilter) {
@@ -94,9 +101,11 @@ class EventController extends Controller
 
         $events = $query->paginate(6);
 
-        if ($request->ajax()) {
-            $view = view('partials.event', compact('events'))->render();
-            return response()->json(['html' => $view]);
+        if ($request->ajax() || $request->query('ajax')) {
+            // Check if the events collection is empty
+            return $events->isEmpty() ? response()->json(['html' => ''])
+                : response()->json(['html' => view('partials.event', compact('events'))->render()]);
+
         }
 
         return view('layouts.event.list', compact('events', 'universities', 'categories', 'locations'));
@@ -352,7 +361,7 @@ class EventController extends Controller
 
             return redirect()->route('events.index')->with('success', 'Event deleted successfully.');
         } catch (\Exception $e) {
-            return redirect()->route('events.index')->with('error', 'Error deleting event');
+            return redirect()->route('events.index')->with('error', 'Error deleting event. Error: ' . $e->getMessage());
         }
     }
 
@@ -401,7 +410,7 @@ class EventController extends Controller
     {
         DB::transaction(function () use ($event) {
             Discussion::where('event_id', $event->id)->delete();
-            $this->stripeController->refundAllPaymentsFromEvent($event);
+            $this->refundTickets($event);
             $event->status = 'DELETED';
             $event->save();
         });
@@ -426,5 +435,10 @@ class EventController extends Controller
         } catch (\Exception $e) {
             return redirect()->route('events.index')->with('error', 'Error deleting event. Cause: ' . $e->getMessage());
         }
+    }
+
+    private function refundTickets(Event $event): void
+    {
+        $this->stripeController->refundAllPaymentsFromEvent($event);
     }
 }
