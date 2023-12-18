@@ -64,6 +64,7 @@
                          data-bs-parent="#fullTextSearch">
                         <div class="accordion-body pt-0">
                             <div class="form-row d-flex flex-row justify-content-around mx-2">
+
                                 <div class="col mx-2">
                                     <label for="event-type" class="text-white label-filter">Looking for</label>
                                     <select id="event-type" name="event-type" class="form-control">
@@ -73,6 +74,7 @@
                                         @endforeach
                                     </select>
                                 </div>
+
                                 <div class="col mx-2">
                                     <label for="location" class="text-white label-filter">Location</label>
                                     <select id="location" name="location" class="form-control">
@@ -82,10 +84,21 @@
                                         @endforeach
                                     </select>
                                 </div>
+
                                 <div class="col mx-2">
                                     <label for="date-filter" class="text-white label-filter">When</label>
                                     <input type="date" class="form-control" id="date-filter" name="date-filter"
                                            value="{{ request('date-filter') }}">
+                                </div>
+
+                                <div class="col mx-2">
+                                    <label for="university" class="text-white label-filter">University</label>
+                                    <select id="university" name="university" class="form-control">
+                                        <option value="">Choose university</option>
+                                        @foreach ($universities as $university)
+                                            <option value="{{ $university->id }}" {{ request('university') == $university->id ? 'selected' : '' }}>{{ $university->name }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -114,11 +127,11 @@
                         Sort By
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="dropdown-sort">
-                        <li><a class="dropdown-item" style="cursor:pointer" data-sort="start-date">Start Date</a></li>
-                        <li><a class="dropdown-item" style="cursor:pointer" data-sort="name">Name</a></li>
-                        <li><a class="dropdown-item" style="cursor:pointer" data-sort="price-lowest">Price (lowest
+                        <li><a class="dropdown-item dropdown-sort" style="cursor:pointer" data-sort="start-date">Start Date</a></li>
+                        <li><a class="dropdown-item dropdown-sort" style="cursor:pointer" data-sort="name">Name</a></li>
+                        <li><a class="dropdown-item dropdown-sort" style="cursor:pointer" data-sort="price-lowest">Price (lowest
                                 first)</a></li>
-                        <li><a class="dropdown-item" style="cursor:pointer" data-sort="price-greater">Price (greater
+                        <li><a class="dropdown-item dropdown-sort" style="cursor:pointer" data-sort="price-greater">Price (greater
                                 first)</a></li>
                     </ul>
                 </div>
@@ -136,7 +149,7 @@
     </div>
 
     <div class="banner mt-5">
-        <img src="{{URL::asset('/assets/make-your-event.png')}}" class="image-mye"/>
+        <img src="{{URL::asset('/assets/make-your-event.png')}}" class="image-mye" alt="Banner image"/>
         <div class="banner-content text-center">
             <h1>Make your own Event</h1>
             <p>Publish your own event here!</p>
@@ -155,7 +168,7 @@
                     <a href="{{ route('universities.show', $university->id) }}" class="text-decoration-none">
                         <div class="card mb-4 card-hover-effect">
                             <img src="{{ Storage::url($university->image_url) }}" class="card-img-top"
-                                 alt="Image of {{ $university->name }}">
+                                 alt="Image of {{ $university->name }}" style="width: 100%; height: 300px; object-fit: cover;">
                             <div class="card-body">
                                 <h5 class="card-title">{{ $university->name }}</h5>
                                 <p class="card-text">Localization: {{ $university->address }}</p>
@@ -172,56 +185,6 @@
     </div>
 
     <script type="text/javascript" src="{{ URL::asset ('js/event/list-event.js') }}"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <script>
-        $(document).ready(function () {
-            let page = 1; // Track the current page
-
-            function getUrlParameter(name) {
-                name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-                let regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-                let results = regex.exec(location.search);
-                return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-            }
-
-            // Function to load more data with filters
-            function loadMoreData(page, sortType, eventType, location, dateFilter, nameFilter) {
-                $.ajax({
-                    url: `?page=${page}&sort=${sortType}&event-type=${eventType}&location=${location}&date-filter=${dateFilter}&full-text-search=${nameFilter}`,
-                    type: "get",
-                    beforeSend: function () {
-                        $('#loadMore').text('Loading...');
-                    }
-                })
-                    .done(function (data) {
-                        if (data.html === "") {
-                            $('#loadMore').text('No more records').prop('disabled', true);
-                            return;
-                        }
-                        $('#loadMore').text('Load More');
-                        $("#anchor").before(data.html); // Insert the new data before the anchor
-                    })
-                    .fail(function (jqXHR, ajaxOptions, thrownError) {
-                        alert('server not responding...');
-                    });
-            }
-
-            // Load more button click event
-            $('#loadMore').click(function () {
-                page++; // Increase the page number
-                let sortType = getUrlParameter('sort');
-                // Get filter values from URL
-                let eventType = getUrlParameter('event-type');
-                let location = getUrlParameter('location');
-                let dateFilter = getUrlParameter('date-filter');
-                let nameFilter = getUrlParameter('full-text-search');
-
-                loadMoreData(page, sortType, eventType, location, dateFilter, nameFilter); // Load data with filters
-            });
-
-        });
-    </script>
 
 @endsection
 
