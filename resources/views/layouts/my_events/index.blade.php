@@ -3,55 +3,48 @@
 @section('title', 'My Events')
 
 @section('content')
-    @section('breadcrumbs')
-        <li>
-             &nbsp; / My Events
-        </li>
-    @endsection
     <div class="container py-5">
-        <h1 class="text-center mb-5 display-4">My Events</h1>
+        <h1 class="text-center mb-5">My Events</h1>
 
-        <div class="row mb-5">
-            <div class="col-12">
-                <h2 class="mb-4">Events I'm Organizing</h2>
-                @forelse ($organizedEvents as $event)
-                    <div class="card mb-4 border-0 shadow-sm">
-                        <div class="card-body">
-                            <h3 class="card-title h4">{{ $event->name }}</h3>
-                            <p class="card-text text-muted mb-4">{{ $event->description }}</p>
-                            <a href="{{ route('events.show', $event->id) }}" class="btn btn-outline-primary btn-sm">
-                                <i class="bi bi-eye"></i> View Event
+        <section class="mb-5">
+            <h2 class="fs-3 mb-3">Events I'm Organizing</h2>
+            @forelse ($organizedEvents as $event)
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h3 class="card-title">{{ $event->name }}</h3>
+                        <p class="card-text">{{ $event->description }}</p>
+                        <div class="d-flex justify-content-start">
+                            <a href="{{ route('events.show', $event->id) }}" class="btn btn-primary me-2">
+                                View Event
                             </a>
                             @if($event->isFinished())
-                                <a href="{{ route('payment.transfer', 10, 'stripe_account_id') }}" class="btn btn-outline-primary btn-sm">
-                                    <i class="bi bi-cash-coin"></i> Receive tickets cash
+                                <a href="{{ route('payment.transfer', 10, 'stripe_account_id') }}" class="btn btn-secondary">
+                                    Receive Tickets Cash
                                 </a>
                             @endif
                         </div>
                     </div>
-                @empty
-                    <p class="text-muted">You are not organizing any events currently.</p>
-                @endforelse
-            </div>
-        </div>
+                </div>
+            @empty
+                <p>You are not organizing any events currently.</p>
+            @endforelse
+        </section>
 
-        <div class="row">
-            <div class="col-12">
-                <h2 class="mb-4">Events I Have Tickets For</h2>
-                @forelse ($eventsWithTickets as $event)
-                    <div class="card mb-4 border-0 shadow-sm">
-                        <div class="card-body">
-                            <h3 class="card-title h4">{{ $event->name }}</h3>
-                            <p class="card-text text-muted mb-4">{{ $event->description }}</p>
-                            <a href="{{ route('events.show', $event->id) }}" class="btn btn-outline-primary btn-sm">
-                                <i class="bi bi-eye"></i> View Event
-                            </a>
-                        </div>
+        <section>
+            <h2 class="fs-3 mb-3">Events I Have Tickets For</h2>
+            @forelse ($eventsWithTickets as $event)
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h3 class="card-title">{{ $event->name }}</h3>
+                        <p class="card-text">{{ $event->description }}</p>
+                        <a href="{{ route('events.show', $event->id) }}" class="btn btn-primary">
+                            View Event
+                        </a>
                     </div>
-                @empty
-                    <p class="text-muted">You have no tickets for any events currently.</p>
-                @endforelse
-            </div>
-        </div>
+                </div>
+            @empty
+                <p>You have no tickets for any events currently.</p>
+            @endforelse
+        </section>
     </div>
 @endsection
