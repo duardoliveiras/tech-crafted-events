@@ -67,7 +67,7 @@ class CommentReportController extends Controller
         $comment = Comment::find($commentId);
         $user = User::find($comment->user_id);
 
-        Mail::send('mail.banned', [], function ($message) use ($user) {
+        Mail::send('mail.banned', ['comment' => $comment, 'name' => $user->name], function ($message) use ($user) {
             $message->to($user->email);
             $message->subject("Your account are banned");
         });
