@@ -118,8 +118,7 @@
     var pusher = new Pusher('4c0e8adf1fed7e7d69a1', {
         cluster: 'eu'
     });
-
-    var channel = pusher.subscribe('notification-channel');
+   
     channel.bind('notification-received', function(data) {
         //alert(JSON.stringify(data));
         const icon = document.getElementById('notification-ico');

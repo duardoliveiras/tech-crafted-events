@@ -297,7 +297,7 @@ class EventController extends Controller
     {
         try {
             $event = $this->updateEventData($request, $id);
-            event(new NotificationReceived($id));
+            event(new NotificationReceived());
             return redirect()->route('events.show', $event->id)->with('success', 'Event updated successfully!');
         } catch (\Exception $e) {
             return redirect()->back()->withInput()->withErrors(['msg' => $e->getMessage()]);
