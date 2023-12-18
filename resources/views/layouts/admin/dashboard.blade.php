@@ -55,13 +55,6 @@
                             <div>
                                 <a href="{{ route('events.show', $event->id) }}">{{ $event->name }}</a>
                             </div>
-                            <div>
-                                @if($event->status == 'BANNED')
-                                <a href="{{ route('ban.event', $event->id) }}" class="btn btn-secondary">Unban</a>
-                                @else
-                                <a href="{{ route('ban.event', $event->id) }}" class="btn btn-danger">Ban</a>
-                                @endif
-                            </div>
                         </div>
                     </li>
                     @endforeach

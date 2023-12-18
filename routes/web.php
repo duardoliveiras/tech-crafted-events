@@ -73,7 +73,6 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/admin/store', [AdminController::class, 'store'])->name('admin.store');
     Route::get('/admin/reports', [AdminController::class, 'reports'])->name('admin.reports');
     Route::get('admin/ban/user/{user}', [AdminController::class, 'banUser'])->name('ban.user');
-    Route::get('admin/ban/event/{event}', [AdminController::class, 'banEvent'])->name('ban.event');
 });
 
 // Events
