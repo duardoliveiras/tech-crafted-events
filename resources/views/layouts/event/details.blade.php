@@ -53,7 +53,7 @@
                         <div class="col-md-8">
 
                             <div class="card-body">
-                                <button type="button" class="btn btn-outline-danger position-absolute top-0 end-0 m-3"
+                                <button type="button" class="btn btn-outline-danger position-absolute top-0 end-0 m-1"
                                         data-toggle="modal" data-target="#reportModal">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                          class="bi bi-flag-fill" viewBox="0 0 16 16">
@@ -115,6 +115,8 @@
                                            class="btn btn-warning m-1">Authenticate Ticket</a>
                                         <a href="{{ route('events.edit', $event->id) }}" class="btn btn-secondary m-1">Edit
                                             Event</a>
+                                        <a href="{{ route('events.attendees', ['event' => $event->id]) }}"
+                                           class="btn btn-outline-secondary m-1">View attendees</a>
                                         <form action="{{ route('events.destroy', $event->id) }}" method="POST"
                                               class="d-inline">
                                             @csrf

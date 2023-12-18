@@ -18,24 +18,25 @@ class EnsureUserHasAccessOrIsAdmin
     public function handle(Request $request, Closure $next): Response
     {
         $eventId = $request->route('event');
-        $event = Event::with('ticket')->findOrFail($eventId); // Certifique-se de que a relação tickets está correta.
+        $event = Event::with('ticket')->findOrFail($eventId); // Ensure that the tickets relation is correct.
 
-        // Verifica se o usuário é o dono do evento
+        // Check if the user is the owner of the event
         if ($event->owner_id == Auth::id()) {
             return $next($request);
         }
 
-        // Verifica se o usuário é um admin
+        // Check if the user is an admin
         if (Auth::user()->isAdmin()) {
             return $next($request);
         }
 
-        // Verifica se o usuário tem um ticket
-        if ($event->ticket->contains('user_id', Auth::id())) {
+        // Check if the user has a ticket with status "PAID" or "READ"
+        $userTicket = $event->ticket->firstWhere('user_id', Auth::id());
+        if ($userTicket && in_array($userTicket->status, ['PAID', 'READ'])) {
             return $next($request);
         }
 
-        // Se nenhuma das condições acima for verdadeira, redireciona para a home com erro
+        // If none of the above conditions are true, redirect to home with an error
         return redirect('home')->withErrors('You do not have access to this discussion.');
     }
 }
