@@ -157,20 +157,4 @@ class AdminController extends Controller
         }
     }
 
-    public function banEvent($eventId)
-    {
-        $event = Event::find($eventId);
-        if ($event) {
-            $sysdate = Carbon::now();
-            error_log($event->status);
-            if ($event->status == 'BANNED') {
-                $newStatus = ($event->end_date > $sysdate) ? 'UPCOMING' : 'FINISHED';
-            } else {
-                $newStatus = 'BANNED';
-            }
-            $event->update(['status' => $newStatus]);
-        }
-        return redirect()->route('admin.dashboard');
-    }
-
 }
