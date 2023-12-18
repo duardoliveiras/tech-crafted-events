@@ -25,5 +25,8 @@ Route::get('/api/events/{event}', [EventController::class, 'showJson'])
 Route::put('/api/events', [EventController::class, 'updateJson'])
     ->middleware(['auth']);
 
-Route::get('/api/events', [EventController::class, 'storeJson'])
+Route::post('/api/events', [EventController::class, 'storeJson'])
+    ->middleware(['auth']);
+
+Route::delete('/api/events/{event}', [EventController::class, 'destroyJson'])
     ->middleware(['auth']);
