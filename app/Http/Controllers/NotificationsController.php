@@ -35,10 +35,11 @@ class NotificationsController extends Controller
     public function updateRead($notificationId)
     {
         $notification = UserEventNotifications::find($notificationId);
+        $qt_notificaiton = Auth::user()->notifications()->where('read', false)->count();
 
         if ($notification) {
             $notification->update(['read' => true]);
-            return response()->json(['message' => 'Read success.']);
+            return response()->json(['message' => 'Read success.', 'qt_notification' => $qt_notificaiton]);
         } else {
             return response()->json(['error' => 'Notification not found.'], 404);
         }
