@@ -35,3 +35,4 @@ class NotificationReceived implements ShouldBroadcast
         return 'notification-received';
     }
 }
+
