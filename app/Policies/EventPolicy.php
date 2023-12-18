@@ -11,7 +11,16 @@ class EventPolicy
     /**
      * Determine whether the user can update the model.
      */
+    public function create(User $user): bool
+    {
+        return !$user->isAdmin();
+    }
     public function update(User $user, Event $event): bool
+    {
+        return $user->isAdmin() || $event->owner->user_id === $user->id;
+    }
+
+    public function showList(User $user, Event $event): bool
     {
         return $user->isAdmin() || $event->owner->user_id === $user->id;
     }

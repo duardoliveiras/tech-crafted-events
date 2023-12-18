@@ -105,7 +105,6 @@ class EventController extends Controller
             // Check if the events collection is empty
             return $events->isEmpty() ? response()->json(['html' => ''])
                 : response()->json(['html' => view('partials.event', compact('events'))->render()]);
-
         }
 
         return view('layouts.event.list', compact('events', 'universities', 'categories', 'locations'));
@@ -233,6 +232,10 @@ class EventController extends Controller
 
     private function validateEventData(Request $request): array
     {
+        $tomorrow = Carbon::tomorrow()->format('Y-m-d');
+
+        $this->validationRules['start_date'] = 'required|date|after:' . $tomorrow;
+
         $validatedData = $request->validate($this->validationRules);
 
         $startDate = Carbon::parse($validatedData['start_date']);
@@ -357,6 +360,10 @@ class EventController extends Controller
 
             $this->authorizeDeletion($event);
 
+            if ($event->image_url && Storage::disk('public')->exists($event->image_url)) {
+                Storage::disk('public')->delete($event->image_url);
+            }
+
             $this->deleteEventWithDiscussion($event);
 
             return redirect()->route('events.index')->with('success', 'Event deleted successfully.');
@@ -441,4 +448,12 @@ class EventController extends Controller
     {
         $this->stripeController->refundAllPaymentsFromEvent($event);
     }
+
+    public function showAttendees($eventId)
+    {
+        $event = Event::with('ticket.user')->findOrFail($eventId);
+        $this->authorize('showList', $event);
+        return view('layouts.event.attendee', compact('event'));
+    }
+
 }
