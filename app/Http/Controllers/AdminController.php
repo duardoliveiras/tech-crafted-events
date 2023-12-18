@@ -58,7 +58,7 @@ class AdminController extends Controller
             $imageFile = $request->file('image_url');
             $image = Image::make($imageFile);
             $imagePath = 'users/' . $imageFile->hashName();
-            Storage::disk('public')->put($imagePath, (string)$image->encode());
+            Storage::disk('public')->put($imagePath, (string) $image->encode());
             $imageUrl = $imagePath;
         }
 
@@ -82,61 +82,63 @@ class AdminController extends Controller
     public function reports()
     {
         $events = Event::where('status', '!=', 'BANNED')
-        ->whereHas('event_report', fn($query) => $query->where('analyzed', false))
-        ->withCount([
-            'event_report as event_report_count' => function ($query) {
-                $query->where('analyzed', false);
-            }
-        ])->get();
+            ->whereHas('event_report', fn($query) => $query->where('analyzed', false))
+            ->withCount([
+                'event_report as event_report_count' => function ($query) {
+                    $query->where('analyzed', false);
+                }
+            ])->get();
 
         $events = $events->sortByDesc('event_report_count');
 
         $comments = Comment::where('is_deleted', false)
             ->whereHas('comment_report', fn($query) => $query->where('analyzed', false))
             ->withCount([
-                'comment_report as comment_report_count' => function ($query){
+                'comment_report as comment_report_count' => function ($query) {
                     $query->where('analyzed', false);
                 }
             ])->get();
         $comments = $comments->sortByDesc('event_report_count');
-  
+
         return view('layouts.admin.reports', compact('events', 'comments'));
-        
+
     }
 
     public function eventReports($eventId, $reason)
     {
-        if($reason == "All"){
+        if ($reason == "All") {
             $eventReports = EventReport::where('event_id', $eventId)
-            ->where('analyzed', false)
-            ->with('user')
-            ->get();
-        }else{
+                ->where('analyzed', false)
+                ->with('user')
+                ->get();
+        } else {
             $eventReports = EventReport::where('event_id', $eventId)
-            ->where('reason', $reason)
-            ->where('analyzed', false)
-            ->with('user')
-            ->get();
+                ->where('reason', $reason)
+                ->where('analyzed', false)
+                ->with('user')
+                ->get();
         }
-  
+
         return response()->json($eventReports);
     }
 
     public function commentReports($userId, $reason)
     {
-        if($reason == "All"){
-            $commentReports = CommentReport::where('user_id', $userId)
-            ->where('analyzed', false)
-            ->with('user')
-            ->get();
-        }else{
-            $commentReports = CommentReport::where('user_id', $userId)
-            ->where('reason', $reason)
-            ->where('analyzed', false)
-            ->with('user')
-            ->get();
+        $comment = Comment::where('user_id', $userId)->first();
+
+        if ($reason == "All") {
+            $commentReports = CommentReport::where('comment_id', $comment->id)
+                ->where('analyzed', false)
+                ->with('user')
+                ->get();
+        } else {
+            $commentReports = CommentReport::where('comment_id', $comment->id)
+                ->where('reason', $reason)
+                ->where('analyzed', false)
+                ->with('user')
+                ->get();
         }
-        
+
         return response()->json($commentReports);
     }
 }

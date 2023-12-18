@@ -71,6 +71,7 @@ function getEventReports(eventId, page) {
 function getCommentReports(userId, page) {
   var reason = document.getElementById("reportReason").value;
   console.log(reason);
+  console.log(userId);
   fetch(`/admin/reports/reports-comments/${userId}/${reason}`)
     .then((response) => {
       if (!response.ok) {

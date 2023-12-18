@@ -51,8 +51,8 @@
                         </div>
 
                         <div class="form-row mb-3">
-                            <label for="phone_number_number">phone_number number:</label>
-                            <input type="text" class="form-control" id="phone_number_number" name="phone_number_number" value="{{ $user->phone_number }}" required>
+                            <label for="phone_number">Phone Number</label>
+                            <input type="text" class="form-control" id="phone_number" name="phone_number" value="{{ $user->phone_number }}" required>
                         </div>
 
                         @if($user->provider == null)
