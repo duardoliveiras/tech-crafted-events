@@ -10,6 +10,7 @@ use App\Models\University;
 use App\Models\EventReport;
 use Illuminate\Http\Request;
 use App\Models\CommentReport;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Intervention\Image\Facades\Image;
@@ -23,8 +24,11 @@ class AdminController extends Controller
         $usersPage = request('usersPage', 1);
         $eventsPage = request('eventsPage', 1);
 
-        $users = User::where('id', '!=', Auth::id())->paginate(10, ['*'], 'usersPage')->withPath('?eventsPage=' . $eventsPage);
-        $events = Event::paginate(10, ['*'], 'eventsPage')->withPath('?usersPage=' . $usersPage);
+        $users = User::where('id', '!=', Auth::id())
+            ->orderBy('name', 'asc')
+            ->paginate(10, ['*'], 'usersPage')
+            ->withPath('?eventsPage=' . $eventsPage);
+        $events = Event::orderBy('name')->paginate(10, ['*'], 'eventsPage')->withPath('?usersPage=' . $usersPage);
 
         return view('layouts.admin.dashboard', compact('users', 'events'));
     }
@@ -141,4 +145,32 @@ class AdminController extends Controller
 
         return response()->json($commentReports);
     }
+
+    public function banUser($userId)
+    {
+        $user = User::find($userId);
+        if ($user) {
+            $user->update(['is_banned' => !$user->is_banned]);
+            return redirect()->route('admin.dashboard');
+        } else {
+            return redirect()->route('admin.dashboard');
+        }
+    }
+
+    public function banEvent($eventId)
+    {
+        $event = Event::find($eventId);
+        if ($event) {
+            $sysdate = Carbon::now();
+            error_log($event->status);
+            if ($event->status == 'BANNED') {
+                $newStatus = ($event->end_date > $sysdate) ? 'UPCOMING' : 'FINISHED';
+            } else {
+                $newStatus = 'BANNED';
+            }
+            $event->update(['status' => $newStatus]);
+        }
+        return redirect()->route('admin.dashboard');
+    }
+
 }
