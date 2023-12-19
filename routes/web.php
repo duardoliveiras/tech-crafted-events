@@ -111,6 +111,7 @@ Route::resource('universities', UniversityController::class);
 //Ticket
 Route::get('/events/{event}/ticket/buy', [TicketController::class, 'showBuyTicketForm'])->name('ticket.buy');
 Route::post('/events/{event}/ticket/acquire', [TicketController::class, 'acquireTicket'])->name('ticket.acquire');
+Route::post('/events/{event}/ticket/invite', [TicketController::class, 'acquireInvite'])->name('ticket.invite');
 Route::get('/events/{event}/ticket/authorize', [TicketController::class, 'authorizeTicket'])->name('ticket.authorize');
 Route::get('/events/{event}/ticket/{ticket}', [TicketController::class, 'showTicket'])
     ->name('ticket.show')
