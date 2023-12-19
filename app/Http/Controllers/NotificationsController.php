@@ -28,6 +28,10 @@ class NotificationsController extends Controller
             ->where('user_id', $user_id)
             ->where('read', false)
             ->get();
+        $userNotifications = Notification::where('user_id', $user_id)->get();
+
+        $allNotifications = $userEventNotifications->concat($userNotifications);
+        error_log($allNotifications);
 
         return response()->json($userEventNotifications);
     }

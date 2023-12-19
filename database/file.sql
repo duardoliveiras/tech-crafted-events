@@ -130,6 +130,7 @@ CREATE TABLE Notification
     notificationtype NotificationType NOT NULL,
     user_id          UUID             NOT NULL,
     event_id		 UUID   			  null,
+    created_at		 TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
     FOREIGN KEY (user_id) REFERENCES Users (id),
     foreign key (EVENT_ID) references event (id)
 );
@@ -140,6 +141,7 @@ CREATE TABLE EventNotifications
     id                SERIAL PRIMARY KEY,
     event_id          UUID NOT NULL,
     notification_text TEXT NOT NULL,
+    created_at		  TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
     FOREIGN KEY (event_id) REFERENCES Event (id)
 );
 
