@@ -40,5 +40,23 @@ function getUsers() {
 }
 
 function inviteUser(id) {
-  console.log("oi", id);
+  var url = "/invite/" + id + "/event/" + eventId;
+  var options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+    },
+    body: JSON.stringify({}),
+  };
+  fetch(url, options)
+    .then((response) => {
+      if (!response.ok) {
+        throw Error(response.statusText);
+      }
+      console.log("invite!");
+    })
+    .catch((error) => {
+      console.error("Erro", error);
+    });
 }

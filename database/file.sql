@@ -127,7 +127,7 @@ CREATE TABLE Notification
 (
     id               UUID PRIMARY KEY,
     text             TEXT             NOT NULL,
-    notificationType NotificationType NOT NULL,
+    notificationtype NotificationType NOT NULL,
     user_id          UUID             NOT NULL,
     event_id		 UUID   			  null,
     FOREIGN KEY (user_id) REFERENCES Users (id),

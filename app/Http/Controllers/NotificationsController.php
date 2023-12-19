@@ -45,4 +45,17 @@ class NotificationsController extends Controller
         }
     }
 
+    public function inviteUser($userId, $eventId)
+    {
+        $notification = new Notification([
+            'text' => "You are invited to EVENT",
+            'notificationtype' => 'INVITE',
+            'user_id' => $userId,
+            'event_id' => $eventId
+        ]);
+
+        $notification->save();
+        return response()->json(['message' => 'Invited success.']);
+    }
+
 }

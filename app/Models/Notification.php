@@ -13,16 +13,15 @@ class Notification extends BaseModel
 
     protected $table = 'notification';
     protected $fillable = [
-        'id',
         'text',
-        'expiresAt',
-        'notificationType',
+        'notificationtype',
         'user_id',
+        'event_id'
     ];
 
     public static function getNotificationsByUserId($user_id)
     {
         return self::where('user_id', $user_id)->get();
     }
-    
+
 }
