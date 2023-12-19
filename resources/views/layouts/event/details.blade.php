@@ -129,6 +129,9 @@
                             <a href="{{ route('events.edit', $event->id) }}"
                                class="btn btn-primary my-2 custom-button edit-event"><i class="far fa-edit"></i> Edit
                                 Event</a>
+                            <button class="btn btn-primary my-2 custom-button edit-event" 
+                                data-toggle="modal" data-target="#inviteModal"><i class="fas fa-share-alt"></i> Invite User </button>
+
                             <form action="{{ route('events.destroy', $event->id) }}" method="POST"
                                   class="d-inline w-100 m-0 p-0">
                                 @csrf
@@ -172,9 +175,48 @@
     <!-- Report Modal -->
     @include('partials.report', ['event' => $event, 'report' => "event"])
 
+    <div class="modal fade" id="inviteModal" tabindex="-1" role="dialog" aria-labelledby="inviteModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="reportModalLabel"> Invite User </h3>
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal" aria-label="Close"
+                            onclick="window.location=route_reports">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col">
+                                    <label for="full-text-search" class="text-white label-filter">Search for event</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="userSearch" name="userSearch" placeholder="Type email of a user...">
+                                        <div class="input-group-append">
+                                            <button type="submit" class="btn btn-primary" onclick="getUsers()">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                                <div class="card mt-3" style="width: 100%; height: 100%;">
+                                    <ul class="list-group list-group-flush" id="listUser">
+                                        <!-- insert by js -->
+                                    </ul>
+                                </div>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="{{ URL::asset ('js/event/details-event.js') }}"></script>
+    <script src="{{ asset('js/event/invite.js') }}"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@200;300;400;500;600;800&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');

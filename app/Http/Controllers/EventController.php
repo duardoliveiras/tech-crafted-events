@@ -2,25 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\NotificationReceived;
-use App\Models\Category;
-use App\Models\City;
-use App\Models\Country;
-use App\Models\Discussion;
-use App\Models\Event;
-use App\Models\EventOrganizer;
-use App\Models\Ticket;
-use App\Models\University;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
+use App\Models\City;
+use App\Models\User;
+use App\Models\Event;
+use App\Models\Ticket;
+use App\Models\Country;
+use App\Models\Category;
 use Illuminate\View\View;
+use App\Models\Discussion;
+use App\Models\University;
+use Illuminate\Http\Request;
+use App\Models\EventOrganizer;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use App\Events\NotificationReceived;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class EventController extends Controller
 {
@@ -445,5 +446,11 @@ class EventController extends Controller
     private function refundTickets(Event $event): void
     {
         $this->stripeController->refundAllPaymentsFromEvent($event);
+    }
+
+    public function getUsers($userEmail)
+    {
+        $users = User::where('email', 'like', '%' . $userEmail . '%')->get();
+        return response()->json($users);
     }
 }
