@@ -117,10 +117,10 @@
     var pusher = new Pusher('4c0e8adf1fed7e7d69a1', {
         cluster: 'eu'
     });
-    var userId = '{{ Auth::user()->id }}';
+    var userId = @if(Auth::check()) '{{ Auth::user()->id }}' @else null @endif;
     console.log("id", userId);
     var channel = pusher.subscribe('notification-channel');
-
+    
     channel.bind('notification-received', function(data) {
         //alert(JSON.stringify(data));
         console.log(data.users);
