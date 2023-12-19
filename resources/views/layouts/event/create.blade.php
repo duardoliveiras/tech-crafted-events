@@ -2,6 +2,8 @@
 
 <link rel="stylesheet" type="text/css" href="{{URL::asset('/assets/css/create-event.css')}}">
 
+@section('title', 'Create Event')
+
 @section('content')
     @section('breadcrumbs')
         <li>

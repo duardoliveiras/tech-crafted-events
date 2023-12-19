@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'About Us - TechCrafted')
+@section('title', 'About Us')
 
 @section('content')
     @section('breadcrumbs')
