@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Services\TicketService;
+use PDF;
+use App\Models\User;
 use App\Models\Event;
 use App\Models\Ticket;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
-use PDF;
+use Illuminate\Http\Request;
+use App\Http\Services\TicketService;
+use Illuminate\Support\Facades\Auth;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class TicketController extends Controller
@@ -43,13 +44,25 @@ class TicketController extends Controller
             return back()->withError('You already have a ticket for this event.');
         }
 
-        if ((float)$event->current_price === 0.0) {
+        if ((float) $event->current_price === 0.0) {
             $this->ticketService->createFreeTicket($eventId);
 
             return redirect()->route('events.show', $eventId)->with('success', 'Your free ticket has been acquired!');
         } else {
             return route('payment.session', ['eventId' => $event->id, 'amount' => $event->current_price, 'eventName' => $event->name]);
         }
+    }
+
+    public function acquireInvite($eventId)
+    {
+        $this->ticketService->createFreeTicket($eventId);
+
+        $response = [
+            'message' => 'Your free ticket has been acquired!',
+            'redirect' => route('events.show', $eventId)
+        ];
+
+        return response()->json($response);
     }
 
     public function showTicket($eventId, $ticketId)

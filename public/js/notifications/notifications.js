@@ -90,6 +90,16 @@ function getInvites() {
         cardHtml +=
           '<p class="card-text text-muted mb-4">' + invite.text + "</p>";
         cardHtml += "</div>";
+        cardHtml +=
+          '<a href="' +
+          routeEventsShow.replace(":id", invite.events.id) +
+          '" class="btn btn-primary m-1 btn-sm">';
+        cardHtml += '<i class="bi bi-eye"></i> View Event </a>';
+        cardHtml +=
+          "<button onclick=\"acquireInvite('" +
+          invite.events.id +
+          '\')" class="btn btn-secondary btn-sm">Accept</button>';
+
         cardHtml += "</div>";
         cardHtml += "</div>";
 
@@ -100,6 +110,32 @@ function getInvites() {
     })
     .catch((error) => {
       console.log(error);
+    });
+}
+
+function acquireInvite(eventId) {
+  var url = "/events/" + eventId + "/ticket/invite";
+  var options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+    },
+    body: JSON.stringify({}),
+  };
+  fetch(url, options)
+    .then((response) => {
+      if (!response.ok) {
+        throw Error(response.statusText);
+      } else {
+        return response.json();
+      }
+    })
+    .then((data) => {
+      window.location.href = data.redirect;
+    })
+    .catch((error) => {
+      console.error("Erro", error);
     });
 }
 
