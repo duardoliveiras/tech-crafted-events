@@ -127,11 +127,13 @@ CREATE TABLE Notification
 (
     id               UUID PRIMARY KEY,
     text             TEXT             NOT NULL,
-    expiresAt        DATE             NOT NULL,
     notificationType NotificationType NOT NULL,
     user_id          UUID             NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES Users (id)
+    event_id		 UUID   			  null,
+    FOREIGN KEY (user_id) REFERENCES Users (id),
+    foreign key (EVENT_ID) references event (id)
 );
+
 
 CREATE TABLE EventNotifications
 (
