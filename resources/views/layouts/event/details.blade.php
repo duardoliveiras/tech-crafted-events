@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', $event->name)
+
 @section('content')
     @section('breadcrumbs')
         <li> &nbsp; / {{ $event->name }} </li>
@@ -133,7 +135,8 @@
                                class="btn btn-primary my-2 custom-button edit-event"><i class="far fa-edit"></i> Edit
                                 Event</a>
                             <a href="{{ route('events.attendees', ['event' => $event->id]) }}"
-                               class="btn btn-outline-secondary my-2 custom-button"><i class="fas fa-users"></i> View attendees</a>
+                               class="btn btn-outline-secondary my-2 custom-button"><i class="fas fa-users"></i> View
+                                attendees</a>
 
                             <form action="{{ route('events.destroy', $event->id) }}" method="POST"
                                   class="d-inline w-100 m-0 p-0">
