@@ -16,12 +16,18 @@ class Notification extends BaseModel
         'text',
         'notificationtype',
         'user_id',
+        'creadted_at',
         'event_id'
     ];
 
     public static function getNotificationsByUserId($user_id)
     {
         return self::where('user_id', $user_id)->get();
+    }
+
+    public function events()
+    {
+        return $this->belongsTo(Event::class, 'event_id');
     }
 
 }

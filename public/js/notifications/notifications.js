@@ -1,4 +1,7 @@
 function getNotifications() {
+  document.getElementById("btnEvent").classList.add("active");
+  document.getElementById("btnInvite").classList.remove("active");
+
   fetch("/load-notifications")
     .then((response) => {
       if (!response.ok) {
@@ -49,6 +52,52 @@ function getNotifications() {
       });
     })
 
+    .catch((error) => {
+      console.log(error);
+    });
+}
+
+function getInvites() {
+  document.getElementById("btnInvite").classList.add("active");
+  document.getElementById("btnEvent").classList.remove("active");
+  fetch("/load-invites")
+    .then((response) => {
+      if (!response.ok) {
+        throw Error(response.statusText);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      var notificacoesContainer = document.getElementById(
+        "notificacoesContainer"
+      );
+
+      notificacoesContainer.innerHTML = "";
+
+      data.forEach((invite) => {
+        var cardHtml = '<div class="card mb-4 border-0 shadow-sm">';
+        cardHtml += '<div class="card-body">';
+        cardHtml += '<div class="d-flex align-items-center">';
+        cardHtml +=
+          '<img class="rounded-circle shadow-1-strong me-2" src="' +
+          assetUrl +
+          "/" +
+          invite.events.image_url +
+          '" alt="' +
+          "/" +
+          invite.events.name +
+          '" width="50" height="50"/>';
+        cardHtml +=
+          '<p class="card-text text-muted mb-4">' + invite.text + "</p>";
+        cardHtml += "</div>";
+        cardHtml += "</div>";
+        cardHtml += "</div>";
+
+        document
+          .getElementById("notificacoesContainer")
+          .insertAdjacentHTML("beforeend", cardHtml);
+      });
+    })
     .catch((error) => {
       console.log(error);
     });
