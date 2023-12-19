@@ -55,7 +55,7 @@ Route::get('/auth/{provider}/callback', [ProviderController::class, 'callback'])
 //Notifications
 Route::get('/load-notifications', [NotificationsController::class, 'index'])->name('notifications.index');
 Route::get('/load-invites', [NotificationsController::class, 'getInvites']);
-Route::put('/update-read/{id}', [NotificationsController::class, 'updateRead'])->name('read-notification');
+Route::put('/update-read/{type}/{id}', [NotificationsController::class, 'updateRead'])->name('read-notification');
 Route::post('/update-notification', [NotificationsController::class, 'received'])->name('update-notification');
 Route::post('/invite/{user}/event/{event}', [NotificationsController::class, 'inviteUser']);
 

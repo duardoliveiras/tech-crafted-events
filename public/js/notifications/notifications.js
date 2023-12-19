@@ -42,7 +42,7 @@ function getNotifications() {
         cardHtml +=
           '<button onclick="readNotification(' +
           notification.id +
-          ')" class="btn btn-secondary btn-sm">Read</button>';
+          ',\'notification\')" class="btn btn-secondary btn-sm">Read</button>';
         cardHtml += "</div>";
         cardHtml += "</div>";
 
@@ -98,7 +98,11 @@ function getInvites() {
         cardHtml +=
           "<button onclick=\"acquireInvite('" +
           invite.events.id +
-          '\')" class="btn btn-secondary btn-sm">Accept</button>';
+          '\')" class="btn btn-success btn-sm">Accept</button>';
+        cardHtml +=
+          "<button onclick=\"readNotification('" +
+          invite.events.id +
+          "', 'invite')\" class=\"m-1 btn btn-danger btn-sm\">Reject</button>";
 
         cardHtml += "</div>";
         cardHtml += "</div>";
@@ -127,12 +131,12 @@ function acquireInvite(eventId) {
     .then((response) => {
       if (!response.ok) {
         throw Error(response.statusText);
-      } else {
-        return response.json();
       }
+      readNotification(eventId, "invite");
+      return response.json();
     })
     .then((data) => {
-      window.location.href = data.redirect;
+      //window.location.href = data.redirect;
     })
     .catch((error) => {
       console.error("Erro", error);
@@ -143,8 +147,8 @@ function updateRead() {
   document.getElementById("formUpdateRead").submit();
 }
 
-function readNotification(notificationId) {
-  var url = "/update-read/" + notificationId;
+function readNotification(notificationId, type) {
+  var url = "/update-read/" + type + "/" + notificationId;
 
   var options = {
     method: "PUT",
@@ -160,7 +164,7 @@ function readNotification(notificationId) {
       if (!response.ok) {
         throw Error(response.statusText);
       }
-      getNotifications();
+      type == "notification" ? getNotifications() : getInvites();
       return response.json();
     })
     .then((data) => {

@@ -17,6 +17,7 @@ class Notification extends BaseModel
         'notificationtype',
         'user_id',
         'creadted_at',
+        'read',
         'event_id'
     ];
 

@@ -131,6 +131,7 @@ CREATE TABLE Notification
     user_id          UUID             NOT NULL,
     event_id		 UUID   			  null,
     created_at		 TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
+    read             BOOLEAN NOT NULL,
     FOREIGN KEY (user_id) REFERENCES Users (id),
     foreign key (EVENT_ID) references event (id)
 );
