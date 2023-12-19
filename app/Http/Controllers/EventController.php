@@ -297,7 +297,10 @@ class EventController extends Controller
     {
         try {
             $event = $this->updateEventData($request, $id);
-            event(new NotificationReceived());
+            $users = Ticket::where('event_id', $event->id)
+                ->pluck('user_id')
+                ->toArray();
+            event(new NotificationReceived($users));
             return redirect()->route('events.show', $event->id)->with('success', 'Event updated successfully!');
         } catch (\Exception $e) {
             return redirect()->back()->withInput()->withErrors(['msg' => $e->getMessage()]);
@@ -308,7 +311,6 @@ class EventController extends Controller
     {
         try {
             $event = $this->updateEventData($request, $id);
-            event(new NotificationReceived($id));
             return response()->json(['success' => 'Event updated successfully!', 'event' => $event]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 422);

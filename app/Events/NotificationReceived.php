@@ -17,11 +17,12 @@ class NotificationReceived implements ShouldBroadcast
 
 
     public $message;
+    public $users;
 
     // Here you create the message to be sent when the event is triggered.
-    public function __construct()
+    public function __construct($users)
     {
-        $this->message = 'You Recevied a new notification';
+        $this->users = $users;
     }
 
     // You should specify the name of the channel created in Pusher.
