@@ -2,25 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
-use App\Models\City;
-use App\Models\Country;
-use App\Models\Discussion;
-use App\Models\Event;
-use App\Models\EventOrganizer;
-use App\Models\Ticket;
-use App\Models\University;
-use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
+use App\Models\City;
+use App\Models\User;
+use App\Models\Event;
+use App\Models\Ticket;
+use App\Models\Country;
+use App\Models\Category;
 use Illuminate\View\View;
+use App\Models\Discussion;
+use App\Models\University;
+use Illuminate\Http\Request;
+use App\Models\EventOrganizer;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use App\Events\NotificationReceived;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class EventController extends Controller
 {
@@ -279,7 +280,7 @@ class EventController extends Controller
         $image = Image::make($imageFile);
 
         $imagePath = 'events/' . $imageFile->hashName();
-        Storage::disk('public')->put($imagePath, (string)$image->encode());
+        Storage::disk('public')->put($imagePath, (string) $image->encode());
 
         return $imagePath;
     }
@@ -300,6 +301,11 @@ class EventController extends Controller
     {
         try {
             $event = $this->updateEventData($request, $id);
+            $users = Ticket::where('event_id', $event->id)
+                ->where('status', 'PAID')
+                ->pluck('user_id')
+                ->toArray();
+            event(new NotificationReceived($users));
             return redirect()->route('events.show', $event->id)->with('success', 'Event updated successfully!');
         } catch (\Exception $e) {
             return redirect()->back()->withInput()->withErrors(['msg' => $e->getMessage()]);
@@ -396,7 +402,7 @@ class EventController extends Controller
     {
         $pattern = '/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i';
 
-        return (bool)preg_match($pattern, $uuid);
+        return (bool) preg_match($pattern, $uuid);
     }
 
     private function findEventById($id): Event
@@ -434,7 +440,7 @@ class EventController extends Controller
             $event = $this->findEventById($eventId);
             $ticket = $this->findTicketById($ticketId);
 
-            if ($ticket->price_paid == 0) {
+            if ((double) $ticket->price_paid != 0) {
                 $this->stripeController->refundPaymentFromUser($event, Auth::id());
             }
 
