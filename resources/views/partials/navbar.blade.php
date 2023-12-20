@@ -94,7 +94,8 @@
     <div class="offcanvas-body">
         <div class="btn-group d-flex" role="group" aria-label="Notification Types">
             <button type="button" class="btn btn-outline-primary active" onclick="getNotifications()" id="btnEvent">Event</button>
-            <button type="button" class="btn btn-outline-primary" onclick="getInvites()" id="btnInvite">Invite</button>
+            <button type="button" class="btn btn-outline-primary" onclick="getInvites('INVITE')" id="btnInvite">Invite</button>
+            <button type="button" class="btn btn-outline-primary" onclick="getInvites('REPORT')" id="btnReport">Report</button>
         </div>
 
         <div id="notificacoesContainer">

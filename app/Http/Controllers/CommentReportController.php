@@ -47,7 +47,7 @@ class CommentReportController extends Controller
     }
     public function check_all_comment($userId)
     {
-        $reports = CommentReport::where('user_id', $userId)->get();
+        $reports = CommentReport::whereHas('comment', fn($query) => $query->where('user_id', $userId))->get();
 
         if ($reports) {
             foreach ($reports as $report) {

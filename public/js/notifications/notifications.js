@@ -1,6 +1,7 @@
 function getNotifications() {
   document.getElementById("btnEvent").classList.add("active");
   document.getElementById("btnInvite").classList.remove("active");
+  document.getElementById("btnReport").classList.remove("active");
 
   fetch("/load-notifications")
     .then((response) => {
@@ -57,10 +58,19 @@ function getNotifications() {
     });
 }
 
-function getInvites() {
-  document.getElementById("btnInvite").classList.add("active");
-  document.getElementById("btnEvent").classList.remove("active");
-  fetch("/load-invites")
+function getInvites(type) {
+  if (type === "INVITE") {
+    document.getElementById("btnInvite").classList.add("active");
+    document.getElementById("btnEvent").classList.remove("active");
+    document.getElementById("btnReport").classList.remove("active");
+  } else {
+    document.getElementById("btnReport").classList.add("active");
+    document.getElementById("btnEvent").classList.remove("active");
+    document.getElementById("btnInvite").classList.remove("active");
+  }
+
+  var url = `/load/` + type;
+  fetch(url)
     .then((response) => {
       if (!response.ok) {
         throw Error(response.statusText);
@@ -73,46 +83,66 @@ function getInvites() {
       );
 
       notificacoesContainer.innerHTML = "";
+      if (type === "INVITE") {
+        data.forEach((invite) => {
+          var cardHtml = '<div class="card mb-4 border-0 shadow-sm">';
+          cardHtml += '<div class="card-body">';
+          cardHtml += '<div class="d-flex align-items-center">';
+          cardHtml +=
+            '<img class="rounded-circle shadow-1-strong me-2" src="' +
+            assetUrl +
+            "/" +
+            invite.events.image_url +
+            '" alt="' +
+            "/" +
+            invite.events.name +
+            '" width="50" height="50"/>';
+          cardHtml +=
+            '<p class="card-text text-muted mb-4">' + invite.text + "</p>";
+          cardHtml += "</div>";
+          cardHtml +=
+            '<a href="' +
+            routeEventsShow.replace(":id", invite.events.id) +
+            '" class="btn btn-primary m-1 btn-sm">';
+          cardHtml += '<i class="bi bi-eye"></i> View Event </a>';
+          cardHtml +=
+            "<button onclick=\"acquireInvite('" +
+            invite.events.id +
+            "', '" +
+            invite.id +
+            '\')" class="btn btn-success btn-sm">Accept</button>';
+          cardHtml +=
+            "<button onclick=\"readNotification('" +
+            invite.id +
+            "', 'invite')\" class=\"m-1 btn btn-danger btn-sm\">Reject</button>";
 
-      data.forEach((invite) => {
-        var cardHtml = '<div class="card mb-4 border-0 shadow-sm">';
-        cardHtml += '<div class="card-body">';
-        cardHtml += '<div class="d-flex align-items-center">';
-        cardHtml +=
-          '<img class="rounded-circle shadow-1-strong me-2" src="' +
-          assetUrl +
-          "/" +
-          invite.events.image_url +
-          '" alt="' +
-          "/" +
-          invite.events.name +
-          '" width="50" height="50"/>';
-        cardHtml +=
-          '<p class="card-text text-muted mb-4">' + invite.text + "</p>";
-        cardHtml += "</div>";
-        cardHtml +=
-          '<a href="' +
-          routeEventsShow.replace(":id", invite.events.id) +
-          '" class="btn btn-primary m-1 btn-sm">';
-        cardHtml += '<i class="bi bi-eye"></i> View Event </a>';
-        cardHtml +=
-          "<button onclick=\"acquireInvite('" +
-          invite.events.id +
-          "', '" +
-          invite.id +
-          '\')" class="btn btn-success btn-sm">Accept</button>';
-        cardHtml +=
-          "<button onclick=\"readNotification('" +
-          invite.id +
-          "', 'invite')\" class=\"m-1 btn btn-danger btn-sm\">Reject</button>";
+          cardHtml += "</div>";
+          cardHtml += "</div>";
 
-        cardHtml += "</div>";
-        cardHtml += "</div>";
+          document
+            .getElementById("notificacoesContainer")
+            .insertAdjacentHTML("beforeend", cardHtml);
+        });
+      } else {
+        data.forEach((invite) => {
+          var cardHtml = '<div class="card mb-4 border-0 shadow-sm">';
+          cardHtml += '<div class="card-body">';
+          cardHtml += '<div class="d-flex align-items-center">';
+          cardHtml +=
+            '<p class="card-text text-muted mb-4">' + invite.text + "</p>";
+          cardHtml += "</div>";
+          cardHtml +=
+            "<button onclick=\"readNotification('" +
+            invite.id +
+            "', 'invite')\" class=\"m-1 btn btn-secondary btn-sm\">Read</button>";
+          cardHtml += "</div>";
+          cardHtml += "</div>";
 
-        document
-          .getElementById("notificacoesContainer")
-          .insertAdjacentHTML("beforeend", cardHtml);
-      });
+          document
+            .getElementById("notificacoesContainer")
+            .insertAdjacentHTML("beforeend", cardHtml);
+        });
+      }
     })
     .catch((error) => {
       console.log(error);
@@ -166,7 +196,7 @@ function readNotification(notificationId, type) {
       if (!response.ok) {
         throw Error(response.statusText);
       }
-      type == "notification" ? getNotifications() : getInvites();
+      type == "notification" ? getNotifications() : getInvites("INVITE");
       return response.json();
     })
     .then((data) => {
