@@ -273,7 +273,7 @@ function check_all_event(eventId) {
     });
 }
 
-function check_all_comment(userId) {
+function check_all_comment(userId, commentId) {
   var url = "/events/" + userId + "/check-all-comment";
   console.log(url);
 

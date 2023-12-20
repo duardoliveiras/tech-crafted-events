@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\NotificationReceived;
+use App\Models\CommentReport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Notification;
@@ -32,13 +33,14 @@ class NotificationsController extends Controller
         return response()->json($userEventNotifications);
     }
 
-    public function getInvites()
+    public function getInvites($type)
     {
         $user_id = Auth::id();
 
         $invites = Notification::with('events')
             ->where('user_id', $user_id)
             ->where('read', false)
+            ->where('notificationtype', $type)
             ->get();
 
         return response()->json($invites);
@@ -88,6 +90,24 @@ class NotificationsController extends Controller
 
 
         return response()->json(['message' => 'Invited success.']);
+    }
+
+    public function notifyUsers($commentId)
+    {
+        $users = CommentReport::where('comment_id', $commentId);
+
+        foreach ($users as $user) {
+            $notification = new Notification([
+                'text' => "You are invited to EVENT",
+                'notificationtype' => 'INVITE',
+                'user_id' => $user->user_id,
+                'read' => false,
+                'event_id' => null
+            ]);
+            $notification->save();
+        }
+
+        return response()->json(['message' => 'Read success.']);
     }
 
 }
