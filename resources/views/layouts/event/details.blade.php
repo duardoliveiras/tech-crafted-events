@@ -98,7 +98,7 @@
                                 <button class="btn btn-secondary custom-button disabled">Ticket Purchase Pending
                                 </button>
                             @else
-                                <span class="mb-2">Tickets for € {{ number_format($event->current_price, 2) }}</span>
+                                <span class="mb-2">Tickets for {{ $event->current_price == 0 ? 'free' : '€ ' . number_format($event->current_price, 2) }}</span>
                                 <a href="{{ route('ticket.buy', ['event' => $event->id]) }}"
                                    class="btn btn-primary w-100 custom-button"><i class="fas fa-money-bill-wave"></i>
                                     Buy now!</a>
