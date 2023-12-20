@@ -21,3 +21,7 @@
     border-width: 2px !important;
     font-size: 1rem !important;
 }
+
+.custom-input.is-invalid {
+    border-color: #dc3545 !important;
+}

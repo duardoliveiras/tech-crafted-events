@@ -161,4 +161,5 @@ class TicketController extends Controller
         // Download the PDF with a dynamic filename
         return $pdf->download('invoice-' . $ticket->id . '.pdf');
     }
+
 }

@@ -2,6 +2,8 @@
 
 <link rel="stylesheet" type="text/css" href="{{ URL::asset('/assets/css/create-event.css') }}">
 
+@section('title', 'Create Event Organizer')
+
 @section('content')
     <div class="container d-flex justify-content-center align-items-center" style="min-height: 40vh;">
         <div class="card w-100 p-3" style="box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;">

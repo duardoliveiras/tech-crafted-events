@@ -2,6 +2,8 @@
 
 <link rel="stylesheet" type="text/css" href="{{URL::asset('/assets/css/list-event.css')}}">
 
+@section('title', 'Tech Crafted')
+
 @section('content')
     <!-- Success Message -->
     @if(session('success'))

@@ -7,7 +7,11 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ preg_replace('/(?<!\ )[A-Z]/', ' $0', config('app.name', 'Laravel')) }}</title>
+{{--    <title>{{ preg_replace('/(?<!\ )[A-Z]/', ' $0', config('app.name', 'Laravel')) }}</title>--}}
+
+    <title>
+        @yield('title', config('app.name', 'Laravel'))
+    </title>
 
     <link rel="icon" href="{{ URL::asset('/assets/img/logo-without-text.svg') }}">
 
