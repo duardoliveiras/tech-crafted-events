@@ -471,9 +471,14 @@ class EventController extends Controller
     }
 
 
-    public function getUsers($userEmail)
+    public function getUsers($userEmail, $eventId)
     {
-        $users = User::where('email', 'like', '%' . $userEmail . '%')->get();
+        $users = User::where('email', 'like', '%' . $userEmail . '%')
+            ->whereDoesntHave('ticket', function ($query) use ($eventId) {
+                $query->where('event_id', $eventId)
+                    ->where('status', 'PAID');
+            })
+            ->get();
         return response()->json($users);
     }
 }

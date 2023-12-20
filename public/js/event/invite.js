@@ -1,7 +1,7 @@
-function getUsers() {
+function getUsers(eventId) {
   var name = document.getElementById("userSearch").value;
   if (name != "") {
-    var url = `/users/` + name;
+    var url = `/users/` + name + `/event/` + eventId;
     fetch(url)
       .then((response) => {
         if (!response.ok) {
@@ -40,6 +40,13 @@ function getUsers() {
 }
 
 function inviteUser(id) {
+  document.getElementById("listUser").innerHTML = "";
+  const newRow = document.createElement("li");
+  newRow.className =
+    "list-group-item border-success text-success d-flex justify-content-between align-items-center";
+  newRow.innerHTML = `User invited`;
+  document.getElementById("listUser").appendChild(newRow);
+
   var url = "/invite/" + id + "/event/" + eventId;
   var options = {
     method: "POST",
