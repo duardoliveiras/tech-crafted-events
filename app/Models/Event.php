@@ -52,6 +52,11 @@ class Event extends BaseModel
         return $this->hasMany(Ticket::class);
     }
 
+    public function ticketsValid()
+    {
+        return $this->hasMany(Ticket::class)->where('status', 'PAID');
+    }
+
     public function discussion()
     {
         return $this->hasOne(Discussion::class);

@@ -79,6 +79,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
 // Events
 Route::resource('events', EventController::class);
 Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
+Route::get('events/attendees/{event}', [EventController::class, 'showAttendees'])->name('events.attendees');
 
 //Reports
 Route::post('/events/{event}/report', [EventReportController::class, 'postReport'])->name('event-report.store');
