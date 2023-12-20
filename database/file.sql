@@ -75,7 +75,7 @@ CREATE TABLE Users
 (
     id             UUID PRIMARY KEY,
     name           VARCHAR(255) NOT NULL,
-    phone          CHAR(20)     NOT NULL,
+    phone_number_number   CHAR(20)     NOT NULL,
     email          VARCHAR(255) NOT NULL UNIQUE,
     password       VARCHAR(255),
     provider       VARCHAR(255),
@@ -127,17 +127,22 @@ CREATE TABLE Notification
 (
     id               UUID PRIMARY KEY,
     text             TEXT             NOT NULL,
-    expiresAt        DATE             NOT NULL,
-    notificationType NotificationType NOT NULL,
+    notificationtype NotificationType NOT NULL,
     user_id          UUID             NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES Users (id)
+    event_id		 UUID   			  null,
+    created_at		 TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
+    read             BOOLEAN NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES Users (id),
+    foreign key (EVENT_ID) references event (id)
 );
+
 
 CREATE TABLE EventNotifications
 (
     id                SERIAL PRIMARY KEY,
     event_id          UUID NOT NULL,
     notification_text TEXT NOT NULL,
+    created_at		  TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
     FOREIGN KEY (event_id) REFERENCES Event (id)
 );
 
@@ -339,7 +344,7 @@ VALUES
     ('55555555-5555-5555-5555-555555555555', 'Universidade do Porto', 'Praça de Gomes Teixeira', '11111111-1111-1111-1111-111111111111', '/universities/university4.jpeg');
 
 
-INSERT INTO Users (id, name, phone, email, password, birthDate, university_id, is_banned, is_deleted, image_url)
+INSERT INTO Users (id, name, phone_number, email, password, birthDate, university_id, is_banned, is_deleted, image_url)
 VALUES ('66666666-6666-6666-6666-666666666666', 'Tiririca', '+55 77997890', 'tiririca@gmail.com',
         '902fab49244e61e09d9568aedebc84daa1da7b2a', '1990-03-15', '22222222-2222-2222-2222-222222222222', false, false,
         ''),
@@ -351,7 +356,7 @@ INSERT INTO eventorganizer (id, legal_id, user_id)
 VALUES ('88888888-8888-8888-8888-888888888888', '123456', '66666666-6666-6666-6666-666666666666'),
        ('99999999-9999-9999-9999-999999999999', '125656', '77777777-7777-7777-7777-777777777777');
 
-INSERT INTO Users (id, name, phone, email, password, birthDate, university_id, is_banned, is_deleted, image_url)
+INSERT INTO Users (id, name, phone_number, email, password, birthDate, university_id, is_banned, is_deleted, image_url)
 VALUES ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Tiririca Pior Que Tá Não Fica', '+55 99997890', 'admin@gmail.com',
         '$2y$10$/cAIN8kgiGZR3jDakznSreoEZYQ6NNXnfEAUPEeWmgB9gd3.IdKaG', '1990-03-15',
         '22222222-2222-2222-2222-222222222222', false, false, '');

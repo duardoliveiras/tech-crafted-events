@@ -32,7 +32,7 @@ class User extends Authenticatable
         'birthdate',
         'email',
         'password',
-        'phone',
+        'phone_number',
         'is_deleted',
         'is_banned',
         'university_id',
@@ -91,7 +91,7 @@ class User extends Authenticatable
         $this->name = '[User Deleted]';
         $this->email = '';
         $this->password = bcrypt(Str::random(10)); // Reset password with a random hash
-        $this->phone = '';
+        $this->phone_number = '';
         $this->birthdate = now();
         $this->image_url = '';
 

@@ -10,6 +10,7 @@ use App\Models\Event;
 use App\Models\EventOrganizer;
 use App\Models\Ticket;
 use App\Models\University;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
@@ -459,4 +460,10 @@ class EventController extends Controller
         return view('layouts.event.attendee', compact('event'));
     }
 
+
+    public function getUsers($userEmail)
+    {
+        $users = User::where('email', 'like', '%' . $userEmail . '%')->get();
+        return response()->json($users);
+    }
 }

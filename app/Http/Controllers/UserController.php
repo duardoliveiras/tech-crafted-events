@@ -63,25 +63,34 @@ class UserController extends Controller
             return redirect()->route('home')->with('error', 'You do not have permission to update this profile.');
         }
 
-        $validatedData = $request->validate([
-            'name' => 'required|max:255',
-            'birthdate' => 'required|date',
-            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-            'phone_number' => 'required|max:20'
-        ]);
+        if ($user->provider == null) {
+            $validatedData = $request->validate([
+                'name' => 'required|max:255',
+                'birthdate' => 'required|date',
+                'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+                'phone_number' => 'required|max:20'
+            ]);
 
-
-        $user->update(array_merge($validatedData, ['image_url' => $this->uploadImage($request->file('image_url'))]));
+            $user->update(array_merge($validatedData, ['image_url' => $this->uploadImage($request->file('image_url'))]));
+        } else {
+            $validatedData = $request->validate([
+                'birthdate' => 'required|date',
+                'phone_number' => 'required|max:20'
+            ]);
+            $user->update(['birthdate' => $request->birthdate,
+                'phone_number' => $request->phone_number]);
+        }
 
         return redirect()->route('profile.show', $user->id)->with('success', 'Profile updated successfully!');
     }
+
 
     private function uploadImage($imageFile)
     {
         $image = Image::make($imageFile);
 
         $imagePath = 'users/' . $imageFile->hashName();
-        Storage::disk('public')->put($imagePath, (string)$image->encode());
+        Storage::disk('public')->put($imagePath, (string) $image->encode());
 
         return $imagePath;
     }
