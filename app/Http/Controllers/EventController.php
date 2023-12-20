@@ -367,11 +367,11 @@ class EventController extends Controller
 
             $this->authorizeDeletion($event);
 
+            $this->deleteEventWithDiscussion($event);
+
             if ($event->image_url && Storage::disk('public')->exists($event->image_url)) {
                 Storage::disk('public')->delete($event->image_url);
             }
-
-            $this->deleteEventWithDiscussion($event);
 
             return redirect()->route('events.index')->with('success', 'Event deleted successfully.');
         } catch (\Exception $e) {
@@ -391,6 +391,10 @@ class EventController extends Controller
             $this->authorizeDeletion($event);
 
             $this->deleteEventWithDiscussion($event);
+
+            if ($event->image_url && Storage::disk('public')->exists($event->image_url)) {
+                Storage::disk('public')->delete($event->image_url);
+            }
 
             return response()->json(['success' => 'Event deleted successfully.']);
         } catch (\Exception $e) {
@@ -423,7 +427,6 @@ class EventController extends Controller
     private function deleteEventWithDiscussion($event): void
     {
         DB::transaction(function () use ($event) {
-            Discussion::where('event_id', $event->id)->delete();
             $this->refundTickets($event);
             $event->status = 'DELETED';
             $event->save();
