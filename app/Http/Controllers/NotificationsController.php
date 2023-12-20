@@ -46,10 +46,10 @@ class NotificationsController extends Controller
 
     public function updateRead($type, $notificationId)
     {
+        $qt_notificaiton = Auth::user()->allNotifications();
+
         if ($type == 'notification') {
             $notification = UserEventNotifications::find($notificationId);
-            $qt_notificaiton = Auth::user()->notifications()->where('read', false)->count();
-
             if ($notification) {
                 $notification->update(['read' => true]);
                 return response()->json(['message' => 'Read success.', 'qt_notification' => $qt_notificaiton]);
@@ -59,6 +59,7 @@ class NotificationsController extends Controller
         } else if ($type == 'invite') {
             $notification = Notification::find($notificationId);
             $notification->update(['read' => true]);
+            return response()->json(['message' => 'Read success.', 'qt_notification' => $qt_notificaiton]);
         }
 
     }
@@ -72,6 +73,8 @@ class NotificationsController extends Controller
             ->get();
 
         if ($notification->isEmpty()) {
+            $users = array($userId);
+            event(new NotificationReceived($users));
             $notification = new Notification([
                 'text' => "You are invited to EVENT",
                 'notificationtype' => 'INVITE',
