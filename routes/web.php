@@ -58,7 +58,7 @@ Route::get('/load/{type}', [NotificationsController::class, 'getInvites']);
 Route::put('/update-read/{type}/{id}', [NotificationsController::class, 'updateRead'])->name('read-notification');
 Route::post('/update-notification', [NotificationsController::class, 'received'])->name('update-notification');
 Route::post('/invite/{user}/event/{event}', [NotificationsController::class, 'inviteUser']);
-Route::post('/notification/report-comment/{comment}', [NotificationsController::class, 'notifyUsers']);
+Route::post('/notification/report-comment/{comment}/{type}', [NotificationsController::class, 'notifyUsers']);
 
 // Forget Password
 Route::post('/password/email', [ForgotPasswordController::class, 'forgetPasswordPost'])->name('password.email');
