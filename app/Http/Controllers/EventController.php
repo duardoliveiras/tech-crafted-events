@@ -2,26 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
-use App\Models\City;
-use App\Models\User;
-use App\Models\Event;
-use App\Models\Ticket;
-use App\Models\Country;
 use App\Models\Category;
-use Illuminate\View\View;
+use App\Models\City;
+use App\Models\Country;
 use App\Models\Discussion;
-use App\Models\University;
-use Illuminate\Http\Request;
+use App\Models\Event;
 use App\Models\EventOrganizer;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
-use App\Events\NotificationReceived;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
-use Intervention\Image\Facades\Image;
-use Illuminate\Support\Facades\Storage;
+use App\Models\Ticket;
+use App\Models\University;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
+use Intervention\Image\Facades\Image;
 
 class EventController extends Controller
 {
@@ -107,7 +106,6 @@ class EventController extends Controller
             // Check if the events collection is empty
             return $events->isEmpty() ? response()->json(['html' => ''])
                 : response()->json(['html' => view('partials.event', compact('events'))->render()]);
-
         }
 
         return view('layouts.event.list', compact('events', 'universities', 'categories', 'locations'));
@@ -235,6 +233,10 @@ class EventController extends Controller
 
     private function validateEventData(Request $request): array
     {
+        $tomorrow = Carbon::tomorrow()->format('Y-m-d');
+
+        $this->validationRules['start_date'] = 'required|date|after:' . $tomorrow;
+
         $validatedData = $request->validate($this->validationRules);
 
         $startDate = Carbon::parse($validatedData['start_date']);
@@ -277,7 +279,7 @@ class EventController extends Controller
         $image = Image::make($imageFile);
 
         $imagePath = 'events/' . $imageFile->hashName();
-        Storage::disk('public')->put($imagePath, (string) $image->encode());
+        Storage::disk('public')->put($imagePath, (string)$image->encode());
 
         return $imagePath;
     }
@@ -298,10 +300,6 @@ class EventController extends Controller
     {
         try {
             $event = $this->updateEventData($request, $id);
-            $users = Ticket::where('event_id', $event->id)
-                ->pluck('user_id')
-                ->toArray();
-            event(new NotificationReceived($users));
             return redirect()->route('events.show', $event->id)->with('success', 'Event updated successfully!');
         } catch (\Exception $e) {
             return redirect()->back()->withInput()->withErrors(['msg' => $e->getMessage()]);
@@ -363,6 +361,10 @@ class EventController extends Controller
 
             $this->authorizeDeletion($event);
 
+            if ($event->image_url && Storage::disk('public')->exists($event->image_url)) {
+                Storage::disk('public')->delete($event->image_url);
+            }
+
             $this->deleteEventWithDiscussion($event);
 
             return redirect()->route('events.index')->with('success', 'Event deleted successfully.');
@@ -394,7 +396,7 @@ class EventController extends Controller
     {
         $pattern = '/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i';
 
-        return (bool) preg_match($pattern, $uuid);
+        return (bool)preg_match($pattern, $uuid);
     }
 
     private function findEventById($id): Event
@@ -430,8 +432,11 @@ class EventController extends Controller
 
         try {
             $event = $this->findEventById($eventId);
+            $ticket = $this->findTicketById($ticketId);
 
-            $this->stripeController->refundPaymentFromUser($event, Auth::id());
+            if ($ticket->price_paid == 0) {
+                $this->stripeController->refundPaymentFromUser($event, Auth::id());
+            }
 
             $ticket = $this->findTicketById($ticketId);
 
@@ -447,6 +452,14 @@ class EventController extends Controller
     {
         $this->stripeController->refundAllPaymentsFromEvent($event);
     }
+
+    public function showAttendees($eventId)
+    {
+        $event = Event::with('ticket.user')->findOrFail($eventId);
+        $this->authorize('showList', $event);
+        return view('layouts.event.attendee', compact('event'));
+    }
+
 
     public function getUsers($userEmail)
     {

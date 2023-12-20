@@ -22,16 +22,28 @@
 
                             <div class="form-group mb-3">
                                 <label for="name">Name:</label>
+                                <span class="ms-1 custom-label" data-toggle="tooltip" data-placement="top"
+                                      title="Enter the name of the university that you want to add">
+                                    <img src="{{ asset('assets/img/info.svg') }}" alt="Info">
+                                </span>
                                 <input type="text" class="form-control" id="name" name="name" required>
                             </div>
 
                             <div class="form-group mb-3">
                                 <label for="image_url">Image:</label>
+                                <span class="ms-1 custom-label" data-toggle="tooltip" data-placement="top"
+                                      title="Enter the picture of the university that you want to add">
+                                    <img src="{{ asset('assets/img/info.svg') }}" alt="Info">
+                                </span>
                                 <input type="file" class="form-control-file" id="image_url" name="image_url" required>
                             </div>
 
                             <div class="form-group mb-3">
                                 <label for="address_search">Search Address (City, State, Country):</label>
+                                <span class="ms-1 custom-label" data-toggle="tooltip" data-placement="top"
+                                      title="Enter the address of the university that you want to add">
+                                    <img src="{{ asset('assets/img/info.svg') }}" alt="Info">
+                                </span>
                                 <div class="input-group">
                                     <input type="text" class="form-control" id="address_search" name="address_search" placeholder="Type address..." required>
                                     <div class="input-group-append">
@@ -46,6 +58,10 @@
                             </div>
                             <div class="form-group mb-3">
                                 <label for="address">Address Description (Number, Neighborhood, Reference):</label>
+                                <span class="ms-1 custom-label" data-toggle="tooltip" data-placement="top"
+                                      title="Enter the address description of the university that you want to add">
+                                    <img src="{{ asset('assets/img/info.svg') }}" alt="Info">
+                                </span>
                                 <input type="text" class="form-control" id="address" name="address"
                                        placeholder="Type address's number, neighborhood, reference..." required>
                             </div>

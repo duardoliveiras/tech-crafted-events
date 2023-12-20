@@ -74,13 +74,11 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/create', [AdminController::class, 'create'])->name('admin.create');
     Route::post('/admin/store', [AdminController::class, 'store'])->name('admin.store');
     Route::get('/admin/reports', [AdminController::class, 'reports'])->name('admin.reports');
-    Route::get('admin/ban/user/{user}', [AdminController::class, 'banUser'])->name('ban.user');
 });
 
 // Events
 Route::resource('events', EventController::class);
 Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
-Route::get('/users/{email}', [EventController::class, 'getUsers']);
 
 //Reports
 Route::post('/events/{event}/report', [EventReportController::class, 'postReport'])->name('event-report.store');
@@ -111,7 +109,6 @@ Route::resource('universities', UniversityController::class);
 //Ticket
 Route::get('/events/{event}/ticket/buy', [TicketController::class, 'showBuyTicketForm'])->name('ticket.buy');
 Route::post('/events/{event}/ticket/acquire', [TicketController::class, 'acquireTicket'])->name('ticket.acquire');
-Route::post('/events/{event}/ticket/invite', [TicketController::class, 'acquireInvite'])->name('ticket.invite');
 Route::get('/events/{event}/ticket/authorize', [TicketController::class, 'authorizeTicket'])->name('ticket.authorize');
 Route::get('/events/{event}/ticket/{ticket}', [TicketController::class, 'showTicket'])
     ->name('ticket.show')
@@ -163,4 +160,3 @@ Route::get('/event-organizer', [EventOrganizerController::class, 'show'])
 Route::post('/event-organizer/{legal_id}/{stripe_account_id}', [EventOrganizerController::class, 'create'])
     ->name('event-organizer.create')
     ->middleware(['auth']);
-
