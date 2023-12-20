@@ -198,6 +198,7 @@ class EventController extends Controller
 
     public function create()
     {
+        $this->authorize('create', Event::class);
         $categories = Category::all();
         $eventOrganizer = EventOrganizer::where('user_id', Auth::id())->first();
         $hasLegalId = $eventOrganizer && !is_null($eventOrganizer->legal_id);
