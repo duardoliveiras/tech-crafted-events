@@ -74,11 +74,14 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/create', [AdminController::class, 'create'])->name('admin.create');
     Route::post('/admin/store', [AdminController::class, 'store'])->name('admin.store');
     Route::get('/admin/reports', [AdminController::class, 'reports'])->name('admin.reports');
+    Route::get('admin/ban/user/{user}', [AdminController::class, 'banUser'])->name('ban.user');
 });
 
 // Events
 Route::resource('events', EventController::class);
 Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
+Route::get('events/attendees/{event}', [EventController::class, 'showAttendees'])->name('events.attendees');
+Route::get('/users/{email}', [EventController::class, 'getUsers']);
 
 //Reports
 Route::post('/events/{event}/report', [EventReportController::class, 'postReport'])->name('event-report.store');
