@@ -71,7 +71,7 @@ class EventController extends Controller
         }
 
         if ($universityFilter) {
-            $query->whereHas('owner.user.university', function($q) use ($universityFilter) {
+            $query->whereHas('owner.user.university', function ($q) use ($universityFilter) {
                 $q->where('university_id', $universityFilter);
             });
         }
@@ -431,8 +431,11 @@ class EventController extends Controller
 
         try {
             $event = $this->findEventById($eventId);
+            $ticket = $this->findTicketById($ticketId);
 
-            $this->stripeController->refundPaymentFromUser($event, Auth::id());
+            if ($ticket->price_paid == 0) {
+                $this->stripeController->refundPaymentFromUser($event, Auth::id());
+            }
 
             $ticket = $this->findTicketById($ticketId);
 
