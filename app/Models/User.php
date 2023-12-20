@@ -109,11 +109,22 @@ class User extends Authenticatable
         return $this->hasMany(EventOrganizer::class, 'user_id');
     }
 
-    public function notifications()
+    public function eventNotifications()
     {
         return $this->hasMany(UserEventNotifications::class, 'user_id');
     }
 
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class, 'user_id');
+    }
+
+    public function allNotifications()
+    {
+        $qt_notification = $this->eventNotifications()->where('read', false)->count();
+        $qt_notification += $this->notifications()->where('read', false)->count();
+        return $qt_notification;
+    }
     public function votesForDiscussion(Discussion $discussion)
     {
         return Vote::whereIn('comment_id', $discussion->comment()->pluck('id'))
