@@ -24,11 +24,11 @@ class DiscussionController extends Controller
             $event = Event::findOrFail($eventId);
             $user = auth()->user();
 
-            if (!$event->ticket()->whereIn('status', ['PAID', 'READ'])->where('user_id', $user->id)->exists()) {
-                return back()->withError('You cannot access this discussion because you do not have valid a ticket.');
+            if (!($event->status === 'UPCOMING' || $event->status === 'ONGOING')) {
+                abort(404);
             }
 
-            $userHasTicket = $event->ticket->contains('user_id', $user->id);
+            $userHasTicket = $event->ticket()->whereIn('status', ['PAID', 'READ'])->where('user_id', $user->id)->exists();
             $isOrganizer = $event->owner->id == $user->id;
 
             if (!($userHasTicket || $isOrganizer || $user->isAdmin())) {
