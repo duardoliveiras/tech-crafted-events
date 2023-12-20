@@ -291,7 +291,29 @@ function check_all_comment(userId, commentId) {
       if (!response.ok) {
         throw Error(response.statusText);
       }
-      window.location.href = "/admin/reports";
+
+      url = `/notification/report-comment/${commentId}`;
+      options = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]')
+            .content,
+        },
+        body: JSON.stringify({}),
+      };
+
+      fetch(url, options)
+        .then((response) => {
+          if (!response.ok) {
+            throw Error(response.statusText);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
+      //window.location.href = "/admin/reports";
     })
 
     .catch((error) => {
