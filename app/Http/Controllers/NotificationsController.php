@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\NotificationReceived;
-use App\Models\CommentReport;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Models\Notification;
-use App\Models\EventNotification;
 use App\Models\Event;
+use App\Models\Comment;
+use App\Models\Discussion;
+use App\Models\Notification;
+use Illuminate\Http\Request;
+use App\Models\CommentReport;
+use App\Models\EventNotification;
+use App\Events\NotificationReceived;
+use Illuminate\Support\Facades\Auth;
 use App\Models\UserEventNotifications;
 
 class NotificationsController extends Controller
@@ -58,7 +60,7 @@ class NotificationsController extends Controller
             } else {
                 return response()->json(['error' => 'Notification not found.'], 404);
             }
-        } else if ($type == 'invite') {
+        } else {
             $notification = Notification::find($notificationId);
             $notification->update(['read' => true]);
             return response()->json(['message' => 'Read success.', 'qt_notification' => $qt_notificaiton]);
@@ -94,18 +96,23 @@ class NotificationsController extends Controller
 
     public function notifyUsers($commentId)
     {
-        $users = CommentReport::where('comment_id', $commentId);
+        $comment = Comment::find($commentId);
+        $reports = CommentReport::where('comment_id', $commentId)->get();
+        $event = Discussion::find($comment->discussion_id)->event;
 
-        foreach ($users as $user) {
+        $users = [];
+        foreach ($reports as $report) {
             $notification = new Notification([
-                'text' => "You are invited to EVENT",
-                'notificationtype' => 'INVITE',
-                'user_id' => $user->user_id,
+                'text' => "Your comment report in the " . $event->name . " discussion has been successfully analyzed. The comment was maintained as our team believes it did not violate any company rules.",
+                'notificationtype' => 'REPORT',
+                'user_id' => $report->user_id,
                 'read' => false,
                 'event_id' => null
             ]);
             $notification->save();
+            array_push($users, $report->user_id);
         }
+        event(new NotificationReceived($users));
 
         return response()->json(['message' => 'Read success.']);
     }

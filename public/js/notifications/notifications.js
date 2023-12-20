@@ -134,7 +134,7 @@ function getInvites(type) {
           cardHtml +=
             "<button onclick=\"readNotification('" +
             invite.id +
-            "', 'invite')\" class=\"m-1 btn btn-secondary btn-sm\">Read</button>";
+            "', 'report')\" class=\"m-1 btn btn-secondary btn-sm\">Read</button>";
           cardHtml += "</div>";
           cardHtml += "</div>";
 
@@ -196,7 +196,13 @@ function readNotification(notificationId, type) {
       if (!response.ok) {
         throw Error(response.statusText);
       }
-      type == "notification" ? getNotifications() : getInvites("INVITE");
+      if (type == "notification") {
+        getNotifications();
+      } else if (type == "invite") {
+        getInvites("INVITE");
+      } else {
+        getInvites("REPORT");
+      }
       return response.json();
     })
     .then((data) => {
