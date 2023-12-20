@@ -94,16 +94,22 @@ class NotificationsController extends Controller
         return response()->json(['message' => 'Invited success.']);
     }
 
-    public function notifyUsers($commentId)
+    public function notifyUsers($commentId, $type)
     {
         $comment = Comment::find($commentId);
         $reports = CommentReport::where('comment_id', $commentId)->get();
         $event = Discussion::find($comment->discussion_id)->event;
 
+        if ($type === "check") {
+            $text = "Your comment report in the " . $event->name . " discussion has been successfully analyzed. The comment was maintained as our team believes it did not violate any company rules.";
+        } else {
+            $text = "Your comment report in the " . $event->name . " discussion has been successfully analyzed. The comment was removed from the site and the writer's account was banned. Thank you for contributing to a safe community.";
+        }
+
         $users = [];
         foreach ($reports as $report) {
             $notification = new Notification([
-                'text' => "Your comment report in the " . $event->name . " discussion has been successfully analyzed. The comment was maintained as our team believes it did not violate any company rules.",
+                'text' => $text,
                 'notificationtype' => 'REPORT',
                 'user_id' => $report->user_id,
                 'read' => false,

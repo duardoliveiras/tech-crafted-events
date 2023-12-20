@@ -240,7 +240,27 @@ function banComment(commentId) {
       if (!response.ok) {
         throw Error(response.statusText);
       }
-      window.location = route_reports;
+      url = `/notification/report-comment/${commentId}/ban`;
+      options = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]')
+            .content,
+        },
+        body: JSON.stringify({}),
+      };
+
+      fetch(url, options)
+        .then((response) => {
+          if (!response.ok) {
+            throw Error(response.statusText);
+          }
+          window.location = route_reports;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     })
     .catch((error) => {
       console.error("Erro", error);
@@ -292,7 +312,7 @@ function check_all_comment(userId, commentId) {
         throw Error(response.statusText);
       }
 
-      url = `/notification/report-comment/${commentId}`;
+      url = `/notification/report-comment/${commentId}/check`;
       options = {
         method: "POST",
         headers: {
@@ -308,12 +328,11 @@ function check_all_comment(userId, commentId) {
           if (!response.ok) {
             throw Error(response.statusText);
           }
+          window.location = route_reports;
         })
         .catch((error) => {
           console.log(error);
         });
-
-      //window.location.href = "/admin/reports";
     })
 
     .catch((error) => {
