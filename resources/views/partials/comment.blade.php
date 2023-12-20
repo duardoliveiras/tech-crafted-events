@@ -1,11 +1,15 @@
 <div class="d-flex flex-start mt-3">
 
+    @if($comment->user->provider == null)
     <img class="rounded-circle shadow-1-strong me-3" src="{{ $comment->user->image_url ? asset('storage/' . $comment->user->image_url) : 'https://static-00.iconduck.com/assets.00/user-icon-2048x2048-ihoxz4vq.png' }}" alt="avatar" width="60" height="60" />
+    @else
+    <img class="rounded-circle shadow-1-strong me-3" src="{{ asset($comment->user->image_url)}}" alt="avatar" width="60" height="60" />
+    @endif
     <div class="w-100">
         <h6 class="fw-bold mb-0" style="font-size: 1.05rem;">
             {{ $comment->user->name }}
             @if($comment->isOwner())
-            <span class="badge rounded-pill bg-success ms-2"><strong>Event Organizer</strong></span>
+            <span class=" badge rounded-pill bg-success ms-2"><strong>Event Organizer</strong></span>
             @endif
             @if($comment->isAdmin())
             <span class="badge rounded-pill bg-secondary ms-2"><strong>Admin</strong></span>
@@ -23,7 +27,7 @@
                 </svg>
             </a>
             @endif
-            <a href="javascript:void(0);" class="link-muted text-decoration-none text-reset ms-2 button-delete" id="button-report" onclick=title="Report comment" data-toggle="modal" data-target="#reportModal">
+            <a href="javascript:void(0);" class="link-muted text-decoration-none text-reset ms-2 button-delete" id="button-report" data-toggle="modal" data-target="#reportModal">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#d3d7cf" class="bi bi-trash3-fill" viewBox="0 0 16 16">
                     <path d="M14.778.085A.5.5 0 0 1 15 .5V8a.5.5 0 0 1-.314.464L14.5 8l.186.464-.003.001-.006.003-.023.009a12.435 12.435 0 0 1-.397.15c-.264.095-.631.223-1.047.35-.816.252-1.879.523-2.71.523-.847 0-1.548-.28-2.158-.525l-.028-.01C7.68 8.71 7.14 8.5 6.5 8.5c-.7 0-1.638.23-2.437.477A19.626 19.626 0 0 0 3 9.342V15.5a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 1 0v.282c.226-.079.496-.17.79-.26C4.606.272 5.67 0 6.5 0c.84 0 1.524.277 2.121.519l.043.018C9.286.788 9.828 1 10.5 1c.7 0 1.638-.23 2.437-.477a19.587 19.587 0 0 0 1.349-.476l.019-.007.004-.002h.001" />
                 </svg>

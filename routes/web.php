@@ -54,7 +54,10 @@ Route::get('/auth/{provider}/callback', [ProviderController::class, 'callback'])
 
 //Notifications
 Route::get('/load-notifications', [NotificationsController::class, 'index'])->name('notifications.index');
-Route::put('/update-read/{id}', [NotificationsController::class, 'updateRead'])->name('read-notification');
+Route::get('/load-invites', [NotificationsController::class, 'getInvites']);
+Route::put('/update-read/{type}/{id}', [NotificationsController::class, 'updateRead'])->name('read-notification');
+Route::post('/update-notification', [NotificationsController::class, 'received'])->name('update-notification');
+Route::post('/invite/{user}/event/{event}', [NotificationsController::class, 'inviteUser']);
 
 // Forget Password
 Route::post('/password/email', [ForgotPasswordController::class, 'forgetPasswordPost'])->name('password.email');
@@ -76,7 +79,6 @@ Route::middleware(['auth', 'admin'])->group(function () {
 // Events
 Route::resource('events', EventController::class);
 Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
-Route::get('events/attendees/{event}', [EventController::class, 'showAttendees'])->name('events.attendees');
 
 //Reports
 Route::post('/events/{event}/report', [EventReportController::class, 'postReport'])->name('event-report.store');

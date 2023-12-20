@@ -8,10 +8,12 @@ use App\Models\Comment;
 use Illuminate\Http\Request;
 use App\Models\CommentReport;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class CommentReportController extends Controller
 {
-    public function postReport(Request $request, $eventId, $commentId){
+    public function postReport(Request $request, $eventId, $commentId)
+    {
         $request->validate([
             'description' => 'reportRequired'
         ]);
@@ -34,36 +36,43 @@ class CommentReportController extends Controller
     {
         $report = CommentReport::find($reportId);
 
-        if($report){
+        if ($report) {
             $report->update(['analyzed' => true]);
             return response()->json(['message' => 'Check report success.']);
-        }else{
+        } else {
             return response()->json(['error' => 'Report not found'], 404);
         }
 
 
     }
-    public function check_all_comment($userId){
+    public function check_all_comment($userId)
+    {
         $reports = CommentReport::where('user_id', $userId)->get();
 
-        if($reports){
-            foreach($reports as $report){
+        if ($reports) {
+            foreach ($reports as $report) {
                 $report->analyzed = true;
                 $report->save();
             }
             return response()->json(['message' => 'Success check all'], 200);
-                                
-        }else{
+
+        } else {
             return response()->json(['error' => 'Event not found'], 404);
         }
-        
+
     }
 
-    public function banComment($commentId){
+    public function banComment($commentId)
+    {
         $comment = Comment::find($commentId);
         $user = User::find($comment->user_id);
 
-        if($user && $comment){
+        Mail::send('mail.banned', ['comment' => $comment, 'name' => $user->name], function ($message) use ($user) {
+            $message->to($user->email);
+            $message->subject("Your account are banned");
+        });
+
+        if ($user && $comment) {
             $user->update([
                 'is_banned' => true
             ]);
@@ -71,7 +80,7 @@ class CommentReportController extends Controller
                 'is_deleted' => true
             ]);
             return response()->json(['message' => 'Banned with success.']);
-        }else{
+        } else {
             return response()->json(['error' => 'User not found.'], 404);
         }
     }
