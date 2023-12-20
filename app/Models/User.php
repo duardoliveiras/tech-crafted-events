@@ -89,7 +89,7 @@ class User extends Authenticatable
 
         // Anonymize personal information
         $this->name = '[User Deleted]';
-        $this->email = '';
+        $this->email = Str::random(10);
         $this->password = bcrypt(Str::random(10)); // Reset password with a random hash
         $this->phone_number = '';
         $this->birthdate = now();

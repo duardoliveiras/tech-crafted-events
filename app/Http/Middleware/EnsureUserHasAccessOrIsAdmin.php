@@ -31,9 +31,11 @@ class EnsureUserHasAccessOrIsAdmin
         }
 
         // Check if the user has a ticket with status "PAID" or "READ"
-        $userTicket = $event->ticket->firstWhere('user_id', Auth::id());
-        if ($userTicket && in_array($userTicket->status, ['PAID', 'READ'])) {
-            return $next($request);
+        $userTickets = $event->ticket->where('user_id', Auth::id());
+        foreach($userTickets as $userTicket) {
+            if ($userTicket && in_array($userTicket->status, ['PAID', 'READ'])) {
+                return $next($request);
+            }
         }
 
         // If none of the above conditions are true, redirect to home with an error

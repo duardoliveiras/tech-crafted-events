@@ -18,23 +18,31 @@ class DiscussionController extends Controller
 
     public function show($eventId)
     {
-        $event = Event::with('discussion', 'ticket')->findOrFail($eventId);
-        $user = auth()->user();
-        $discussion = $event->discussion;
-        if (!$event->discussion) {
-            return redirect()->route('home');
+        try {
+            error_log('opa');
+
+            $event = Event::findOrFail($eventId);
+            $user = auth()->user();
+
+            if (!$event->ticket()->whereIn('status', ['PAID', 'READ'])->where('user_id', $user->id)->exists()) {
+                return back()->withError('You cannot access this discussion because you do not have valid a ticket.');
+            }
+
+            $userHasTicket = $event->ticket->contains('user_id', $user->id);
+            $isOrganizer = $event->owner->id == $user->id;
+
+            if (!($userHasTicket || $isOrganizer || $user->isAdmin())) {
+                abort(403, 'You do not have access to this discussion.');
+            }
+
+            $discussion = $event->discussion;
+            $comments = Comment::getCommentsForDiscussion($discussion->id) ?? collect();
+            $userVotes = $user->votesForDiscussion($discussion);
+
+            return view('layouts.event.discussion.show', compact('discussion', 'comments', 'event', 'userVotes'));
+
+        } catch (\Exception $e) {
+            return back()->withError('Error accessing discussion: ' . $e->getMessage());
         }
-
-        $userHasTicket = $event->ticket->contains('user_id', $user->id);
-        $isOrganizer = $event->owner->id == $user->id;
-
-        if (!($userHasTicket || $isOrganizer || $user->isAdmin())) {
-            abort(403, 'You do not have access to this discussion.');
-        }
-
-        $comments = Comment::getCommentsForDiscussion($discussion->id) ?? collect();
-        $userVotes = $user->votesForDiscussion($discussion);
-
-        return view('layouts.event.discussion.show', compact('discussion', 'comments', 'event', 'userVotes'));
     }
 }
