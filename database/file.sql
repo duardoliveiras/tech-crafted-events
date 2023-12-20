@@ -295,7 +295,8 @@ begin
         insert into tech_crafted.userseventnotifications(user_id, notification_id, read)
         select user_id, id_notification, false
         from ticket
-        where event_id = new.id;
+        where event_id = new.id
+        and status = 'PAID';
     end if;
 
     return new;
