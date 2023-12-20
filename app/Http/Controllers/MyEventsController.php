@@ -22,7 +22,7 @@ class MyEventsController extends Controller
             return $organizer->events;
         });
 
-        $tickets = $user->ticket()->with('event')->get();
+        $tickets = $user->ticket()->with('event')->where('status', 'PAID')->get();
         $eventsWithTickets = $tickets->map(function ($ticket) {
             return $ticket->event;
         })->unique('id');
