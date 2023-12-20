@@ -98,10 +98,12 @@ function getInvites() {
         cardHtml +=
           "<button onclick=\"acquireInvite('" +
           invite.events.id +
+          "', '" +
+          invite.id +
           '\')" class="btn btn-success btn-sm">Accept</button>';
         cardHtml +=
           "<button onclick=\"readNotification('" +
-          invite.events.id +
+          invite.id +
           "', 'invite')\" class=\"m-1 btn btn-danger btn-sm\">Reject</button>";
 
         cardHtml += "</div>";
@@ -117,7 +119,7 @@ function getInvites() {
     });
 }
 
-function acquireInvite(eventId) {
+function acquireInvite(eventId, notificationId) {
   var url = "/events/" + eventId + "/ticket/invite";
   var options = {
     method: "POST",
@@ -132,7 +134,7 @@ function acquireInvite(eventId) {
       if (!response.ok) {
         throw Error(response.statusText);
       }
-      readNotification(eventId, "invite");
+      readNotification(notificationId, "invite");
       return response.json();
     })
     .then((data) => {

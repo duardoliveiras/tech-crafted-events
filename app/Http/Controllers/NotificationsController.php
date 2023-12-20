@@ -57,24 +57,33 @@ class NotificationsController extends Controller
                 return response()->json(['error' => 'Notification not found.'], 404);
             }
         } else if ($type == 'invite') {
-            $notification = Notification::where('event_id', $notificationId)->first();
-            $notification->read = true;
-            $notification->save();
+            $notification = Notification::find($notificationId);
+            $notification->update(['read' => true]);
         }
 
     }
 
     public function inviteUser($userId, $eventId)
     {
-        $notification = new Notification([
-            'text' => "You are invited to EVENT",
-            'notificationtype' => 'INVITE',
-            'user_id' => $userId,
-            'read' => false,
-            'event_id' => $eventId
-        ]);
+        $notification = Notification::where('user_id', $userId)
+            ->where('event_id', $eventId)
+            ->where('notificationtype', 'INVITE')
+            ->where('read', false)
+            ->get();
 
-        $notification->save();
+        if ($notification->isEmpty()) {
+            $notification = new Notification([
+                'text' => "You are invited to EVENT",
+                'notificationtype' => 'INVITE',
+                'user_id' => $userId,
+                'read' => false,
+                'event_id' => $eventId
+            ]);
+            $notification->save();
+        }
+
+
+
         return response()->json(['message' => 'Invited success.']);
     }
 
