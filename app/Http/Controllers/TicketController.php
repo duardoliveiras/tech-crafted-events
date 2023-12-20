@@ -40,7 +40,7 @@ class TicketController extends Controller
             return back()->withError('Sorry, there are no more tickets available for this event.');
         }
 
-        if (Ticket::where('user_id', Auth::id())->where('event_id', $eventId)->exists()) {
+        if (Ticket::where('user_id', Auth::id())->where('event_id', $eventId)->whereIn('status', ['PAID','READ'])->exists()) {
             return back()->withError('You already have a ticket for this event.');
         }
 
