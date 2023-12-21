@@ -157,8 +157,7 @@
         <div class="banner-content text-center">
             <h1>Make your own Event</h1>
             <p>Publish your own event here!</p>
-            <a href="{{route('events.create')}}">
-                <button class="btn btn-primary banner-button px-5">Create Events</button>
+            <a href="{{route('events.create')}}" class="btn btn-primary banner-button px-5">Create Events
             </a>
         </div>
     </div>
