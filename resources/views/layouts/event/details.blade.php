@@ -65,7 +65,7 @@
                     <i class="fas fa-map-marker-alt me-2"></i> It will be hosted at
                     <a class="link-muted text-decoration-none text-reset"
                        href="https://www.google.com/maps/search/?api=1&query={{ urlencode($event->address . ', ' . $event->city->name) }}">
-                        <b>{{ $event->address }}, {{ $event->city->name }}</b>
+                        <b><u>{{ $event->address }}, {{ $event->city->name }}</u></b>
                     </a>
                 </p>
             </div>

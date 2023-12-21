@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm d-flex">
     <div class="container d-flex align-items-center">
         <a href="{{ url('/home') }}" class="logo">
-            <img src="{{ URL::asset('/assets/logo.svg') }}" alt="profile Pic" height="50" width="150" />
+            <img src="{{ URL::asset('/assets/logo.svg') }}" alt="Logo" height="50" width="150" />
         </a>
 
         <div class="d-flex container align-items-center" id="navbarSupportedContent">
