@@ -170,7 +170,7 @@
                 <div class="col-md-4">
                     <a href="{{ route('universities.show', $university->id) }}" class="text-decoration-none">
                         <div class="card mb-4 card-hover-effect">
-                            <img src="{{ Storage::url($university->image_url) }}" class="card-img-top"
+                            <img src="{{ asset('university/' . $university->image_url) }}" class="card-img-top"
                                  alt="Image of {{ $university->name }}"
                                  style="width: 100%; height: 300px; object-fit: cover;">
                             <div class="card-body">
