@@ -11,6 +11,7 @@ use App\Models\University;
 use App\Models\EventReport;
 use Illuminate\Http\Request;
 use App\Models\CommentReport;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -20,6 +21,8 @@ use Illuminate\Support\Facades\Validator;
 
 class AdminController extends Controller
 {
+    static $diskName = 'ImagesSaved';
+
     public function index()
     {
         $usersPage = request('usersPage', 1);
@@ -50,7 +53,7 @@ class AdminController extends Controller
             'birthdate' => 'required|date',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6',
-            'phone' => 'required|unique:users',
+            'phone_number' => 'required|unique:users',
             'university_id' => 'required|exists:university,id',
             'image_url' => 'sometimes|image|max:2048', // Validate if the file is an image and its size
         ]);
@@ -62,10 +65,7 @@ class AdminController extends Controller
         $imageUrl = '';
         if ($request->hasFile('image_url') && $request->file('image_url')->isValid()) {
             $imageFile = $request->file('image_url');
-            $image = Image::make($imageFile);
-            $imagePath = 'users/' . $imageFile->hashName();
-            Storage::disk('public')->put($imagePath, (string) $image->encode());
-            $imageUrl = $imagePath;
+            $imageUrl = $this->uploadImage($imageFile);
         }
 
         $user = User::create([
@@ -73,7 +73,7 @@ class AdminController extends Controller
             'birthdate' => $request->birthdate,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'phone' => $request->phone,
+            'phone_number' => $request->phone_number,
             'university_id' => $request->university_id,
             'image_url' => $imageUrl,
         ]);
@@ -165,7 +165,12 @@ class AdminController extends Controller
         } else {
             return back()->withErrors('You don\'t have permission to access this');
         }
-
     }
 
+    private function uploadImage(UploadedFile $imageFile, $path = 'user'): string
+    {
+        $fileName = $imageFile->hashName();
+        $imageFile->storeAs($path, $fileName, self::$diskName);
+        return $fileName;
+    }
 }
