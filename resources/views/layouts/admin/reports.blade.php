@@ -61,7 +61,12 @@
                 <table class="table table-bordered">
                     <thead>
                     <tr>
-                        <th scope="col">User</th>
+                        <th scope="col">User
+                                <span class="ms-1 custom-label" data-toggle="tooltip" data-placement="top"
+                                      title="Reported user name">
+                                    <img src="{{ asset('assets/img/info.svg') }}" alt="Info">
+                                </span></th>
+                        <th scope="col">Comment</th>
                         <th scope="col">Reports</th>
                         <th scope="col">Actions</th>
                     </tr>
@@ -73,6 +78,7 @@
                             <td>
                                 <a href="{{ route('profile.show', $comment->user->id) }}"> {{ $comment->user->name }} </a>
                             </td>
+                            <td>{{ substr($comment->text, 0, 25) . (strlen($comment->text) > 25 ? '...' : '') }}</td>
                             <td> {{ $comment->comment_report_count }} </td>
                             <td>
                                 <button type="button" class="btn btn-primary" data-toggle="modal"
@@ -141,7 +147,11 @@
                 <table class="table table-bordered mt-3">
                     <thead>
                     <tr>
-                        <th scope="col">Name</th>
+                        <th scope="col">Name                                     
+                                <span class="ms-1 custom-label" data-toggle="tooltip" data-placement="top"
+                                      title="Name of the user who made the report">
+                                    <img src="{{ asset('assets/img/info.svg') }}" alt="Info">
+                                </span></th>
                         <th scope="col">Reason</th>
                         <th scope="col">Description</th>
                         <th scope="col">Action</th>
