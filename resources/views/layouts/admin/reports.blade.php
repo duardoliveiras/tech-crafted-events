@@ -49,8 +49,6 @@
                             </td>
                         </tr>
                     @empty
-                        <tr>
-                        </tr>
                     @endforelse
 
 
@@ -108,8 +106,6 @@
                             </td>
                         </tr>
                     @empty
-                        <tr>
-                        </tr>
                     @endforelse
                     </tbody>
                 </table>
