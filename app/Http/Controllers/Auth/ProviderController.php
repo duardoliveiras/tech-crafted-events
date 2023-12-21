@@ -24,6 +24,10 @@ class ProviderController extends Controller
 
         if ($login) {
             Auth::login($login);
+            if (Auth::user()->is_banned) {
+                Auth::logout();
+                return redirect()->route('login')->with('error', 'Account has been banned.');
+            }
             return redirect('/home');
         } else {
             return view('register-provider', ['universities' => $universities, 'user' => $user, 'provider' => $provider]);
