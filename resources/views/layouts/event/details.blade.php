@@ -98,7 +98,7 @@
                                 <button class="btn btn-secondary custom-button disabled">Ticket Purchase Pending
                                 </button>
                             @else
-                                <span class="mb-2">Tickets for {{ $event->current_price == 0 ? 'free' : '€ ' . number_format($event->current_price, 2) }}</span>
+                                <span class="mb-2">Tickets for {{ $event->current_price == 0? 'free' : '€ ' . number_format($event->current_price, 2) }}</span>
                                 <a href="{{ route('ticket.buy', ['event' => $event->id]) }}"
                                    class="btn btn-primary w-100 custom-button"><i class="fas fa-money-bill-wave"></i>
                                     Buy now!</a>
@@ -191,7 +191,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3 class="modal-title" id="reportModalLabel"> Invite User </h3>
+                    <h3 class="modal-title" id="inviteModalLabel"> Invite User </h3>
                     <button type="button" class="btn btn-outline-secondary" data-dismiss="modal" aria-label="Close"
                             onclick="window.location=route_reports">
                         <span aria-hidden="true">&times;</span>
@@ -230,121 +230,23 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="{{ asset('js/event/invite.js') }}"></script>
+    <link rel="stylesheet" type="text/css" href="{{URL::asset('/assets/css/details-event.css')}}">
+
     <script>
-        var eventId = "{{ $event->id }}";
+        let eventId = "{{ $event->id }}";
     </script>
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@200;300;400;500;600;800&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
-
-        .event-name {
-            color: #1e0a3c;
-            font-weight: 800;
-            font-size: 2.8rem;
-            font-family: 'Raleway', sans-serif !important;
-        }
-
-        .box-left, .box-right, .box-actions, .report-paragraph {
-            font-family: 'Raleway', sans-serif !important;
-        }
-
-        .report-paragraph {
-            color: #7E7E7E;
-        }
-
-        .report-paragraph a {
-            cursor: pointer;
-            color: #1e0a3c !important;
-        }
-
-        .box-actions {
-            border-radius: 16px;
-            border-color: #d5d4d7;
-            border-width: 1px;
-            border-style: solid;
-        }
-
-        .box-actions span {
-            font-weight: 700;
-            font-size: 1.2rem;
-        }
-
-        .image-container {
-            position: relative;
-            width: 100%;
-            overflow: hidden;
-        }
-
         .blurred-background {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background-image: url({{asset('storage/' . $event->image_url) }}); /* Mesma imagem de fundo */
+            background-image: url({{asset('storage/' . $event->image_url) }});
             background-size: cover;
             filter: blur(10px);
             z-index: -1;
-        }
-
-        .image-container img {
-            display: block;
-            width: 100%; /* Define a largura da imagem para 100% do contêiner */
-            max-height: 600px;
-            object-fit: contain; /* Garante que a imagem inteira seja visível */
-            position: relative; /* Isso garante que a imagem fique acima do fundo desfocado */
-        }
-
-
-        .image-container::before, .image-container::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 20%;
-            z-index: 2;
-        }
-
-        .image-container::before {
-            left: 0;
-            background: linear-gradient(to right, #f8fafc, rgba(248, 250, 252, 0));
-        }
-
-        .image-container::after {
-            right: 0;
-            background: linear-gradient(to left, #f8fafc, rgba(248, 250, 252, 0));
-        }
-
-        .vl {
-            border-left: 2px solid #d5d4d7;
-            height: 300px;
-        }
-
-        .custom-button {
-            background: linear-gradient(to left, #7848F4, #5827D8);
-            font-size: 1.4rem !important;
-            font-weight: bolder !important;
-            border: none !important;
-            width: 100% !important;
-
-            &.discussion {
-                background: linear-gradient(to left, #ffa200, #ff7300);
-            }
-
-            &.access-ticket {
-                background: linear-gradient(to left, #7848F4, #5827D8);
-            }
-
-            &.edit-event {
-                background: linear-gradient(to left, #20a2f0, #1c6999);
-            }
-
-            &.authenticate-ticket {
-                background: linear-gradient(to left, #7848F4, #5827D8);
-            }
-
-            &.leave-event, &.cancel-event {
-                background: linear-gradient(to left, #ff6666, #ff0d0d);
-            }
         }
     </style>
 @endsection
