@@ -2,20 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Country;
 use App\Models\University;
 use Illuminate\Http\Request;
-use App\Models\City;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
-use App\Models\Country;
-use App\Models\State;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
-use Intervention\Image\Facades\Image;
 
 
 class UniversityController extends Controller
 {
     const NOMINATIM_API_URL = "https://nominatim.openstreetmap.org/reverse?format=json";
+    static $diskName = 'ImagesSaved';
 
     private $validationRules = [
         'name' => 'required|string|max:255',
@@ -27,10 +26,12 @@ class UniversityController extends Controller
     {
         $this->middleware('admin')->except(['index', 'show']);
     }
+
     public function index(Request $request)
     {
-       return;
+        return;
     }
+
     public function getCityCode($lat, $lon)
     {
         $response = Http::get(self::NOMINATIM_API_URL . "&lat={$lat}&lon={$lon}");
@@ -70,8 +71,8 @@ class UniversityController extends Controller
      */
     public function create()
     {
-        return view('layouts.universities.create');
         $this->authorize('create', University::class);
+        return view('layouts.universities.create');
     }
 
     /**
@@ -96,11 +97,12 @@ class UniversityController extends Controller
             ? redirect()->route('admin.dashboard')->with('success', 'University created successfully.')
             : redirect()->back()->withInput()->withErrors(['msg' => 'Error saving the university.']);
     }
-    private function uploadImage($imageFile) {
-        $image = Image::make($imageFile);
-        $imagePath = 'universities/' . $imageFile->hashName();
-        Storage::disk('public')->put($imagePath, (string)$image->encode());
-        return $imagePath; // This should be a path like "universities/filename.jpg"
+
+    private function uploadImage(UploadedFile $imageFile, $path = 'university'): string
+    {
+        $fileName = $imageFile->hashName();
+        $imageFile->storeAs($path, $fileName, self::$diskName);
+        return $fileName;
     }
 
 
@@ -113,6 +115,7 @@ class UniversityController extends Controller
 
         return view('layouts.universities.details', compact('university'));
     }
+
     /**
      * Show the form for editing the specified resource.
      */
@@ -165,7 +168,6 @@ class UniversityController extends Controller
         return redirect()->route('universities.show', $university->id)
             ->with('success', 'University updated successfully!');
     }
-
 
 
     /**
