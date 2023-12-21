@@ -26,6 +26,7 @@ class AdminController extends Controller
         $eventsPage = request('eventsPage', 1);
 
         $users = User::where('id', '!=', Auth::id())
+            ->where('is_deleted', false)
             ->orderBy('name', 'asc')
             ->paginate(10, ['*'], 'usersPage')
             ->withPath('?eventsPage=' . $eventsPage);
