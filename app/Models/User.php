@@ -32,11 +32,13 @@ class User extends Authenticatable
         'birthdate',
         'email',
         'password',
-        'phone',
+        'phone_number',
         'is_deleted',
         'is_banned',
         'university_id',
-        'image_url'
+        'image_url',
+        'provider',
+        'provider_token'
     ];
 
 
@@ -80,11 +82,51 @@ class User extends Authenticatable
         return $this->admin()->exists();
     }
 
+    public function delete()
+    {
+        // Mark the user as deleted
+        $this->is_deleted = true;
+
+        // Anonymize personal information
+        $this->name = '[User Deleted]';
+        $this->email = Str::random(10);
+        $this->password = bcrypt(Str::random(10)); // Reset password with a random hash
+        $this->phone_number = '';
+        $this->provider = '';
+        $this->provider_token = '';
+        $this->birthdate = now();
+        $this->image_url = '';
+
+        $this->save();
+    }
+
+
+    public function university()
+    {
+        return $this->belongsTo(University::class, 'university_id');
+    }
+
     public function eventOrganizer()
     {
         return $this->hasMany(EventOrganizer::class, 'user_id');
     }
 
+    public function eventNotifications()
+    {
+        return $this->hasMany(UserEventNotifications::class, 'user_id');
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class, 'user_id');
+    }
+
+    public function allNotifications()
+    {
+        $qt_notification = $this->eventNotifications()->where('read', false)->count();
+        $qt_notification += $this->notifications()->where('read', false)->count();
+        return $qt_notification;
+    }
     public function votesForDiscussion(Discussion $discussion)
     {
         return Vote::whereIn('comment_id', $discussion->comment()->pluck('id'))
@@ -92,13 +134,17 @@ class User extends Authenticatable
             ->pluck('vote_type', 'comment_id');
     }
 
+    public function event_report()
+    {
+        return $this->hasMany(EventReport::class, 'user_id');
+    }
 
     protected static function boot()
     {
         parent::boot();
 
         static::creating(function ($model) {
-            $model->{$model->getKeyName()} = (string)Str::uuid();
+            $model->{$model->getKeyName()} = (string) Str::uuid();
         });
     }
 

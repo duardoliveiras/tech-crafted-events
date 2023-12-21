@@ -2,21 +2,19 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
-use App\Models\University;
 use App\Models\User;
-use App\Providers\RouteServiceProvider;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Contracts\View\View;
-use Illuminate\Foundation\Application;
-use Illuminate\Foundation\Auth\RegistersUsers;
+use App\Models\University;
+use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Intervention\Image\Facades\Image;
+use Illuminate\Auth\Events\Registered;
+use App\Providers\RouteServiceProvider;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Intervention\Image\Facades\Image;
-use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\RegistersUsers;
 
 class RegisterController extends Controller
 {
@@ -62,8 +60,8 @@ class RegisterController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'phone' => ['string', 'max:15'],
-            'birthdate' => ['date'],
+            'phone_number' => ['string', 'max:20'],
+            'birthdate' => ['date', 'before:' . now()->subYears(12)->format('Y-m-d')],
             'university_id' => 'required|exists:university,id',
         ]);
     }
@@ -86,7 +84,7 @@ class RegisterController extends Controller
                 $image = Image::make($imageFile);
 
                 $imagePath = 'users/' . $imageFile->hashName();
-                Storage::disk('public')->put($imagePath, (string)$image->encode());
+                Storage::disk('public')->put($imagePath, (string) $image->encode());
 
                 $imageUrl = $imagePath;
             }
@@ -96,7 +94,7 @@ class RegisterController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'phone' => $data['phone'],
+            'phone_number' => $data['phone_number'],
             'birthdate' => $data['birthdate'],
             'university_id' => $data['university_id'],
             'image_url' => $imageUrl
@@ -122,6 +120,27 @@ class RegisterController extends Controller
         return $request->wantsJson()
             ? new JsonResponse([], 201)
             : redirect($this->redirectPath());
+    }
+
+    public function registerComplete(Request $request)
+    {
+        $user =
+            User::updateOrCreate([
+                'email' => $request['email']]
+                , [
+                    'name' => $request['name'],
+                    'email' => $request['email'],
+                    'phone_number' => $request['phone_number'],
+                    'birthdate' => $request['birthdate'],
+                    'university_id' => $request['university_id'],
+                    'image_url' => $request['image_url'],
+                    'provider' => $request['provider'],
+                    'provider_token' => $request['provider_token']
+                ]);
+
+        Auth::login($user);
+        return redirect('/home');
+
     }
 
 

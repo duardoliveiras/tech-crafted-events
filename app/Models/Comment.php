@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -11,10 +10,7 @@ class Comment extends BaseModel
 {
     use HasFactory;
 
-    protected $keyType = 'string';
-    public $timestamps = false;
     protected $table = 'comment';
-
     protected $casts = [
         'commented_at' => 'datetime',
     ];
@@ -22,8 +18,16 @@ class Comment extends BaseModel
         'text',
         'commented_at',
         'user_id',
-        'discussion_id'
+        'discussion_id',
+        'is_deleted',
+        'attachment_path'
     ];
+
+    public static function getCommentsForDiscussion($discussionId)
+    {
+        return static::where('discussion_id', $discussionId)
+            ->get();
+    }
 
     public function discussion(): BelongsTo
     {
@@ -49,5 +53,9 @@ class Comment extends BaseModel
     public function votes(): HasMany
     {
         return $this->hasMany(Vote::class, 'comment_id');
+    }
+
+    public function comment_report(){
+        return $this->hasMany(CommentReport::class, 'comment_id');
     }
 }

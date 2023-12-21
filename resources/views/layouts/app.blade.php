@@ -7,7 +7,13 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+{{--    <title>{{ preg_replace('/(?<!\ )[A-Z]/', ' $0', config('app.name', 'Laravel')) }}</title>--}}
+
+    <title>
+        @yield('title', config('app.name', 'Laravel'))
+    </title>
+
+    <link rel="icon" href="{{ URL::asset('/assets/img/logo-without-text.svg') }}">
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.bunny.net">
@@ -16,21 +22,39 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.6/cropper.css" rel="stylesheet">
 
     <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 
     <!-- map -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 </head>
 <body class="">
+
 <div id="app" class="d-flex flex-column min-vh-100">
-    @include('partials.navbar')
+    @if(optional(\Illuminate\Support\Facades\Route::getCurrentRoute())->uri != 'register')
+        @include('partials.navbar')
+    @endif
+
+            <nav aria-label="breadcrumb" class="mt-2 ms-5">
+                <ol class="breadcrumb">
+                    <li>
+                        <i class="fa fa-home"></i>
+                        <a href="{{route('home')}}">Home</a>
+                    </li>
+                    @yield('breadcrumbs')
+                </ol>
+            </nav>
+
+
 
     <main class="flex-fill py-4">
         @yield('content')
     </main>
-
+    
     <footer class="text-white text-center text-lg-start"
             style="background-color: #10107B !important;">
         <div class="container pt-5 mt-auto">
@@ -95,5 +119,6 @@
         </div>
     </footer>
 </div>
+
 </body>
 </html>

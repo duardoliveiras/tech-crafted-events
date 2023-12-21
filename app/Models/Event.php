@@ -3,15 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 
 class Event extends BaseModel
 {
     use HasFactory;
 
     protected $table = 'event';
-    protected $keyType = 'string';
-    public $timestamps = false;
     protected $fillable = [
         'name',
         'description',
@@ -24,12 +21,15 @@ class Event extends BaseModel
         'category_id',
         'city_id',
         'owner_id',
-        'image_url'
+        'image_url',
+        'status',
+        'created_at'
     ];
     protected $casts = [
         'current_price' => 'float',
         'start_date' => 'datetime',
         'end_date' => 'datetime',
+        'created_at' => 'datetime',
     ];
 
     public function category()
@@ -51,6 +51,7 @@ class Event extends BaseModel
     {
         return $this->hasMany(Ticket::class);
     }
+
     public function discussion()
     {
         return $this->hasOne(Discussion::class);
@@ -64,4 +65,32 @@ class Event extends BaseModel
             ]);
         });
     }
+
+    public function isFinished(): bool
+    {
+        return $this['status'] === EventStatus::Finished->value;
+    }
+
+    public function eventNotifications()
+    {
+        return $this->hasMany(EventNotification::class, 'event_id');
+    }
+
+    public function event_report()
+    {
+        return $this->hasMany(EventReport::class, 'event_id');
+    }
+
+    public function userCanBuyTicket(): bool
+    {
+        foreach ($this->ticket as $ticket) {
+            // Check if the ticket belongs to the current user
+            if ($ticket->user_id === auth()->id() && !$ticket->canBuyTicket()) {
+                // If the user has a ticket and they cannot buy a new one, return false
+                return false;
+            }
+        }
+        return true;
+    }
+
 }

@@ -10,6 +10,7 @@ class BaseModel extends Model
     protected $keyType = 'string';
     public $incrementing = false;
     protected $primaryKey = 'id';
+    public $timestamps = false;
 
     protected static function boot()
     {

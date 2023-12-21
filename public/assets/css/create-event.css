@@ -1,0 +1,27 @@
+.custom-button {
+    background: linear-gradient(to left, #7848F4, #5827D8);
+    font-size: 1.3rem !important;
+    font-weight: bolder !important;
+    border: none !important;
+}
+
+.custom-input {
+    border-color: #CACBCA !important;
+    border-width: 2px !important;
+    font-size: 1rem !important;
+}
+
+.custom-label {
+    font-size: 1rem !important;
+}
+
+.search-city-button {
+    border-radius: 0 6px 6px 0 !important;
+    border-color: #CACBCA !important;
+    border-width: 2px !important;
+    font-size: 1rem !important;
+}
+
+.custom-input.is-invalid {
+    border-color: #dc3545 !important;
+}

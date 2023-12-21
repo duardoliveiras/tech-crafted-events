@@ -1,19 +1,41 @@
 @extends('layouts.app')
 
-<link rel="stylesheet" type="text/css" href="{{URL::asset('/assets/css/list-event.css')}}">
+
+@section('title', 'Tech Crafted')
 
 @section('content')
-    <style>
-        .card-hover-effect {
-            transition: transform .3s, box-shadow .3s;
-            border: none;
-        }
+    <!-- Success Message -->
+    @if(session('success'))
+        <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+            <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header" style="background-color: #308329;color: white;">
+                    <strong class="me-auto" style="font-size: 1.2rem;font-weight: bolder;">Success</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body" style="font-size: 1rem;font-weight: bolder;">
+                    {{ session('success') }}
+                </div>
+            </div>
+        </div>
+    @endif
 
-        .card-hover-effect:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-    </style>
+    <!-- Error Message -->
+    @if(session('error'))
+        <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+            <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header" style="background-color: #f06f6f;color: white;">
+                    <strong class="me-auto" style="font-size: 1.2rem;font-weight: bolder;">Error</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body" style="font-size: 1rem;font-weight: bolder;">
+                    {{ session('error') }}
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <link rel="stylesheet" type="text/css" href="{{URL::asset('/assets/css/list-event.css')}}">
+
     <div class="container my-3 filters-container">
         <form class="mb-0" id="filter-form">
             <div class="form-row d-flex flex-row justify-content-around mx-4">
@@ -43,18 +65,19 @@
                     </h2>
                     <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne"
                          data-bs-parent="#fullTextSearch">
+
                         <div class="accordion-body pt-0">
-                            <div class="form-row d-flex flex-row justify-content-around mx-2">
-                                <div class="col mx-2">
-                                    <label for="eventType" class="text-white label-filter">Looking for</label>
-                                    <select id="eventType" name="eventType" class="form-control">
+                            <div class="form-row d-flex flex-row flex-wrap justify-content-around mx-2">
+                                <div class="col mx-2 mb-3 mb-sm-0">
+                                    <label for="event-type" class="text-white label-filter">Looking for</label>
+                                    <select id="event-type" name="event-type" class="form-control">
                                         <option value="">Choose event type</option>
                                         @foreach ($categories as $eventType)
-                                            <option value="{{ $eventType->id }}" {{ request('eventType') == $eventType->id ? 'selected' : '' }}>{{ $eventType->name }}</option>
+                                            <option value="{{ $eventType->id }}" {{ request('event-type') == $eventType->id ? 'selected' : '' }}>{{ $eventType->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col mx-2">
+                                <div class="col mx-2 mb-3 mb-sm-0">
                                     <label for="location" class="text-white label-filter">Location</label>
                                     <select id="location" name="location" class="form-control">
                                         <option value="">Choose location</option>
@@ -63,84 +86,99 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col mx-2">
+                                <div class="col mx-2 mb-3 mb-sm-0">
                                     <label for="date-filter" class="text-white label-filter">When</label>
                                     <input type="date" class="form-control" id="date-filter" name="date-filter"
                                            value="{{ request('date-filter') }}">
+                                </div>
+                                <div class="col mx-2 mb-3 mb-sm-0">
+                                    <label for="university" class="text-white label-filter">University</label>
+                                    <select id="university" name="university" class="form-control">
+                                        <option value="">Choose university</option>
+                                        @foreach ($universities as $university)
+                                            <option value="{{ $university->id }}" {{ request('university') == $university->id ? 'selected' : '' }}>{{ $university->name }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <input type="hidden" name="sort" id="sort">
+
             <a onclick="clearForm()" id="clear-filters" class="text-decoration-none text-white ms-4"
                style="cursor: pointer;"><u>Clear filter options</u></a>
         </form>
     </div>
 
+
     <div class="container mt-5">
-        <h2 class="title-events black">Upcoming</h2>
-        <h2 class="title-events purple"> Events</h2>
-        <div class="row mt-3">
-            @foreach($events as $event)
-                <div class="col-md-4">
-                    <div class="card mb-4 shadow card-hover-effect" style="border-width: 0;">
-                        <a href="/events/{{ $event->id }}" class="text-decoration-none text-reset">
-                            <div style="position: absolute; top: 10px; left: 20px; background: white; color: #7848F4; padding: 8px; border-radius: 10px;">
-                                @if ($event->current_price == 0)
-                                    FREE
-                                @else
-                                    € {{ number_format($event->current_price, 2) }}
-                                @endif
-                            </div>
-                            <img src="{{('storage/' . $event->image_url) }}"
-                                 class="card-img-top" alt="{{ $event->name }}">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ $event->name }}</h5>
-                                <p class="card-text mb-1"
-                                   style="color: #7848F4;">{{ \Carbon\Carbon::parse($event->start_date)->format('l, F j, g:i A') }}</p>
-                                <p class="card-text" style="color: #7E7E7E;">{{ $event->address }}
-                                    , {{ $event->city->name }}</p>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                @if ($loop->iteration % 3 == 0)
-        </div>
         <div class="row">
+            <div class="title col">
+                <h2 class="title-events black">Upcoming</h2>
+                <h2 class="title-events purple"> Events</h2>
+            </div>
+            <div class="sort-options col justify-content-end d-flex flex-row align-items-center">
+                <div class="dropdown">
+                    <button id="dropdown-sort" class="btn btn-secondary dropdown-toggle" type="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                        Sort By
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdown-sort">
+                        <li><a class="dropdown-item dropdown-sort" style="cursor:pointer" data-sort="start-date">Start
+                                Date</a></li>
+                        <li><a class="dropdown-item dropdown-sort" style="cursor:pointer" data-sort="name">Name</a></li>
+                        <li><a class="dropdown-item dropdown-sort" style="cursor:pointer" data-sort="price-lowest">Price
+                                (lowest
+                                first)</a></li>
+                        <li><a class="dropdown-item dropdown-sort" style="cursor:pointer" data-sort="price-greater">Price
+                                (greater
+                                first)</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row mt-3">
+            @include('partials.event', ['events' => $events])
+            <div id="anchor"></div>
+            @if($events->hasMorePages())
+                <button id="loadMore" class="btn btn-primary custom-button mt-3 mb-3">Load More</button>
             @endif
-            @endforeach
         </div>
     </div>
 
     <div class="banner mt-5">
-        <img src="{{URL::asset('/assets/make-your-event.png')}}" class="image-mye"/>
+        <img src="{{URL::asset('/assets/make-your-event.png')}}" class="image-mye d-none d-sm-block"
+             alt="Banner image"/>
         <div class="banner-content text-center">
             <h1>Make your own Event</h1>
             <p>Publish your own event here!</p>
-            <a href="{{route('events.create')}}">
-                <button class="btn banner-button">Create Events</button>
+            <a href="{{route('events.create')}}" class="btn btn-primary banner-button px-5">Create Events
             </a>
         </div>
     </div>
 
     <div class="container mt-5">
         <h2 class="title-events black">Trending</h2>
-        <h2 class="title-events purple"> Colleges</h2>
-        <div class="row mt-3">
-            @foreach($universities as $index => $university)
+        <h2 class="title-events purple">Colleges</h2>
+        <div class="row mt-3" id="container-events">
+            @foreach($universities as $university)
                 <div class="col-md-4">
-                    <div class="card mb-4 card-hover-effect">
-                        @php
-                            $imageName = 'university' . ($index + 1) . '.jpeg';
-                            $imageUrl = asset("assets/universities/{$imageName}");
-                        @endphp
-                        <img src="{{ $imageUrl }}" class="card-img-top" alt="Imagem de {{ $university->name }}">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ $university->name }}</h5>
-                            <p class="card-text">Localization: {{ $university->address }}</p>
+                    <a href="{{ route('universities.show', $university->id) }}" class="text-decoration-none">
+                        <div class="card mb-4 card-hover-effect">
+                            <img src="{{ Storage::url($university->image_url) }}" class="card-img-top"
+                                 alt="Image of {{ $university->name }}"
+                                 style="width: 100%; height: 300px; object-fit: cover;">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ $university->name }}</h5>
+                                <p class="card-text">Localization: {{ $university->address }}</p>
+                            </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
                 @if ($loop->iteration % 3 == 0)
         </div>
@@ -150,18 +188,7 @@
         </div>
     </div>
 
-    <script>
-        function clearForm() {
-            let currentUrl = new URL(window.location.href);
-
-            let formFields = ["full-text-search", "eventType", "location", "date-filter"];
-            formFields.forEach(function (field) {
-                currentUrl.searchParams.delete(field);
-            });
-
-            window.location.href = currentUrl.href;
-        }
-    </script>
+    <script type="text/javascript" src="{{ URL::asset ('js/event/list-event.js') }}"></script>
 
 @endsection
 

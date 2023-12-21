@@ -3,15 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Ticket extends BaseModel
 {
     use HasFactory;
 
     protected $table = 'ticket';
-    protected $keyType = 'string';
-    public $timestamps = false;
     protected $fillable = [
         'event_id',
         'user_id',
@@ -20,7 +18,6 @@ class Ticket extends BaseModel
         'created_at',
         'updated_at'
     ];
-
 
     public function event()
     {
@@ -37,6 +34,7 @@ class Ticket extends BaseModel
         $this->status = 'PENDING';
         $this->save();
     }
+
     public function markTicketAsPaid()
     {
         $this->status = 'PAID';
@@ -59,6 +57,24 @@ class Ticket extends BaseModel
     {
         $this->status = 'ERROR';
         $this->save();
+    }
+
+    public function isValidTicket(): Ticket|null
+    {
+        return $this->status === 'PAID' || $this->status === 'READ' ? $this : null;
+    }
+
+    public function canBuyTicket(): bool
+    {
+        // Check if the current user already has a ticket
+        if ($this->user_id === Auth::id()) {
+            // If the user already has a ticket, check its status
+            $status = $this->status;
+            // If the status is 'ERROR' or 'CANCELED', the user can buy a new ticket
+            return $status === 'ERROR' || $status === 'CANCELED' || $status === 'PENDING';
+        }
+        // If the current user does not have a ticket, they can buy one
+        return true;
     }
 
 }

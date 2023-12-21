@@ -2,25 +2,31 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
+use Carbon\Carbon;
 use App\Models\City;
-use App\Models\Country;
-use App\Models\Discussion;
+use App\Models\User;
 use App\Models\Event;
-use App\Models\EventOrganizer;
+use App\Models\Ticket;
+use App\Models\Country;
+use App\Models\Category;
+use Illuminate\View\View;
+use App\Models\Discussion;
 use App\Models\University;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Models\EventOrganizer;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use App\Events\NotificationReceived;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\View\View;
 use Intervention\Image\Facades\Image;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class EventController extends Controller
 {
     const NOMINATIM_API_URL = "https://nominatim.openstreetmap.org/reverse?format=json";
+    protected StripeController $stripeController;
 
     private $validationRules = [
         'name' => 'required|string|max:255',
@@ -34,26 +40,36 @@ class EventController extends Controller
         'image_url' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
     ];
 
-    public function __construct()
+    public function __construct(StripeController $stripeController)
     {
         $this->middleware('auth')->except(['index', 'show']);
+        $this->stripeController = $stripeController;
     }
 
-    public function index(Request $request): View
+    public function index(Request $request)
     {
         $categories = Category::all();
         $locations = City::all();
         $universities = University::all();
 
-        $eventType = $request->query('eventType');
+        $eventType = $request->query('event-type');
         $location = $request->query('location');
         $dateFilter = $request->query('date-filter');
         $nameFilter = $request->query('full-text-search');
+        $universityFilter = $request->query('university');
 
         $query = Event::query();
 
+        $searchQuery = 'your_search_query';
+
         if ($nameFilter) {
-            $query->whereRaw('LOWER(name) like ?', ['%' . strtolower($nameFilter) . '%']);
+            $query->where(function ($query) use ($nameFilter) {
+                $query->orWhereRaw("to_tsvector('english', name) @@ to_tsquery('english', ?)", ["'$nameFilter'"])
+                    ->orWhereRaw("to_tsvector('english', description) @@ to_tsquery('english', ?)", ["'$nameFilter'"])
+                    ->orWhereRaw("to_tsvector('english', address) @@ to_tsquery('english', ?)", ["'$nameFilter'"])
+                    ->orWhere('name', 'like', '%' . $nameFilter . '%');
+            })
+                ->get();
         }
 
         if ($eventType) {
@@ -64,11 +80,47 @@ class EventController extends Controller
             $query->where('city_id', $location);
         }
 
+        if ($universityFilter) {
+            $query->whereHas('owner.user.university', function ($q) use ($universityFilter) {
+                $q->where('university_id', $universityFilter);
+            });
+        }
+
         if ($dateFilter) {
             $query->whereDate('start_date', '=', date('Y-m-d', strtotime($dateFilter)));
         }
 
-        $events = $query->get();
+        $sort = $request->query('sort');
+
+        if ($nameFilter) {
+            $query->orderByRaw('ts_rank(to_tsvector(\'english\', name), to_tsquery(\'english\', ?)) DESC', ["'$nameFilter'"]);
+        }
+
+        switch ($sort) {
+            case 'name':
+                $query->orderBy('name');
+                break;
+            case 'price-lowest':
+                $query->orderBy('current_price', 'asc');
+                break;
+            case 'price-greater':
+                $query->orderBy('current_price', 'desc');
+                break;
+            default:
+                $query->orderBy('start_date');
+                break;
+        }
+
+        $query->whereIn('status', ['ONGOING', 'UPCOMING']);
+
+        $events = $query->paginate(6);
+
+
+        if ($request->ajax() || $request->query('ajax')) {
+            // Check if the events collection is empty
+            return $events->isEmpty() ? response()->json(['html' => ''])
+                : response()->json(['html' => view('partials.event', compact('events'))->render()]);
+        }
 
         return view('layouts.event.list', compact('events', 'universities', 'categories', 'locations'));
     }
@@ -109,33 +161,111 @@ class EventController extends Controller
 
     public function show($id): View
     {
-        $event = Event::with('ticket')->findOrFail($id);
-        $userHasTicket = auth()->check() && $event->ticket->contains('user_id', auth()->id());
+        [$event, $userHasTicket] = $this->fetchEventAndTicketStatus($id);
 
         return view('layouts.event.details', compact('event', 'userHasTicket'));
     }
 
+    public function showJson($id): JsonResponse
+    {
+        [$event, $userHasTicket] = $this->fetchEventAndTicketStatus($id);
+
+        return response()->json(['event' => $event, 'userHasTicket' => $userHasTicket]);
+    }
+
+    private function fetchEventAndTicketStatus($id)
+    {
+        if (!$this->isValidUuid($id)) {
+            abort(404, 'Not found');
+        }
+
+        try {
+            $event = Event::with('ticket')->findOrFail($id);
+            $userHasTicket = Auth::check() && $event->ticket->contains('user_id', Auth::id());
+
+            return [$event, $userHasTicket];
+        } catch (ModelNotFoundException $e) {
+            abort(404, 'Not found');
+        } catch (\Exception $e) {
+            // Handle other exceptions if necessary
+            abort(500, 'Server Error');
+        }
+    }
+
+    public function byPassTicketShow($eventId, $ticketId): View
+    {
+        if (!$this->isValidUuid($ticketId) || !$this->isValidUuid($eventId)) {
+            abort(404);
+        }
+
+        try {
+            $ticket = $this->findTicketById($ticketId);
+
+            $ticket->markTicketAsPaid();
+
+            return self::show($eventId);
+        } catch (ModelNotFoundException $e) {
+            abort(404);
+        }
+    }
+
     public function create()
     {
+        $this->authorize('create', Event::class);
         $categories = Category::all();
         $eventOrganizer = EventOrganizer::where('user_id', Auth::id())->first();
         $hasLegalId = $eventOrganizer && !is_null($eventOrganizer->legal_id);
 
+        if (!$hasLegalId) {
+            // needs to create event organizer account first
+            return redirect()->route('event-organizer.show');
+        }
+
         return view('layouts.event.create', compact('categories', 'hasLegalId'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request): \Illuminate\Http\RedirectResponse
     {
-        $request->validate($this->validationRules);
-        $startDate = Carbon::parse($request->input('start_date'));
-        $endDate = Carbon::parse($request->input('end_date'));
+        try {
+            $validatedData = $this->validateEventData($request);
+            $event = $this->storeEventData($validatedData, $request);
+            return redirect()->route('events.index')->with('success', 'Event created successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->withInput()->withErrors(['msg' => 'Error saving the event: ' . $e->getMessage()]);
+        }
+    }
+
+    public function storeJson(Request $request): JsonResponse
+    {
+        try {
+            $validatedData = $this->validateEventData($request);
+            $event = $this->storeEventData($validatedData, $request);
+            return response()->json(['success' => 'Event created successfully.', 'event' => $event]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error saving the event: ' . $e->getMessage()], 422);
+        }
+    }
+
+    private function validateEventData(Request $request): array
+    {
+        $tomorrow = Carbon::tomorrow()->format('Y-m-d');
+
+        $this->validationRules['start_date'] = 'required|date|after:' . $tomorrow;
+
+        $validatedData = $request->validate($this->validationRules);
+
+        $startDate = Carbon::parse($validatedData['start_date']);
+        $endDate = Carbon::parse($validatedData['end_date']);
         if ($endDate->diffInDays($startDate) > 5) {
-            return redirect()->back()->withInput()->withErrors([
-                'end_date' => 'The event cannot be longer than 5 days.'
-            ]);
+            throw new \Exception('The event cannot be longer than 5 days.');
         }
 
-        $cityCode = $this->getCityCode($request->lat, $request->lon);
+        return $request->all();
+    }
+
+    private function storeEventData($validatedData, Request $request)
+    {
+        $cityCode = $this->getCityCode($validatedData['lat'], $validatedData['lon']);
 
         $eventOrganizer = EventOrganizer::firstOrCreate(
             ['user_id' => Auth::id()],
@@ -143,39 +273,35 @@ class EventController extends Controller
         );
 
         if (!$eventOrganizer->legal_id) {
-            return redirect()->back()->withInput()->withErrors([
-                'legal_id' => 'A Legal Identifier is mandatory for creating an event.'
-            ]);
+            throw new \Exception('A Legal Identifier is mandatory for creating an event.');
         }
 
-        $event = Event::create(array_merge(
-            $request->all(),
+        $eventData = array_merge(
+            $validatedData,
             [
                 'city_id' => $cityCode,
                 'owner_id' => $eventOrganizer->id,
-                'current_tickets_qty' => $request->start_tickets_qty,
+                'current_tickets_qty' => $validatedData['start_tickets_qty'],
                 'image_url' => $this->uploadImage($request->file('image_url'))
             ]
-        ));
+        );
 
-        return $event
-            ? redirect()->route('events.index')->with('success', 'Event created successfully.')
-            : redirect()->back()->withInput()->withErrors(['msg' => 'Error saving the event.']);
+        return Event::create($eventData);
     }
 
-    private function uploadImage($imageFile)
+    private function uploadImage($imageFile): string
     {
         $image = Image::make($imageFile);
 
         $imagePath = 'events/' . $imageFile->hashName();
-        Storage::disk('public')->put($imagePath, (string)$image->encode());
+        Storage::disk('public')->put($imagePath, (string) $image->encode());
 
         return $imagePath;
     }
 
     public function edit($id)
     {
-        $event = Event::findOrFail($id);
+        $event = $this->findEventById($id);
 
         $this->authorize('update', $event);
 
@@ -185,49 +311,187 @@ class EventController extends Controller
         return view('layouts.event.edit', compact('event', 'categories', 'cities'));
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $id): \Illuminate\Http\RedirectResponse
     {
-        $event = Event::findOrFail($id);
+        try {
+            $event = $this->updateEventData($request, $id);
+            $users = Ticket::where('event_id', $event->id)
+                ->where('status', 'PAID')
+                ->pluck('user_id')
+                ->toArray();
+            event(new NotificationReceived($users));
+            return redirect()->route('events.show', $event->id)->with('success', 'Event updated successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()->withInput()->withErrors(['msg' => $e->getMessage()]);
+        }
+    }
 
+    public function updateJson(Request $request, $id): JsonResponse
+    {
+        try {
+            $event = $this->updateEventData($request, $id);
+            return response()->json(['success' => 'Event updated successfully!', 'event' => $event]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
+    }
+
+    private function updateEventData(Request $request, $id): Event
+    {
+        $event = $this->findEventById($id);
         $this->authorize('update', $event);
 
-        $updateValidationRules = array_merge($this->validationRules, [
-            'image_url' => 'sometimes|image|max:2048',
-        ]);
-        unset($updateValidationRules['start_tickets_qty']);
-
-        $startDate = Carbon::parse($request->input('start_date'));
-        $endDate = Carbon::parse($request->input('end_date'));
-        if ($endDate->diffInDays($startDate) > 5) {
-            return redirect()->back()->withInput()->withErrors([
-                'end_date' => 'The event cannot be longer than 5 days.'
-            ]);
-        }
+        $validatedData = $this->validateUpdateData($request);
 
         if ($request->hasFile('image_url')) {
             $event->image_url = $this->uploadImage($request->file('image_url'));
         }
 
-        $event->update($request->all());
+        $event->update(array_merge($validatedData, ['current_tickets_qty' => $request->input('current_tickets_qty')]));
 
-        return redirect()->route('events.show', $event->id)->with('success', 'Event updated successfully!');
+        return $event;
     }
 
-    public function destroy($id)
+    private function validateUpdateData(Request $request): array
     {
-        $event = Event::findOrFail($id);
+        $updateValidationRules = array_merge($this->validationRules, [
+            'image_url' => 'sometimes|image|max:2048',
+        ]);
+        unset($updateValidationRules['start_tickets_qty']);
 
-        $this->authorize('delete', $event);
+        $validatedData = $request->validate($updateValidationRules);
+
+        $startDate = Carbon::parse($validatedData['start_date']);
+        $endDate = Carbon::parse($validatedData['end_date']);
+        if ($endDate->diffInDays($startDate) > 5) {
+            throw new \Exception('The event cannot be longer than 5 days.');
+        }
+
+        return $validatedData;
+    }
+
+    public function destroy($id): \Illuminate\Http\RedirectResponse
+    {
+        if (!$this->isValidUuid($id)) {
+            abort(404);
+        }
 
         try {
-            DB::transaction(function () use ($event) {
-                Discussion::where('event_id', $event->id)->delete();
-                $event->delete();
-            });
+            $event = $this->findEventById($id);
+
+            $this->authorizeDeletion($event);
+
+            $this->deleteEventWithDiscussion($event);
+
+            if ($event->image_url && Storage::disk('public')->exists($event->image_url)) {
+                Storage::disk('public')->delete($event->image_url);
+            }
 
             return redirect()->route('events.index')->with('success', 'Event deleted successfully.');
         } catch (\Exception $e) {
-            return redirect()->route('events.index')->with('error', 'Error deleting event');
+            return redirect()->route('events.index')->with('error', 'Error deleting event. Error: ' . $e->getMessage());
         }
+    }
+
+    public function destroyJson($id): JsonResponse
+    {
+        if (!$this->isValidUuid($id)) {
+            response()->json(['error' => 'Event not found.'], 404);
+        }
+
+        try {
+            $event = $this->findEventById($id);
+
+            $this->authorizeDeletion($event);
+
+            $this->deleteEventWithDiscussion($event);
+
+            if ($event->image_url && Storage::disk('public')->exists($event->image_url)) {
+                Storage::disk('public')->delete($event->image_url);
+            }
+
+            return response()->json(['success' => 'Event deleted successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error deleting event'], 422);
+        }
+    }
+
+    private function isValidUuid(string $uuid): bool
+    {
+        $pattern = '/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i';
+
+        return (bool) preg_match($pattern, $uuid);
+    }
+
+    private function findEventById($id): Event
+    {
+        return Event::findOrFail($id);
+    }
+
+    private function findTicketById($id): Ticket
+    {
+        return Ticket::findOrFail($id);
+    }
+
+    private function authorizeDeletion($event): void
+    {
+        $this->authorize('delete', $event);
+    }
+
+    private function deleteEventWithDiscussion($event): void
+    {
+        DB::transaction(function () use ($event) {
+            $this->refundTickets($event);
+            $event->status = 'DELETED';
+            $event->save();
+        });
+    }
+
+    public function leave($eventId, $ticketId)
+    {
+        if (!$this->isValidUuid($eventId) || !$this->isValidUuid($ticketId)) {
+            abort(404);
+        }
+
+        try {
+            $event = $this->findEventById($eventId);
+            $ticket = $this->findTicketById($ticketId);
+
+            if ((double) $ticket->price_paid != 0) {
+                $this->stripeController->refundPaymentFromUser($event, Auth::id());
+            }
+
+            $ticket = $this->findTicketById($ticketId);
+
+            $ticket->markTicketAsCanceled();
+
+            return redirect()->route('events.index')->with('success', 'Leaved from event "' . $event->name . '" successfully.');
+        } catch (\Exception $e) {
+            return redirect()->route('events.index')->with('error', 'Error deleting event. Cause: ' . $e->getMessage());
+        }
+    }
+
+    private function refundTickets(Event $event): void
+    {
+        $this->stripeController->refundAllPaymentsFromEvent($event);
+    }
+
+    public function showAttendees($eventId)
+    {
+        $event = Event::with('ticket.user')->findOrFail($eventId);
+        $this->authorize('showList', $event);
+        return view('layouts.event.attendee', compact('event'));
+    }
+
+
+    public function getUsers($userEmail, $eventId)
+    {
+        $users = User::where('email', 'like', '%' . $userEmail . '%')
+            ->whereDoesntHave('ticket', function ($query) use ($eventId) {
+                $query->where('event_id', $eventId)
+                    ->where('status', 'PAID');
+            })
+            ->get();
+        return response()->json($users);
     }
 }
