@@ -3,6 +3,11 @@
 @section('title', 'Admin Dashboard')
 
 @section('content')
+@section('breadcrumbs')
+<li>
+    &nbsp; / Dashboard
+</li>
+@endsection
 <div class="container mt-4">
     <h2 class="mb-4">Admin Dashboard</h2>
 

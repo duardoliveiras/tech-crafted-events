@@ -1,6 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
+@section('breadcrumbs')
+<li>
+    &nbsp; /  <a href="{{ route('admin.dashboard') }} "> Dashboard </a>
+</li>
+<li>
+    &nbsp; / Admin
+</li>
+@endsection
     <div class="container py-5">
         <div class="row justify-content-center">
             <div class="col-md-8">

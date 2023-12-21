@@ -3,6 +3,11 @@
 @section('title', $university->name)
 
 @section('content')
+@section('breadcrumbs')
+<li>
+    &nbsp; / {{ $university->name }}
+</li>
+@endsection
     <div class="container mt-4">
         <div class="row justify-content-center">
             <div class="col-md-8">

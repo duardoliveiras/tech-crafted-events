@@ -73,6 +73,12 @@ class UserController extends Controller
                 'email' => 'required|email|max:255|unique:users,email,' . $user->id,
                 'phone_number' => 'required|max:20'
             ]);
+            if ($request->hasFile('image_url')) {
+                // Check and delete old image
+                if ($user->image_url && Storage::disk('public')->exists($user->image_url)) {
+                    Storage::disk('public')->delete($user->image_url);
+                }
+            }
 
             $user->update(array_merge($validatedData, ['image_url' => $this->uploadImage($request->file('image_url'))]));
         } else {
