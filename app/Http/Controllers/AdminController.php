@@ -96,8 +96,8 @@ class AdminController extends Controller
         $events = $events->sortByDesc('event_report_count');
 
         $comments = Comment::where('is_deleted', false)
-
             ->whereHas('comment_report', fn($query) => $query->where('analyzed', false))
+            ->whereHas('user', fn($query) => $query->where('is_deleted', false))
             ->withCount([
                 'comment_report as comment_report_count' => function ($query) {
                     $query->where('analyzed', false);

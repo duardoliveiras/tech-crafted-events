@@ -216,7 +216,27 @@ function banEvent(eventId) {
       if (!response.ok) {
         throw Error(response.statusText);
       }
-      window.location = route_reports;
+      url = `/notification/report-comment/${eventId}/ban/event`;
+      options = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]')
+            .content,
+        },
+        body: JSON.stringify({}),
+      };
+
+      fetch(url, options)
+        .then((response) => {
+          if (!response.ok) {
+            throw Error(response.statusText);
+          }
+          window.location = route_reports;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     })
     .catch((error) => {
       console.error("Erro", error);
@@ -240,7 +260,7 @@ function banComment(commentId) {
       if (!response.ok) {
         throw Error(response.statusText);
       }
-      url = `/notification/report-comment/${commentId}/ban`;
+      url = `/notification/report-comment/${commentId}/ban/comment`;
       options = {
         method: "POST",
         headers: {
@@ -285,7 +305,27 @@ function check_all_event(eventId) {
       if (!response.ok) {
         throw Error(response.statusText);
       }
-      window.location.href = "/admin/reports";
+      url = `/notification/report-comment/${eventId}/check/event`;
+      options = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]')
+            .content,
+        },
+        body: JSON.stringify({}),
+      };
+
+      fetch(url, options)
+        .then((response) => {
+          if (!response.ok) {
+            throw Error(response.statusText);
+          }
+          window.location = route_reports;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     })
 
     .catch((error) => {
@@ -312,7 +352,7 @@ function check_all_comment(userId, commentId) {
         throw Error(response.statusText);
       }
 
-      url = `/notification/report-comment/${commentId}/check`;
+      url = `/notification/report-comment/${commentId}/check/comment`;
       options = {
         method: "POST",
         headers: {
