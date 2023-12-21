@@ -1,5 +1,9 @@
  
+ @if($report == "comment")
+ <div class="modal fade" id="reportModal-{{ $comment->id }}" tabindex="-1" role="dialog" aria-labelledby="reportModalLabel-{{ $comment->id }}" aria-hidden="true">
+ @else
  <div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-labelledby="reportModalLabel" aria-hidden="true">
+ @endif 
         <div class="modal-dialog" role="document">
             <div class="modal-content">
             <div class="modal-header">
@@ -8,6 +12,7 @@
                     <h5 class="modal-title" id="reportModalLabel">Report {{ $event->name }} </h5> 
                 @else
                     <h5 class="modal-title" id="reportModalLabel">Report {{ $comment->user->name }} </h5> 
+
                 @endif
                     
             </div>
