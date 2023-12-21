@@ -29,7 +29,7 @@ class DiscussionController extends Controller
             }
 
             $userHasTicket = $event->ticket()->whereIn('status', ['PAID', 'READ'])->where('user_id', $user->id)->exists();
-            $isOrganizer = $event->owner->id == $user->id;
+            $isOrganizer = $event->owner->user_id == $user->id;
 
             if (!($userHasTicket || $isOrganizer || $user->isAdmin())) {
                 abort(403, 'You do not have access to this discussion.');

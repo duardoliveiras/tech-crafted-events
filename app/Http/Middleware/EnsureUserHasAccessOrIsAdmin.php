@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use App\Models\Event;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 class EnsureUserHasAccessOrIsAdmin
@@ -19,14 +20,16 @@ class EnsureUserHasAccessOrIsAdmin
     {
         $eventId = $request->route('event');
         $event = Event::with('ticket')->findOrFail($eventId); // Ensure that the tickets relation is correct.
-
+        $user = Auth::user();
         // Check if the user is the owner of the event
-        if ($event->owner_id == Auth::id()) {
+
+
+        if ($event->owner->user_id == $user->id) {
             return $next($request);
         }
 
         // Check if the user is an admin
-        if (Auth::user()->isAdmin()) {
+        if ($user->isAdmin()) {
             return $next($request);
         }
 
