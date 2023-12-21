@@ -2,31 +2,32 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
-use App\Models\City;
-use App\Models\User;
-use App\Models\Event;
-use App\Models\Ticket;
-use App\Models\Country;
-use App\Models\Category;
-use Illuminate\View\View;
-use App\Models\Discussion;
-use App\Models\University;
-use Illuminate\Http\Request;
-use App\Models\EventOrganizer;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
 use App\Events\NotificationReceived;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
-use Intervention\Image\Facades\Image;
-use Illuminate\Support\Facades\Storage;
+use App\Models\Category;
+use App\Models\City;
+use App\Models\Country;
+use App\Models\Event;
+use App\Models\EventOrganizer;
+use App\Models\Ticket;
+use App\Models\University;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
 
 class EventController extends Controller
 {
     const NOMINATIM_API_URL = "https://nominatim.openstreetmap.org/reverse?format=json";
     protected StripeController $stripeController;
+
+    static $diskName = 'ImagesSaved';
 
     private $validationRules = [
         'name' => 'required|string|max:255',
@@ -276,27 +277,26 @@ class EventController extends Controller
             throw new \Exception('A Legal Identifier is mandatory for creating an event.');
         }
 
+        $file = $request->file('image_url');
+
         $eventData = array_merge(
             $validatedData,
             [
                 'city_id' => $cityCode,
                 'owner_id' => $eventOrganizer->id,
                 'current_tickets_qty' => $validatedData['start_tickets_qty'],
-                'image_url' => $this->uploadImage($request->file('image_url'))
+                'image_url' => $this->uploadImage($file)
             ]
         );
 
         return Event::create($eventData);
     }
 
-    private function uploadImage($imageFile): string
+    private function uploadImage(UploadedFile $imageFile, $path = 'event'): string
     {
-        $image = Image::make($imageFile);
-
-        $imagePath = 'events/' . $imageFile->hashName();
-        Storage::disk('public')->put($imagePath, (string) $image->encode());
-
-        return $imagePath;
+        $fileName = $imageFile->hashName();
+        $imageFile->storeAs($path, $fileName, self::$diskName);
+        return $fileName;
     }
 
     public function edit($id)
@@ -344,7 +344,8 @@ class EventController extends Controller
         $validatedData = $this->validateUpdateData($request);
 
         if ($request->hasFile('image_url')) {
-            $event->image_url = $this->uploadImage($request->file('image_url'));
+            $file = $request->file('image_url');
+            $event->image_url = $this->uploadImage($file);
         }
 
         $event->update(array_merge($validatedData, ['current_tickets_qty' => $request->input('current_tickets_qty')]));
@@ -383,8 +384,8 @@ class EventController extends Controller
 
             $this->deleteEventWithDiscussion($event);
 
-            if ($event->image_url && Storage::disk('public')->exists($event->image_url)) {
-                Storage::disk('public')->delete($event->image_url);
+            if ($event->image_url) {
+                Storage::disk(self::$diskName)->delete('event/' . $event->image_url);
             }
 
             return redirect()->route('events.index')->with('success', 'Event deleted successfully.');
@@ -420,7 +421,7 @@ class EventController extends Controller
     {
         $pattern = '/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i';
 
-        return (bool) preg_match($pattern, $uuid);
+        return (bool)preg_match($pattern, $uuid);
     }
 
     private function findEventById($id): Event
@@ -457,7 +458,7 @@ class EventController extends Controller
             $event = $this->findEventById($eventId);
             $ticket = $this->findTicketById($ticketId);
 
-            if ((double) $ticket->price_paid != 0) {
+            if ((double)$ticket->price_paid != 0) {
                 $this->stripeController->refundPaymentFromUser($event, Auth::id());
             }
 

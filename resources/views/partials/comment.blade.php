@@ -1,7 +1,7 @@
 <div class="d-flex flex-start mt-3">
 
     @if($comment->user->provider == null)
-    <img class="rounded-circle shadow-1-strong me-3" src="{{ $comment->user->image_url ? asset('storage/' . $comment->user->image_url) : 'https://static-00.iconduck.com/assets.00/user-icon-2048x2048-ihoxz4vq.png' }}" alt="avatar" width="60" height="60" />
+    <img class="rounded-circle shadow-1-strong me-3" src="{{ $comment->user->image_url ? asset('user/' . $comment->user->image_url) : 'https://static-00.iconduck.com/assets.00/user-icon-2048x2048-ihoxz4vq.png' }}" alt="avatar" width="60" height="60" />
     @else
     <img class="rounded-circle shadow-1-strong me-3" src="{{ asset($comment->user->image_url)}}" alt="avatar" width="60" height="60" />
     @endif
