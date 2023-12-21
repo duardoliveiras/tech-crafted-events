@@ -63,7 +63,11 @@ class EventController extends Controller
         $searchQuery = 'your_search_query';
 
         if ($nameFilter) {
-            $query->whereRaw("to_tsvector('english', name) @@ to_tsquery('english', ?)", ["'$nameFilter'"])->get();
+            $query->whereRaw("to_tsvector('english', name) @@ to_tsquery('english', ?)", ["'$nameFilter'"])
+                ->orWhereRaw("to_tsvector('english', description) @@ to_tsquery('english', ?)", ["'$nameFilter'"])
+                ->orWhereRaw("to_tsvector('english', address) @@ to_tsquery('english', ?)", ["'$nameFilter'"])
+                ->orWhere('name', 'like', '%' . $nameFilter . '%')
+                ->get();
         }
 
         if ($eventType) {
