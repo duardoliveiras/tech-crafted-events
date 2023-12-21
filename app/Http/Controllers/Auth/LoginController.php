@@ -15,12 +15,14 @@ class LoginController extends Controller
 
     protected function redirectPath()
     {
-        if (auth()->user()) {
+        if (Auth::user()->isAdmin()) {
             return route('admin.dashboard');
         }
 
         return property_exists($this, 'redirectTo') ? $this->redirectTo : '/home';
     }
+
+
 
     public function __construct()
     {
