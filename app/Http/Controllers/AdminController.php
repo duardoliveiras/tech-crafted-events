@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Admin;
 use App\Models\Event;
+use App\Events\BanUser;
 use App\Models\Comment;
 use App\Models\University;
 use App\Models\EventReport;
@@ -150,8 +151,10 @@ class AdminController extends Controller
     public function banUser($userId)
     {
         $user = User::find($userId);
+
         if ($user) {
             $user->update(['is_banned' => !$user->is_banned]);
+            event(new BanUser($user));
             return redirect()->route('admin.dashboard');
         } else {
             return redirect()->route('admin.dashboard');
