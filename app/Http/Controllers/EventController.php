@@ -60,8 +60,16 @@ class EventController extends Controller
 
         $query = Event::query();
 
+        $searchQuery = 'your_search_query';
+
         if ($nameFilter) {
-            $query->whereRaw("to_tsvector('english', name) @@ to_tsquery('english', ?)", [$nameFilter])->get();
+            $query->where(function ($query) use ($nameFilter) {
+                $query->orWhereRaw("to_tsvector('english', name) @@ to_tsquery('english', ?)", ["'$nameFilter'"])
+                    ->orWhereRaw("to_tsvector('english', description) @@ to_tsquery('english', ?)", ["'$nameFilter'"])
+                    ->orWhereRaw("to_tsvector('english', address) @@ to_tsquery('english', ?)", ["'$nameFilter'"])
+                    ->orWhere('name', 'like', '%' . $nameFilter . '%');
+            })
+                ->get();
         }
 
         if ($eventType) {
@@ -84,6 +92,10 @@ class EventController extends Controller
 
         $sort = $request->query('sort');
 
+        if ($nameFilter) {
+            $query->orderByRaw('ts_rank(to_tsvector(\'english\', name), to_tsquery(\'english\', ?)) DESC', ["'$nameFilter'"]);
+        }
+
         switch ($sort) {
             case 'name':
                 $query->orderBy('name');
@@ -102,6 +114,7 @@ class EventController extends Controller
         $query->whereIn('status', ['ONGOING', 'UPCOMING']);
 
         $events = $query->paginate(6);
+
 
         if ($request->ajax() || $request->query('ajax')) {
             // Check if the events collection is empty

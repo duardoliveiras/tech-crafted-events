@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Models\User;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
@@ -14,7 +15,7 @@ class LoginController extends Controller
 
     protected function redirectPath()
     {
-        if (Auth::user()->isAdmin()) {
+        if (auth()->user()) {
             return route('admin.dashboard');
         }
 
@@ -30,13 +31,14 @@ class LoginController extends Controller
      * Get the needed authorization credentials from the request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return array
+     * 
      */
     protected function credentials(Request $request)
     {
+
         return array_merge(
             $request->only($this->username(), 'password'),
-            ['is_deleted' => false] // Garante que apenas usuários não deletados possam fazer login
+            ['is_deleted' => false, 'is_banned' => false] // Garante que apenas usuários não deletados possam fazer login
         );
     }
 

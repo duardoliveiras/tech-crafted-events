@@ -7,7 +7,7 @@ enum EventStatus: string
     case Upcoming = 'UPCOMING';
     case Ongoing = 'ONGOING';
     case Finished = 'FINISHED';
-    case Cancelled = 'CANCELLED';
+    case Canceled = 'CANCELED';
     case Banned = 'BANNED';
     case Deleted = 'DELETED';
 }
