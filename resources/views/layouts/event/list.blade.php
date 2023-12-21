@@ -64,10 +64,10 @@
                     </h2>
                     <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne"
                          data-bs-parent="#fullTextSearch">
-                        <div class="accordion-body pt-0">
-                            <div class="form-row d-flex flex-row justify-content-around mx-2">
 
-                                <div class="col mx-2">
+                        <div class="accordion-body pt-0">
+                            <div class="form-row d-flex flex-row flex-wrap justify-content-around mx-2">
+                                <div class="col mx-2 mb-3 mb-sm-0">
                                     <label for="event-type" class="text-white label-filter">Looking for</label>
                                     <select id="event-type" name="event-type" class="form-control">
                                         <option value="">Choose event type</option>
@@ -76,8 +76,7 @@
                                         @endforeach
                                     </select>
                                 </div>
-
-                                <div class="col mx-2">
+                                <div class="col mx-2 mb-3 mb-sm-0">
                                     <label for="location" class="text-white label-filter">Location</label>
                                     <select id="location" name="location" class="form-control">
                                         <option value="">Choose location</option>
@@ -86,14 +85,12 @@
                                         @endforeach
                                     </select>
                                 </div>
-
-                                <div class="col mx-2">
+                                <div class="col mx-2 mb-3 mb-sm-0">
                                     <label for="date-filter" class="text-white label-filter">When</label>
                                     <input type="date" class="form-control" id="date-filter" name="date-filter"
                                            value="{{ request('date-filter') }}">
                                 </div>
-
-                                <div class="col mx-2">
+                                <div class="col mx-2 mb-3 mb-sm-0">
                                     <label for="university" class="text-white label-filter">University</label>
                                     <select id="university" name="university" class="form-control">
                                         <option value="">Choose university</option>
@@ -129,11 +126,14 @@
                         Sort By
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="dropdown-sort">
-                        <li><a class="dropdown-item dropdown-sort" style="cursor:pointer" data-sort="start-date">Start Date</a></li>
+                        <li><a class="dropdown-item dropdown-sort" style="cursor:pointer" data-sort="start-date">Start
+                                Date</a></li>
                         <li><a class="dropdown-item dropdown-sort" style="cursor:pointer" data-sort="name">Name</a></li>
-                        <li><a class="dropdown-item dropdown-sort" style="cursor:pointer" data-sort="price-lowest">Price (lowest
+                        <li><a class="dropdown-item dropdown-sort" style="cursor:pointer" data-sort="price-lowest">Price
+                                (lowest
                                 first)</a></li>
-                        <li><a class="dropdown-item dropdown-sort" style="cursor:pointer" data-sort="price-greater">Price (greater
+                        <li><a class="dropdown-item dropdown-sort" style="cursor:pointer" data-sort="price-greater">Price
+                                (greater
                                 first)</a></li>
                     </ul>
                 </div>
@@ -151,7 +151,8 @@
     </div>
 
     <div class="banner mt-5">
-        <img src="{{URL::asset('/assets/make-your-event.png')}}" class="image-mye" alt="Banner image"/>
+        <img src="{{URL::asset('/assets/make-your-event.png')}}" class="image-mye d-none d-sm-block"
+             alt="Banner image"/>
         <div class="banner-content text-center">
             <h1>Make your own Event</h1>
             <p>Publish your own event here!</p>
@@ -170,7 +171,8 @@
                     <a href="{{ route('universities.show', $university->id) }}" class="text-decoration-none">
                         <div class="card mb-4 card-hover-effect">
                             <img src="{{ Storage::url($university->image_url) }}" class="card-img-top"
-                                 alt="Image of {{ $university->name }}" style="width: 100%; height: 300px; object-fit: cover;">
+                                 alt="Image of {{ $university->name }}"
+                                 style="width: 100%; height: 300px; object-fit: cover;">
                             <div class="card-body">
                                 <h5 class="card-title">{{ $university->name }}</h5>
                                 <p class="card-text">Localization: {{ $university->address }}</p>
