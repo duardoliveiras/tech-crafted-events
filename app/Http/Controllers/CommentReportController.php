@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Event;
+use App\Events\BanUser;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use App\Models\CommentReport;
@@ -67,18 +68,19 @@ class CommentReportController extends Controller
         $comment = Comment::find($commentId);
         $user = User::find($comment->user_id);
 
-        Mail::send('mail.banned', ['comment' => $comment, 'name' => $user->name], function ($message) use ($user) {
-            $message->to($user->email);
-            $message->subject("Your account are banned");
-        });
-
         if ($user && $comment) {
+            Mail::send('mail.banned', ['comment' => $comment, 'name' => $user->name], function ($message) use ($user) {
+                $message->to($user->email);
+                $message->subject("Your account are banned");
+            });
+
             $user->update([
                 'is_banned' => true
             ]);
             $comment->update([
                 'is_deleted' => true
             ]);
+            event(new BanUser($user->id));
             return response()->json(['message' => 'Banned with success.']);
         } else {
             return response()->json(['error' => 'User not found.'], 404);
