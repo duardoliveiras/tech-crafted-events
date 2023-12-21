@@ -1,9 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
+@section('title', 'Discussion')
 @section('breadcrumbs')
 <li>
-    <a href="{{ route('events.show', $event->id) }} "> &nbsp; / {{ $event->name }} </a>
+    &nbsp; / <a href="{{ route('events.show', $event->id) }} ">  {{ $event->name }} </a>
 </li>
 
 <li>
