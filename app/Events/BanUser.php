@@ -11,16 +11,16 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class NotificationReceived implements ShouldBroadcast
+class BanUser implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $users;
 
     // Here you create the message to be sent when the event is triggered.
-    public function __construct($users)
+    public function __construct($user)
     {
-        $this->users = $users;
+        $this->users = $user;
     }
 
     // You should specify the name of the channel created in Pusher.

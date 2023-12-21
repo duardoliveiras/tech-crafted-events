@@ -154,7 +154,7 @@ class AdminController extends Controller
 
         if ($user) {
             $user->update(['is_banned' => !$user->is_banned]);
-            event(new BanUser($user));
+            event(new BanUser($user->id));
             return redirect()->route('admin.dashboard');
         } else {
             return redirect()->route('admin.dashboard');
