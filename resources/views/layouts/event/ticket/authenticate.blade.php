@@ -59,4 +59,16 @@
     <script src="{{ asset('js/html5-qrcode.min.js') }}"></script>
     <script type="text/javascript" src="{{ URL::asset ('js/event/ticket-auth.js') }}"></script>
 
+    <style>
+        #reader__dashboard_section_csr > div > button {
+            color: white !important;
+            border-radius:6px !important;
+            padding: 10px 20px !important;
+            background: linear-gradient(to left, #7848F4, #5827D8);
+            font-size: 1.3rem !important;
+            font-weight: bolder !important;
+            border: none !important;
+        }
+    </style>
+
 @endsection
