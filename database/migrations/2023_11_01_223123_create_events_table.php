@@ -26,9 +26,6 @@ return new class extends Migration {
             $table->timestamps();
             $table->text('full_text_search')->nullable();
         });
-        DB::statement("CREATE INDEX full_text_search_events_idx ON event USING gin(to_tsvector('english', name));");
-        DB::statement("CREATE INDEX full_text_search_events_idx ON event USING gin(to_tsvector('english', description));");
-        DB::statement("CREATE INDEX full_text_search_events_idx ON event USING gin(to_tsvector('english', address));");
     }
 
 
