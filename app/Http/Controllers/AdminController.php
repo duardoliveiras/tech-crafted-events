@@ -150,15 +150,21 @@ class AdminController extends Controller
 
     public function banUser($userId)
     {
-        $user = User::find($userId);
+        if (Auth::user()->isAdmin()) {
+            $user = User::find($userId);
 
-        if ($user) {
-            $user->update(['is_banned' => !$user->is_banned]);
-            event(new BanUser($user->id));
-            return redirect()->route('admin.dashboard');
+            if ($user) {
+                $user->update(['is_banned' => !$user->is_banned]);
+                event(new BanUser($user->id));
+                return redirect()->route('admin.dashboard');
+            } else {
+                return redirect()->route('admin.dashboard');
+            }
+
         } else {
-            return redirect()->route('admin.dashboard');
+            return back()->withErrors('You don\'t have permission to access this');
         }
+
     }
 
 }

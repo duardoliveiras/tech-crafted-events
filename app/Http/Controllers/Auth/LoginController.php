@@ -15,7 +15,7 @@ class LoginController extends Controller
 
     protected function redirectPath()
     {
-        if (Auth::user()->isAdmin()) {
+        if (auth()->user()) {
             return route('admin.dashboard');
         }
 
@@ -31,10 +31,11 @@ class LoginController extends Controller
      * Get the needed authorization credentials from the request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return array
+     * 
      */
     protected function credentials(Request $request)
     {
+
         return array_merge(
             $request->only($this->username(), 'password'),
             ['is_deleted' => false, 'is_banned' => false] // Garante que apenas usuários não deletados possam fazer login
