@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Models\Comment;
 use App\Models\Discussion;
+use App\Models\EventReport;
 use App\Models\Notification;
 use Illuminate\Http\Request;
 use App\Models\CommentReport;
@@ -94,8 +95,9 @@ class NotificationsController extends Controller
         return response()->json(['message' => 'Invited success.']);
     }
 
-    public function notifyUsers($commentId, $type)
+    public function notifyUsersComment($commentId, $type)
     {
+
         $comment = Comment::find($commentId);
         $reports = CommentReport::where('comment_id', $commentId)->get();
         $event = Discussion::find($comment->discussion_id)->event;
@@ -104,6 +106,34 @@ class NotificationsController extends Controller
             $text = "Your comment report in the " . $event->name . " discussion has been successfully analyzed. The comment was maintained as our team believes it did not violate any company rules.";
         } else {
             $text = "Your comment report in the " . $event->name . " discussion has been successfully analyzed. The comment was removed from the site and the writer's account was banned. Thank you for contributing to a safe community.";
+        }
+
+        $users = [];
+        foreach ($reports as $report) {
+            $notification = new Notification([
+                'text' => $text,
+                'notificationtype' => 'REPORT',
+                'user_id' => $report->user_id,
+                'read' => false,
+                'event_id' => null
+            ]);
+            $notification->save();
+            array_push($users, $report->user_id);
+        }
+        event(new NotificationReceived($users));
+
+        return response()->json(['message' => 'Read success.']);
+    }
+
+    public function notifyUsersEvent($eventId, $type)
+    {
+        $reports = EventReport::where('event_id', $eventId)->get();
+        $event = Event::find($eventId);
+
+        if ($type === "check") {
+            $text = "Your " . $event->name . " event report has been successfully analyzed. The event was maintained as our team believes it did not violate any company rules.";
+        } else {
+            $text = "Your " . $event->name . " event report has been successfully analyzed. The event was removed from the site. Thank you for contributing to a safe community.";
         }
 
         $users = [];
