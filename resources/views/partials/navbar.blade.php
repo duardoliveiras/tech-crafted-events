@@ -59,7 +59,7 @@
                     </a>
                 </li>
                 <li class="nav-item dropdown">
-                    <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                    <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         @if(Auth::user()->provider !== null)
                         <img class="rounded-circle shadow-1-strong me-3" src="{{ asset(Auth::user()->image_url)}}" alt="avatar" width="60" height="60" />
                         @else

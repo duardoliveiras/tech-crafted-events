@@ -1,6 +1,5 @@
 @extends('layouts.app')
 
-<link rel="stylesheet" type="text/css" href="{{URL::asset('/assets/css/list-event.css')}}">
 
 @section('title', 'Tech Crafted')
 
@@ -34,6 +33,8 @@
             </div>
         </div>
     @endif
+
+    <link rel="stylesheet" type="text/css" href="{{URL::asset('/assets/css/list-event.css')}}">
 
     <div class="container my-3 filters-container">
         <form class="mb-0" id="filter-form">
