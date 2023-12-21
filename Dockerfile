@@ -11,9 +11,13 @@ RUN apt-get update && apt-get install -y ca-certificates curl gnupg
 RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
 RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
 RUN apt-get update && apt-get install nodejs -y
+RUN apt-get update && apt-get install -y cron
 
 # Copy project code and install project dependencies
 COPY --chown=www-data . /var/www/
+
+# Cron
+RUN (crontab -l ; echo "* * * * * cd /var/www && /usr/bin/php /var/www/artisan schedule:run >> /dev/null 2>&1") | crontab -
 
 # Copy project configurations
 COPY ./etc/php/php.ini /usr/local/etc/php/conf.d/php.ini
