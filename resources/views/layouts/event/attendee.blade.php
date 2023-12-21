@@ -1,11 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-    @section('breadcrumbs')
-        <li>
-            &nbsp; / <a href="{{ route('events.show', $event->id) }}">{{$event->name}}</a>
-        </li>
-        <li> &nbsp; / View Attendees </li>
     <div class="container py-5">
         <div class="card shadow-sm">
             <div class="card-header bg-primary text-white">
@@ -43,4 +38,11 @@
             </div>
         </div>
     </div>
+@endsection
+
+@section('breadcrumbs')
+    <li>
+        &nbsp; / <a href="{{ route('events.show', $event->id) }}">{{ $event->name }}</a>
+    </li>
+    <li> &nbsp; / View Attendees </li>
 @endsection
