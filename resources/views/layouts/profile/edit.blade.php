@@ -60,7 +60,7 @@
 
                             <label class="custom-label" for="image_url">User Image:</label>
                             <div class="w-100 d-flex align-content-center justify-content-center">
-                                <img class="rounded-circle shadow-1-strong mb-2" style="max-width: 200px; max-height: 200px;" id="preview" src="{{ $user->image_url ? asset('storage/' . $user->image_url) : 'https://static-00.iconduck.com/assets.00/user-icon-2048x2048-ihoxz4vq.png' }}" alt="avatar" />
+                                <img class="rounded-circle shadow-1-strong mb-2" style="max-width: 200px; max-height: 200px;" id="preview" src="{{ $user->image_url ? asset('user/' . $user->image_url) : 'https://static-00.iconduck.com/assets.00/user-icon-2048x2048-ihoxz4vq.png' }}" alt="avatar" />
                             </div>
                             <input type="file" accept="image/jpeg, image/png, image/jpg, image/gif, image/svg+xml" class="form-control custom-input image-input" id="image_url" name="image_url" required>
                         </div>

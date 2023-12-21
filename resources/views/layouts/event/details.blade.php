@@ -47,7 +47,7 @@
                 <div class="d-flex justify-content-center w-100 image-container">
                     @if($event->image_url)
                         <div class="blurred-background"></div>
-                        <img src="{{asset('storage/' . $event->image_url) }}" alt="Event Image">
+                        <img src="{{asset('event/' . $event->image_url)}}" alt="Event Image">
                     @endif
                 </div>
             </div>
@@ -243,7 +243,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-image: url({{asset('storage/' . $event->image_url) }});
+            background-image: url({{asset('event/' . $event->image_url) }});
             background-size: cover;
             filter: blur(10px);
             z-index: -1;
