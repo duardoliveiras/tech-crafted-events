@@ -1,9 +1,10 @@
 @extends('layouts.app')
 
+@section('content')
+
 <link rel="stylesheet" type="text/css" href="{{URL::asset('/assets/css/register.css')}}">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
 
-@section('content')
 <div class="container" style="height: 100vh;">
     <div class="row justify-content-center h-100">
         <div class="col-md-6 d-flex flex-column justify-content-center h-100">

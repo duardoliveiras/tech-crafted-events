@@ -3,6 +3,11 @@
 @section('title', 'Reports')
 
 @section('content')
+@section('breadcrumbs')
+<li>
+    &nbsp; / Reports
+</li>
+@endsection
 
     <div class="container mt-4">
         <h2 class="mb-4">Reports</h2>
@@ -49,8 +54,6 @@
                             </td>
                         </tr>
                     @empty
-                        <tr>
-                        </tr>
                     @endforelse
 
 
@@ -108,8 +111,6 @@
                             </td>
                         </tr>
                     @empty
-                        <tr>
-                        </tr>
                     @endforelse
                     </tbody>
                 </table>
