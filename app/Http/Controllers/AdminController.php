@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Admin;
 use App\Models\Event;
+use App\Events\BanUser;
 use App\Models\Comment;
 use App\Models\University;
 use App\Models\EventReport;
@@ -96,8 +97,8 @@ class AdminController extends Controller
         $events = $events->sortByDesc('event_report_count');
 
         $comments = Comment::where('is_deleted', false)
-
             ->whereHas('comment_report', fn($query) => $query->where('analyzed', false))
+            ->whereHas('user', fn($query) => $query->where('is_deleted', false))
             ->withCount([
                 'comment_report as comment_report_count' => function ($query) {
                     $query->where('analyzed', false);
@@ -149,13 +150,21 @@ class AdminController extends Controller
 
     public function banUser($userId)
     {
-        $user = User::find($userId);
-        if ($user) {
-            $user->update(['is_banned' => !$user->is_banned]);
-            return redirect()->route('admin.dashboard');
+        if (Auth::user()->isAdmin()) {
+            $user = User::find($userId);
+
+            if ($user) {
+                $user->update(['is_banned' => !$user->is_banned]);
+                event(new BanUser($user->id));
+                return redirect()->route('admin.dashboard');
+            } else {
+                return redirect()->route('admin.dashboard');
+            }
+
         } else {
-            return redirect()->route('admin.dashboard');
+            return back()->withErrors('You don\'t have permission to access this');
         }
+
     }
 
 }

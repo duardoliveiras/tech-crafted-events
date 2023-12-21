@@ -1,7 +1,9 @@
 @extends('layouts.app')
 
+@section('title', $user->name)
 @section('content')
 @section('breadcrumbs')
+
 <li>
     &nbsp; / {{ $user->name }}
 </li>

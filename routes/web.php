@@ -54,10 +54,12 @@ Route::get('/auth/{provider}/callback', [ProviderController::class, 'callback'])
 
 //Notifications
 Route::get('/load-notifications', [NotificationsController::class, 'index'])->name('notifications.index');
-Route::get('/load-invites', [NotificationsController::class, 'getInvites']);
+Route::get('/load/{type}', [NotificationsController::class, 'getInvites']);
 Route::put('/update-read/{type}/{id}', [NotificationsController::class, 'updateRead'])->name('read-notification');
 Route::post('/update-notification', [NotificationsController::class, 'received'])->name('update-notification');
 Route::post('/invite/{user}/event/{event}', [NotificationsController::class, 'inviteUser']);
+Route::post('/notification/report-comment/{comment}/{type}/comment', [NotificationsController::class, 'notifyUsersComment']);
+Route::post('/notification/report-comment/{event}/{type}/event', [NotificationsController::class, 'notifyUsersEvent']);
 
 // Forget Password
 Route::post('/password/email', [ForgotPasswordController::class, 'forgetPasswordPost'])->name('password.email');
