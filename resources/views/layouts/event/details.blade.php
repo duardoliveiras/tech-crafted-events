@@ -53,7 +53,7 @@
             </div>
         </div>
         <div class="row mt-5">
-            <div class="col-8 box-left">
+            <div class="col-md-8 col-12 box-left">
                 <h1 class="event-name">{{ $event->name }}</h1>
                 <p class="event-description ms-2 mb-2">{{ $event->description }}</p>
                 <h3 class="mt-5">When?</h3>
@@ -69,10 +69,10 @@
                     </a>
                 </p>
             </div>
-            <div class="col-1" style="width: 30px;">
+            <div class="col-1 d-none d-sm-block" style="width: 30px;">
                 <div class="vl"></div>
             </div>
-            <div class="col-3 box-right ms-2 me-0 pe-0">
+            <div class="col-md-3 col-12 box-right ms-md-2 me-md-0 pe-md-0">
                 @if(auth()->check())
                     @php
                         $userTickets = $event->ticket->where('user_id', auth()->id());
@@ -91,7 +91,7 @@
                         $canBuyTicket = auth()->check() && $event->current_tickets_qty > 0 && $event->userCanBuyTicket() && !$isOwnerOrAdmin;
                         $isTicketPending = $event->ticket->where('user_id', auth()->id())->where('status', 'PENDING')->count() > 0;
                     @endphp
-                    <div class="box-actions ms-5 px-4 py-4 d-flex justify-content-center align-items-center flex-column w-100">
+                    <div class="box-actions ms-md-5 px-4 py-4 d-flex justify-content-center align-items-center flex-column w-100">
                         @if($canBuyTicket)
                             @if($isTicketPending)
                                 <span class="mb-2">You have a ticket pending for payment. If already paid, wait until we detect.</span>
@@ -139,7 +139,9 @@
                                 attendees</a>
 
                             <button class="btn btn-primary my-2 custom-button edit-event"
-                                data-toggle="modal" data-target="#inviteModal"><i class="fas fa-share-alt"></i> Invite User </button>
+                                    data-toggle="modal" data-target="#inviteModal"><i class="fas fa-share-alt"></i>
+                                Invite User
+                            </button>
 
                             <form action="{{ route('events.destroy', $event->id) }}" method="POST"
                                   class="d-inline w-100 m-0 p-0">
@@ -153,7 +155,7 @@
                         @endif
                     </div>
                 @else
-                    <div class="box-actions ms-5 px-4 py-4 d-flex justify-content-center align-items-center flex-column w-100">
+                    <div class="box-actions ms-md-5 px-4 py-4 d-flex justify-content-center align-items-center flex-column w-100">
                         <span class="mb-2">Tickets for € {{ number_format($event->current_price, 2) }}</span>
                         <a href="{{ route('login') }}"
                            class="btn btn-primary mt-3 custom-button">Login to purchase</a>
@@ -196,27 +198,30 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                        <div class="container">
-                            <div class="row">
-                                <div class="col">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" id="userSearch" name="userSearch" placeholder="Type email of a user...">
-                                        <div class="input-group-append">
-                                            <button type="submit" class="btn btn-primary" onclick="getUsers('{{ $event->id }}')">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                                                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
-                                                </svg>
-                                            </button>
-                                        </div>
+                    <div class="container">
+                        <div class="row">
+                            <div class="col">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="userSearch" name="userSearch"
+                                           placeholder="Type email of a user...">
+                                    <div class="input-group-append">
+                                        <button type="submit" class="btn btn-primary"
+                                                onclick="getUsers('{{ $event->id }}')">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                                 fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                                            </svg>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
-                                <div class="card mt-3" style="width: 100%; height: 100%;">
-                                    <ul class="list-group list-group-flush" id="listUser">
-                                        <!-- insert by js -->
-                                    </ul>
-                                </div>
                         </div>
+                        <div class="card mt-3" style="width: 100%; height: 100%;">
+                            <ul class="list-group list-group-flush" id="listUser">
+                                <!-- insert by js -->
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

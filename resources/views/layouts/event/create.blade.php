@@ -101,8 +101,8 @@
                                 @enderror
                             </div>
 
-                            <div class="form-row d-flex justify-content-around mb-3">
-                                <div class="form-group col-md-5 me-1">
+                            <div class="d-flex flex-column flex-md-row justify-content-around mb-3">
+                                <div class="form-group col-md-5 col-12 me-1">
                                     <label class="custom-label" for="start_date">Start Date</label>
                                     <span class="ms-1 custom-label" data-toggle="tooltip" data-placement="top"
                                           title="Set the date and time when your event will begin.">
