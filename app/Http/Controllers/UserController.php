@@ -2,20 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Facades\Image;
 
 class UserController extends Controller
 {
+
+    static $diskName = 'ImagesSaved';
 
     // JUST AUTHENTICATED USERS
     public function __construct()
     {
         $this->middleware('auth');
     }
+
     public function index()
     {
         return view('profile.index', [
@@ -84,17 +87,12 @@ class UserController extends Controller
         return redirect()->route('profile.show', $user->id)->with('success', 'Profile updated successfully!');
     }
 
-
-    private function uploadImage($imageFile)
+    private function uploadImage(UploadedFile $imageFile, $path = 'user'): string
     {
-        $image = Image::make($imageFile);
-
-        $imagePath = 'users/' . $imageFile->hashName();
-        Storage::disk('public')->put($imagePath, (string) $image->encode());
-
-        return $imagePath;
+        $fileName = $imageFile->hashName();
+        $imageFile->storeAs($path, $fileName, self::$diskName);
+        return $fileName;
     }
-
 
     /**
      * Remove the specified resource from storage.
@@ -110,8 +108,8 @@ class UserController extends Controller
         $authUser = Auth::user();
 
         if ($authUser->isAdmin() || $authUser->id == $user->id) {
-            if ($user->image_url && Storage::disk('public')->exists($user->image_url)) {
-                Storage::disk('public')->delete($user->image_url);
+            if ($user->image_url) {
+                Storage::disk(self::$diskName)->delete('user/' . $user->image_url);
             }
             $user->delete();
 
@@ -126,6 +124,5 @@ class UserController extends Controller
         }
     }
 
-    
-    
+
 }

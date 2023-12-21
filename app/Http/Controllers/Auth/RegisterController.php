@@ -2,19 +2,18 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Models\User;
-use App\Models\University;
-use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
+use App\Models\University;
+use App\Models\User;
+use App\Providers\RouteServiceProvider;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Intervention\Image\Facades\Image;
-use Illuminate\Auth\Events\Registered;
-use App\Providers\RouteServiceProvider;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Foundation\Auth\RegistersUsers;
 
 class RegisterController extends Controller
 {
@@ -37,6 +36,7 @@ class RegisterController extends Controller
      * @var string
      */
     protected $redirectTo = RouteServiceProvider::HOME;
+    static $diskName = 'ImagesSaved';
 
     /**
      * Create a new controller instance.
@@ -81,11 +81,7 @@ class RegisterController extends Controller
             $imageFile = $data['image_url'];
 
             if ($imageFile->isValid()) {
-                $image = Image::make($imageFile);
-
-                $imagePath = 'users/' . $imageFile->hashName();
-                Storage::disk('public')->put($imagePath, (string) $image->encode());
-
+                $imagePath = $this->uploadImage($imageFile);
                 $imageUrl = $imagePath;
             }
         }
@@ -126,7 +122,7 @@ class RegisterController extends Controller
     {
         $user =
             User::updateOrCreate([
-                'email' => $request['email']]
+                    'email' => $request['email']]
                 , [
                     'name' => $request['name'],
                     'email' => $request['email'],
@@ -143,10 +139,16 @@ class RegisterController extends Controller
 
     }
 
-
     public function showRegistrationForm()
     {
         $universities = University::all();
         return view('auth.register', compact('universities'));
+    }
+
+    private function uploadImage(UploadedFile $imageFile, $path = 'user'): string
+    {
+        $fileName = $imageFile->hashName();
+        $imageFile->storeAs($path, $fileName, self::$diskName);
+        return $fileName;
     }
 }
