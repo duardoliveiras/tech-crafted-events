@@ -8,10 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Country extends BaseModel
 {
     use HasFactory;
+
     protected $table = 'country';
-    protected $keyType = 'string';
     protected $fillable = ['name', 'initials'];
-    public $timestamps = false;
 
     public function states()
     {

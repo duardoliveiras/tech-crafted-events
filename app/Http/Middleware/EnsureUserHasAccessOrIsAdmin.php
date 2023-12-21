@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use App\Models\Event;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 class EnsureUserHasAccessOrIsAdmin
@@ -18,24 +19,29 @@ class EnsureUserHasAccessOrIsAdmin
     public function handle(Request $request, Closure $next): Response
     {
         $eventId = $request->route('event');
-        $event = Event::with('ticket')->findOrFail($eventId); // Certifique-se de que a relação tickets está correta.
+        $event = Event::with('ticket')->findOrFail($eventId); // Ensure that the tickets relation is correct.
+        $user = Auth::user();
+        // Check if the user is the owner of the event
 
-        // Verifica se o usuário é o dono do evento
-        if ($event->owner_id == Auth::id()) {
+
+        if ($event->owner->user_id == $user->id) {
             return $next($request);
         }
 
-        // Verifica se o usuário é um admin
-        if (Auth::user()->isAdmin()) {
+        // Check if the user is an admin
+        if ($user->isAdmin()) {
             return $next($request);
         }
 
-        // Verifica se o usuário tem um ticket
-        if ($event->ticket->contains('user_id', Auth::id())) {
-            return $next($request);
+        // Check if the user has a ticket with status "PAID" or "READ"
+        $userTickets = $event->ticket->where('user_id', Auth::id());
+        foreach($userTickets as $userTicket) {
+            if ($userTicket && in_array($userTicket->status, ['PAID', 'READ'])) {
+                return $next($request);
+            }
         }
 
-        // Se nenhuma das condições acima for verdadeira, redireciona para a home com erro
+        // If none of the above conditions are true, redirect to home with an error
         return redirect('home')->withErrors('You do not have access to this discussion.');
     }
 }

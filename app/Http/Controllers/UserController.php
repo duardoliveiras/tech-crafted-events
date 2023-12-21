@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Facades\Image;
 
 class UserController extends Controller
 {
@@ -19,22 +21,6 @@ class UserController extends Controller
         return view('profile.index', [
             'users' => User::all()
         ]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
     }
 
     /**
@@ -58,7 +44,7 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        // Verificar se é o próprio usuário ou se é administrador
+        // Verify if it's the user themselves or admin
         if (!(Auth::user()->id === $user->id || Auth::user()->isAdmin)) {
             return redirect()->route('home')->with('error', 'You do not have permission to edit this profile.');
         }
@@ -77,16 +63,42 @@ class UserController extends Controller
             return redirect()->route('home')->with('error', 'You do not have permission to update this profile.');
         }
 
-        $validatedData = $request->validate([
-            'name' => 'required|max:255',
-            'birthdate' => 'required|date',
-            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-            'phone_number' => 'required|max:20'
-        ]);
+        if ($user->provider == null) {
+            $validatedData = $request->validate([
+                'name' => 'required|max:255',
+                'birthdate' => 'required|date',
+                'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+                'phone_number' => 'required|max:20'
+            ]);
+            if ($request->hasFile('image_url')) {
+                // Check and delete old image
+                if ($user->image_url && Storage::disk('public')->exists($user->image_url)) {
+                    Storage::disk('public')->delete($user->image_url);
+                }
+            }
 
-        $user->update($validatedData);
+            $user->update(array_merge($validatedData, ['image_url' => $this->uploadImage($request->file('image_url'))]));
+        } else {
+            $validatedData = $request->validate([
+                'birthdate' => 'required|date',
+                'phone_number' => 'required|max:20'
+            ]);
+            $user->update(['birthdate' => $request->birthdate,
+                'phone_number' => $request->phone_number]);
+        }
 
         return redirect()->route('profile.show', $user->id)->with('success', 'Profile updated successfully!');
+    }
+
+
+    private function uploadImage($imageFile)
+    {
+        $image = Image::make($imageFile);
+
+        $imagePath = 'users/' . $imageFile->hashName();
+        Storage::disk('public')->put($imagePath, (string) $image->encode());
+
+        return $imagePath;
     }
 
 
@@ -104,9 +116,10 @@ class UserController extends Controller
         $authUser = Auth::user();
 
         if ($authUser->isAdmin() || $authUser->id == $user->id) {
-
-            $user->is_deleted = true;
-            $user->save();
+            if ($user->image_url && Storage::disk('public')->exists($user->image_url)) {
+                Storage::disk('public')->delete($user->image_url);
+            }
+            $user->delete();
 
             if (!$authUser->isAdmin() || $authUser->id == $user->id) {
                 Auth::logout();
@@ -119,4 +132,6 @@ class UserController extends Controller
         }
     }
 
+    
+    
 }

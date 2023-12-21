@@ -8,9 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Admin extends BaseModel
 {
     use HasFactory;
+    public $timestamps = false;
 
     protected $table = 'admin';
-    protected $keyType = 'string';
     protected $fillable = ['user_id'];
 
     public function user()

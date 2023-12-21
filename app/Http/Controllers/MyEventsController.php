@@ -19,10 +19,10 @@ class MyEventsController extends Controller
         // Buscando os EventOrganizers e seus eventos
         $eventOrganizers = $user->eventOrganizer()->with('events')->get();
         $organizedEvents = $eventOrganizers->flatMap(function ($organizer) {
-            return $organizer->events;
+            return $organizer->events()->whereIn('status', ['UPCOMING', 'ONGOING', 'FINISHED'])->get();
         });
 
-        $tickets = $user->ticket()->with('event')->get();
+        $tickets = $user->ticket()->with('event')->where('status', 'PAID')->get();
         $eventsWithTickets = $tickets->map(function ($ticket) {
             return $ticket->event;
         })->unique('id');

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Comment;
 use App\Models\Event;
 
 class DiscussionController extends Controller
@@ -15,74 +15,34 @@ class DiscussionController extends Controller
         $this->middleware('auth');
         $this->middleware('acess.ticket')->only('show');
     }
-    public function index()
-    {
-        //
-    }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
     public function show($eventId)
     {
-        $event = Event::with('discussion', 'ticket')->findOrFail($eventId);
-        $user = auth()->user();
-        $discussion = $event->discussion;
-        if (!$event->discussion) {
-            return redirect()->route('home');
+        try {
+            error_log('opa');
+
+            $event = Event::findOrFail($eventId);
+            $user = auth()->user();
+
+            if (!($event->status === 'UPCOMING' || $event->status === 'ONGOING')) {
+                abort(404);
+            }
+
+            $userHasTicket = $event->ticket()->whereIn('status', ['PAID', 'READ'])->where('user_id', $user->id)->exists();
+            $isOrganizer = $event->owner->user_id == $user->id;
+
+            if (!($userHasTicket || $isOrganizer || $user->isAdmin())) {
+                abort(403, 'You do not have access to this discussion.');
+            }
+
+            $discussion = $event->discussion;
+            $comments = Comment::getCommentsForDiscussion($discussion->id) ?? collect();
+            $userVotes = $user->votesForDiscussion($discussion);
+
+            return view('layouts.event.discussion.show', compact('discussion', 'comments', 'event', 'userVotes'));
+
+        } catch (\Exception $e) {
+            return back()->withError('Error accessing discussion: ' . $e->getMessage());
         }
-
-        $userHasTicket = $event->ticket->contains('user_id', $user->id);
-        $isOrganizer = $event->owner->id == $user->id;
-
-        if (!($userHasTicket || $isOrganizer || $user->isAdmin())) {
-            abort(403, 'You do not have access to this discussion.');
-        }
-
-        $comments = $discussion->comments ?? collect();
-        $userVotes = $user->votesForDiscussion($discussion);
-
-        return view('layouts.event.discussion.show', compact('discussion', 'comments', 'event', 'userVotes'));
-    }
-
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }

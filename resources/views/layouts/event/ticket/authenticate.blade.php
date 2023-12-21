@@ -1,6 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
+    @section('breadcrumbs')
+        <li> 
+            &nbsp; / <a href="{{ route('events.show', $event->id) }}">{{$event->name}}</a>
+        </li>
+        <li> &nbsp; / Authenticate </li>
+    @endsection
+
     <div class="container mt-5">
         <div class="card">
             <div class="card-header">
@@ -32,14 +39,14 @@
                             @csrf
                             <div class="mb-3">
                                 <label for="ticket_id" class="form-label">Ticket ID</label>
-                                <input type="text" class="form-control" id="ticket_id" name="ticket_id" readonly>
+                                <input type="text" class="form-control" id="ticket_id" name="ticket_id">
                             </div>
                             <div class="mb-3">
                                 <label for="user_id" class="form-label">User ID</label>
-                                <input type="text" class="form-control" id="user_id" name="user_id" readonly>
+                                <input type="text" class="form-control" id="user_id" name="user_id">
                             </div>
                             <div class="mb-3">
-                                <button type="submit" class="btn btn-primary" id="submitForm">Enviar</button>
+                                <button type="submit" class="btn btn-primary" id="submitForm">Send</button>
                             </div>
                         </form>
                     </div>
@@ -50,27 +57,18 @@
 
     <!-- JavaScript para ler o QR Code -->
     <script src="{{ asset('js/html5-qrcode.min.js') }}"></script>
-    <script type="text/javascript">
-        function onScanSuccess(qrCodeMessage) {
-            document.getElementById('result').innerHTML = qrCodeMessage;
+    <script type="text/javascript" src="{{ URL::asset ('js/event/ticket-auth.js') }}"></script>
 
-            var parts = qrCodeMessage.split(','); // Separar por vírgulas
-
-            // Preencher os campos do formulário
-            var form = document.getElementById('qrForm');
-            form.action = '/events/' + parts[0] + '/ticket/authenticate'; // Event ID
-            document.getElementById('ticket_id').value = parts[1]; // Ticket ID
-            document.getElementById('user_id').value = parts[2]; // User ID
-            document.getElementById('submitForm').click();
+    <style>
+        #reader__dashboard_section_csr > div > button {
+            color: white !important;
+            border-radius:6px !important;
+            padding: 10px 20px !important;
+            background: linear-gradient(to left, #7848F4, #5827D8);
+            font-size: 1.3rem !important;
+            font-weight: bolder !important;
+            border: none !important;
         }
+    </style>
 
-        function onScanError(errorMessage) {
-            // Tratar erro de leitura do QR Code
-            console.error(errorMessage);
-        }
-
-        var html5QrcodeScanner = new Html5QrcodeScanner(
-            "reader", { fps: 10, qrbox: 250 });
-        html5QrcodeScanner.render(onScanSuccess, onScanError);
-    </script>
 @endsection

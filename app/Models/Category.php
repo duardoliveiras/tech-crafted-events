@@ -10,8 +10,6 @@ class Category extends BaseModel
     use HasFactory;
 
     protected $table = 'category';
-    protected $keyType = 'string';
-
     protected $fillable = ['name'];
 
     public function events()
