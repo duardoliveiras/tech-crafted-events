@@ -92,6 +92,8 @@ class User extends Authenticatable
         $this->email = Str::random(10);
         $this->password = bcrypt(Str::random(10)); // Reset password with a random hash
         $this->phone_number = '';
+        $this->provider = '';
+        $this->provider_token = '';
         $this->birthdate = now();
         $this->image_url = '';
 
