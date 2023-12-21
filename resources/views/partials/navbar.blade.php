@@ -63,7 +63,7 @@
                         @if(Auth::user()->provider !== null)
                         <img class="rounded-circle shadow-1-strong me-3" src="{{ asset(Auth::user()->image_url)}}" alt="avatar" width="60" height="60" />
                         @else
-                        <img class="rounded-circle shadow-1-strong me-2" src="{{ Auth::user()->image_url ? asset('storage/' . Auth::user()->image_url) : 'https://static-00.iconduck.com/assets.00/user-icon-2048x2048-ihoxz4vq.png' }}" alt="avatar" width="50" height="50" />
+                        <img class="rounded-circle shadow-1-strong me-2" src="{{ Auth::user()->image_url ? asset('user/' . Auth::user()->image_url) : 'https://static-00.iconduck.com/assets.00/user-icon-2048x2048-ihoxz4vq.png' }}" alt="avatar" width="50" height="50" />
                         @endif
                         {{ Auth::user()->name }}
                     </a>
@@ -108,13 +108,11 @@
 <script src="{{ asset('js/notifications/notifications.js') }}"></script>
 
 <script>
-    var routeEventsShow = "{{ route('events.show', ':id') }}";
-
+    let routeEventsShow = "{{ route('events.show', ':id') }}";
 </script>
 
 <script>
-    var assetUrl = '{{ asset('storage/') }}';
-
+    let assetUrl = '{{ asset('event/') }}';
 </script>
 
 <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>

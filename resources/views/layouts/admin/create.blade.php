@@ -67,12 +67,12 @@
                             </div>
 
                             <div class="form-group mb-3">
-                                <label for="phone" class="form-label">Phone:</label>
+                                <label for="phone_number" class="form-label">Phone:</label>
                                 <span class="ms-1 custom-label" data-toggle="tooltip" data-placement="top"
                                       title="Enter the phone number of the admin account that you want to create ">
                                     <img src="{{ asset('assets/img/info.svg') }}" alt="Info">
                                 </span>
-                                <input type="text" class="form-control" id="phone" name="phone" required>
+                                <input type="text" class="form-control" id="phone_number" name="phone_number" required>
                             </div>
 
                             <div class="form-group mb-3">
