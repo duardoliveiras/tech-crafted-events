@@ -130,13 +130,12 @@ class StripeController extends Controller
                 $eventPayments[] = $this->formatPayment($payment, $event);
             }
         }
-
         return $eventPayments;
     }
 
     public function refundPayment($paymentIntent): void
     {
-        $refund = $this->stripe->refunds->create(['payment_intent' => $paymentIntent]);
+        //$refund = $this->stripe->refunds->create(['payment_intent' => $paymentIntent]);
     }
 
     // fazer reembolso de vários pagamentos, assim que um evento for cancelado -> listar todos pagamentos de um EVENT_ID e então, para cada um, fazer o reembolso

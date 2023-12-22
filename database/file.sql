@@ -1,6 +1,6 @@
-CREATE SCHEMA IF NOT EXISTS tech_crafted;
+CREATE SCHEMA IF NOT EXISTS lbaw2316;
 SET
-    search_path TO tech_crafted;
+    search_path TO lbaw2316;
 
 DROP TABLE IF EXISTS Vote CASCADE;
 DROP TABLE IF EXISTS Comment CASCADE;
@@ -288,11 +288,11 @@ begin
 
     if v_update = true then
 
-        insert into tech_crafted.eventnotifications(id, event_id, notification_text)
+        insert into eventnotifications(id, event_id, notification_text)
         values (DEFAULT, new.id, v_notification_text)
         returning id into id_notification;
 
-        insert into tech_crafted.userseventnotifications(user_id, notification_id, read)
+        insert into userseventnotifications(user_id, notification_id, read)
         select user_id, id_notification, false
         from ticket
         where event_id = new.id

@@ -40,7 +40,7 @@ class TicketController extends Controller
             return back()->withError('Sorry, there are no more tickets available for this event.');
         }
 
-        if (Ticket::where('user_id', Auth::id())->where('event_id', $eventId)->whereIn('status', ['PAID','READ'])->exists()) {
+        if (Ticket::where('user_id', Auth::id())->where('event_id', $eventId)->whereIn('status', ['PAID', 'READ'])->exists()) {
             return back()->withError('You already have a ticket for this event.');
         }
 
@@ -146,14 +146,14 @@ class TicketController extends Controller
         // For example, generating a QR code for the ticket
         $qrContent = "{$eventId},{$ticket->id},{$ticket->user_id}";
 
-        $qrImagePath = 'storage/temp_qrcodes/ticket-' . $ticket->id . '.svg';
+        $qrImagePath = 'temp_qrcodes/ticket-' . $ticket->id . '.svg';
         QrCode::format('svg')->size(200)->generate($qrContent, public_path($qrImagePath));
 
         // Prepare the data to be passed to the view
         $data = [
             'ticket' => $ticket,
             'event' => $event,
-            'qrCodePath' => 'storage/temp_qrcodes/ticket-' . $ticket->id . '.svg'
+            'qrCodePath' => 'temp_qrcodes/ticket-' . $ticket->id . '.svg'
         ];
         // Load the view and pass in the ticket data
         $pdf = PDF::loadView('layouts.event.ticket.pdf', $data);
