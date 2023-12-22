@@ -339,10 +339,10 @@ VALUES ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'Los Angeles', '77777777-7777-77
 
 INSERT INTO University (id, name, address, city_id, image_url)
 VALUES
-    ('22222222-2222-2222-2222-222222222222', 'University of California, Los Angeles', '405 Hilgard Ave', 'cccccccc-cccc-cccc-cccc-cccccccccccc', '/universities/university1.jpeg'),
-    ('33333333-3333-3333-3333-333333333333', 'Columbia University', '116th St & Broadway', 'dddddddd-dddd-dddd-dddd-dddddddddddd', '/universities/university2.jpeg'),
-    ('44444444-4444-4444-4444-444444444444', 'Universidade de São Paulo', 'R. da Reitoria, R. Cidade Universitária, 374', 'ffffffff-ffff-ffff-ffff-ffffffffffff', '/universities/university3.jpeg'),
-    ('55555555-5555-5555-5555-555555555555', 'Universidade do Porto', 'Praça de Gomes Teixeira', '11111111-1111-1111-1111-111111111111', '/universities/university4.jpeg');
+    ('22222222-2222-2222-2222-222222222222', 'University of California, Los Angeles', '405 Hilgard Ave', 'cccccccc-cccc-cccc-cccc-cccccccccccc', 'university1.jpeg'),
+    ('33333333-3333-3333-3333-333333333333', 'Columbia University', '116th St & Broadway', 'dddddddd-dddd-dddd-dddd-dddddddddddd', 'university2.jpeg'),
+    ('44444444-4444-4444-4444-444444444444', 'Universidade de São Paulo', 'R. da Reitoria, R. Cidade Universitária, 374', 'ffffffff-ffff-ffff-ffff-ffffffffffff', 'university3.jpeg'),
+    ('55555555-5555-5555-5555-555555555555', 'Universidade do Porto', 'Praça de Gomes Teixeira', '11111111-1111-1111-1111-111111111111', 'university4.jpeg');
 
 
 INSERT INTO Users (id, name, phone_number, email, password, birthDate, university_id, is_banned, is_deleted, image_url)
