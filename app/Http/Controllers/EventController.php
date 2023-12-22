@@ -421,7 +421,7 @@ class EventController extends Controller
     {
         $pattern = '/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i';
 
-        return (bool)preg_match($pattern, $uuid);
+        return (bool) preg_match($pattern, $uuid);
     }
 
     private function findEventById($id): Event
@@ -441,10 +441,21 @@ class EventController extends Controller
 
     private function deleteEventWithDiscussion($event): void
     {
-        DB::transaction(function () use ($event) {
+        try {
+            // Try to refund all users
             $this->refundTickets($event);
-            $event->status = 'DELETED';
-            $event->save();
+        } catch (\Exception $e) {
+            \Log::error('Error refundTickets: ' . $e->getMessage());
+        }
+
+        // Transação separada para a atualização do evento
+        DB::transaction(function () use ($event) {
+            try {
+                $event->status = 'DELETED';
+                $event->save();
+            } catch (\Exception $e) {
+                \Log::error('Error event update: ' . $e->getMessage());
+            }
         });
     }
 
@@ -458,7 +469,7 @@ class EventController extends Controller
             $event = $this->findEventById($eventId);
             $ticket = $this->findTicketById($ticketId);
 
-            if ((double)$ticket->price_paid != 0) {
+            if ((double) $ticket->price_paid != 0) {
                 $this->stripeController->refundPaymentFromUser($event, Auth::id());
             }
 

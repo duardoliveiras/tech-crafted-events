@@ -66,7 +66,7 @@
 
 
                     <div class="form-row mb-3">
-                        <label class="custom-label w-100" for="phone_number">{{ __('phone_number') }}</label>
+                        <label class="custom-label w-100" for="phone_number">{{ __('Phone Number:') }}</label>
                         <input id="phone_number" type="text" class="form-control custom-input @error('phone_number') is-invalid @enderror" name="phone_number" value="{{ old('phone_number') }}" oninput="validatephone_numberInput(this)" required>
                         <span class="invalid-feedback" role="alert" id="error-message-phone_number"></span>
                     </div>
