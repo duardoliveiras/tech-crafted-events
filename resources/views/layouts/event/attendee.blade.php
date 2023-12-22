@@ -21,7 +21,7 @@
                             </thead>
                             <tbody>
                             @foreach ($event->ticket as $ticket)
-                                @if(in_array($ticket->user->status, ['PAID', 'READ']))
+                                @if($ticket->status == 'PAID' || $ticket->status == 'READ')
                                     <tr>
                                         <td>{{ $ticket->user->name }}</td>
                                         <td>{{ $ticket->user->email }}</td>
