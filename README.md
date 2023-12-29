@@ -141,3 +141,9 @@ sudo docker run --name tech-crafted-service -d -p 8000:80 techcrafted:latest
 ```
 
 This will start a local `nginx` service on port 8000 for Tech Crafted.
+
+## Team
+
+* Member 1 [Bernardo Brito](https://github.com/brito-bernardo)
+* Member 2 [Eduardo Oliveira](https://github.com/duardoliveiras)
+* Member 3 [Vicente Damasceno](https://github.com/Vicente-MD)
