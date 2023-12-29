@@ -2,6 +2,8 @@
 
 Tech Crafted is an open-source university event management website crafted by three friends passionate about development. Built with PHP, Laravel, JS, HTML, CSS, Bootstrap, Postgresql, and Docker, our platform aims to enhance development skills while providing an intuitive and scalable solution for event organizers.
 
+[![Video](https://raw.githubusercontent.com/duardoliveiras/tech-crafted-events/main/uploads/aboutus.png)](https://youtu.be/ucvq9tmYUHU)
+
 ## Index
 - [Installation](#installing-the-software-dependencies)
 - [Starting](#starting-the-service)
